@@ -1,0 +1,11 @@
+.build/
+build/
+install/
+log/
+__pycache__/
+*.pyc
+.venv/
+.env
+*.bag
+*.db3
+*.mcap

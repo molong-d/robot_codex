@@ -1,0 +1,14 @@
+# v0 accepts only the installed, reviewed pick_place task template.
+string task_name
+string object_id
+string target_id
+uint32 timeout_ms
+---
+bool success
+string status
+string error_code
+string message
+---
+string active_skill
+string status
+string message
