@@ -3,6 +3,7 @@ robot_runtime:
     motion_component: mock_arm  # or slow_mock_arm; skills and tree stay unchanged
     mock_action_ticks: 3
     mock_fail_pick: false
+    mock_motion_permitted: true  # mock stand-in for E-stop / guarded-area / controller-mode admission
     tick_period_ms: 20
     skill_timeout_ms: 2000
     stop_timeout_ms: 2000
