@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root BTCPP_format="4" main_tree_to_execute="PickPlace">
+  <BehaviorTree ID="PickPlace">
+    <Sequence>
+      <Skill skill="locate_object" implementation="standard" object="{object}"/>
+      <Skill skill="pick_object" implementation="standard" object="{object}"/>
+      <Skill skill="place_object" implementation="standard" object="{object}" target="{target}"/>
+    </Sequence>
+  </BehaviorTree>
+</root>

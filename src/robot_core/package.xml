@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>robot_core</name><version>0.1.0</version>
+  <description>Robot skill contracts, component binding and execution lifecycle.</description>
+  <maintainer email="44089363+molong-d@users.noreply.github.com">molong-d</maintainer>
+  <license>LicenseRef-Proprietary</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>
