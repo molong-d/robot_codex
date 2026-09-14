@@ -20,6 +20,18 @@ class Manipulator : public Component {
   virtual std::string location(const std::string&) const = 0;
 };
 
+class MockExecutionGate final : public ExecutionGate {
+ public:
+  explicit MockExecutionGate(bool permitted = true) : permitted_(permitted) {}
+  std::string resource_id() const override { return "demo_safety_system"; }
+  Admission admit(const std::string& skill, const Arguments&, Time) const override {
+    if (permitted_) return {true, "", "mock execution permitted"};
+    return {false, "SAFETY_INTERLOCK", "mock execution gate is not armed for " + skill};
+  }
+ private:
+  bool permitted_;
+};
+
 class MockLocator final : public ObjectLocator {
  public:
   std::string resource_id() const override { return "demo_camera"; }
@@ -151,10 +163,10 @@ inline void register_demo_skills(Skills& skills) {
       "requested object is held",
       "exclusive arm control", "object at target and gripper empty"});
   skills.implement("locate_object", "standard", [](Context& c) { return std::make_unique<Locate>(c); },
-      {{{"perception", "object_locator", 1}}, {}});
+      {{{"perception", "object_locator", 1}}, {}, ""});
   skills.implement("pick_object", "standard", [](Context& c) { return std::make_unique<Manipulate>(c, true); },
-      {{{"motion", "manipulator", 1}}, {"motion"}});
+      {{{"motion", "manipulator", 1}, {"safety", "execution_gate", 1}}, {"motion"}, "safety"});
   skills.implement("place_object", "standard", [](Context& c) { return std::make_unique<Manipulate>(c, false); },
-      {{{"motion", "manipulator", 1}}, {"motion"}});
+      {{{"motion", "manipulator", 1}, {"safety", "execution_gate", 1}}, {"motion"}, "safety"});
 }
 }  // namespace robot_core
