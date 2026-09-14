@@ -14,11 +14,12 @@ struct Fixture {
   Skills skills;
   Resources resources;
   Time now{Clock::now()};
-  explicit Fixture(int ticks = 3, bool fail = false)
-      : bindings(components, {{"perception", "camera"}, {"motion", "arm"}}),
+  explicit Fixture(int ticks = 3, bool fail = false, bool permitted = true)
+      : bindings(components, {{"perception", "camera"}, {"motion", "arm"}, {"safety", "gate"}}),
         context{bindings, world} {
     components.add("camera", std::make_shared<MockLocator>());
     components.add("arm", std::make_shared<MockManipulator>(ticks, fail));
+    components.add("gate", std::make_shared<MockExecutionGate>(permitted));
     register_demo_skills(skills);
   }
   Request request(std::string id, std::string skill, Arguments args = {{"object", "workpiece"}}) {
@@ -81,6 +82,13 @@ int main() {
       f.world.observations["workpiece"].stamp = f.now + 1s;
       check(f.run(f.request("future", "pick_object")).code == "STALE_OBSERVATION", "future");
       check(f.resources.empty(), "precondition failure releases lease");
+    });
+    test("execution gate blocks actuation before resource claim or dispatch", [] {
+      Fixture f(3, false, false); f.locate();
+      const auto result = f.run(f.request("blocked", "pick_object"));
+      check(result.status == Status::failed && result.code == "SAFETY_INTERLOCK", "gate must reject");
+      check(f.resources.empty(), "denied request must not lease arm");
+      check(f.bindings.get<Manipulator>("motion")->holding().empty(), "denied request must not move arm");
     });
     test("invalid arguments fail before dispatch", [] {
       Fixture f;
@@ -146,7 +154,7 @@ int main() {
     test("exceptions latch unknown state and retain control ownership", [] {
       Fixture f;
       f.skills.implement("pick_object", "broken", [](Context&) { return std::make_unique<ProbeSkill>(true); },
-                        {{{"motion", "manipulator", 1}}, {"motion"}});
+                        {{{"motion", "manipulator", 1}}, {"motion"}, ""});
       auto r = f.request("broken", "pick_object"); r.implementation = "broken";
       Session s(f.skills, f.resources, f.context, r); s.start(f.now);
       check(s.tick(f.now).status == Status::faulted, "fault latched");

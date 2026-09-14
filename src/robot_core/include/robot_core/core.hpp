@@ -50,6 +50,20 @@ class Component {
   virtual std::string resource_id() const = 0;
 };
 
+struct Admission {
+  bool allowed{false};
+  std::string code;
+  std::string message;
+};
+
+// A hardware-facing implementation may bind this to an E-stop, guarded-area,
+// controller-mode, or operator-permission check.
+class ExecutionGate : public Component {
+ public:
+  std::string interface_id() const final { return "execution_gate"; }
+  virtual Admission admit(const std::string& skill, const Arguments& arguments, Time now) const = 0;
+};
+
 class Components {
  public:
   void add(const std::string& id, std::shared_ptr<Component> component) {
@@ -109,6 +123,8 @@ struct SkillDefinition {
 struct Dependencies {
   std::vector<Requirement> components;
   std::vector<std::string> exclusive_roles;
+  // Empty for read-only skills. Actuating skills must name an ExecutionGate role.
+  std::string execution_gate_role;
 };
 struct Context {
   Bindings& bindings;
@@ -221,6 +237,14 @@ class Session {
         if (component->interface_id() != requirement.interface_id ||
             component->interface_version() != requirement.version)
           throw std::invalid_argument("incompatible component: " + requirement.role);
+      }
+      if (!dependencies.execution_gate_role.empty()) {
+        const auto gate = context_.bindings.get<ExecutionGate>(dependencies.execution_gate_role);
+        const auto admission = gate->admit(request_.skill, request_.arguments, now);
+        if (!admission.allowed)
+          return result_ = {Status::failed,
+                            admission.code.empty() ? "EXECUTION_DENIED" : admission.code,
+                            admission.message.empty() ? "execution gate denied request" : admission.message};
       }
       std::vector<std::string> claimed;
       for (const auto& role : dependencies.exclusive_roles)
