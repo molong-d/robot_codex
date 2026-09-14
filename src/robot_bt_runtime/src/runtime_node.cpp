@@ -27,10 +27,11 @@ struct Engine {
   std::chrono::milliseconds skill_timeout{2000};
   bool fault_latched{false};
 
-  Engine(std::string motion, int ticks, bool fail)
-      : bindings(components, {{"perception", "mock_camera"}, {"motion", std::move(motion)}}),
+  Engine(std::string motion, int ticks, bool fail, bool permitted)
+      : bindings(components, {{"perception", "mock_camera"}, {"motion", std::move(motion)}, {"safety", "execution_gate"}}),
         context{bindings, world} {
     components.add("mock_camera", std::make_shared<rc::MockLocator>());
+    components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
     components.add("mock_arm", std::make_shared<rc::MockManipulator>(ticks, fail));
     components.add("slow_mock_arm", std::make_shared<rc::MockManipulator>(ticks * 2, fail));
     bindings.get<rc::Manipulator>("motion"); // fail startup on invalid configuration
@@ -95,13 +96,14 @@ class RuntimeNode final : public rclcpp::Node {
     const auto motion = declare_parameter<std::string>("motion_component", "mock_arm");
     const auto ticks = declare_parameter<int>("mock_action_ticks", 3);
     const auto fail = declare_parameter<bool>("mock_fail_pick", false);
+    const auto motion_permitted = declare_parameter<bool>("mock_motion_permitted", true);
     const auto period = declare_parameter<int>("tick_period_ms", 20);
     const auto skill_timeout = declare_parameter<int>("skill_timeout_ms", 2000);
     const auto stop_timeout = declare_parameter<int>("stop_timeout_ms", 2000);
     if (ticks <= 0 || ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
-    engine_ = std::make_unique<Engine>(motion, ticks, fail);
+    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
       return std::make_unique<SkillNode>(name, config, *engine_);
@@ -122,7 +124,8 @@ class RuntimeNode final : public rclcpp::Node {
         },
         [this](const std::shared_ptr<GoalHandle> handle) { accept(handle); });
     timer_ = create_wall_timer(std::chrono::milliseconds(period), [this] { tick(); });
-    RCLCPP_INFO(get_logger(), "Mock-only runtime ready: /execute_task; motion=%s", motion.c_str());
+    RCLCPP_INFO(get_logger(), "Mock-only runtime ready: /execute_task; motion=%s; permitted=%s",
+                motion.c_str(), motion_permitted ? "true" : "false");
   }
   void request_shutdown() {
     if (tree_) tree_->haltTree();
