@@ -72,7 +72,13 @@ ros2 launch robot_bringup demo.launch.py motion_component:=slow_mock_arm
 ros2 launch robot_bringup demo.launch.py mock_fail_pick:=true
 ```
 
-预期 `EXECUTION_FAILED`，不会执行后续放置技能。参数 `mock_action_ticks` 可增大动作持续时间，方便观察取消和超时；这只是计次 mock，不是物理仿真。
+预期 `EXECUTION_FAILED`，不会执行后续放置技能。模拟执行许可拒绝（真实接入时应由急停、围栏、控制器模式等系统提供）：
+
+```bash
+ros2 launch robot_bringup demo.launch.py mock_motion_permitted:=false
+```
+
+此时抓取和放置会返回 `SAFETY_INTERLOCK`，不会取得机械臂资源或下发动作。参数 `mock_action_ticks` 可增大动作持续时间，方便观察取消和超时；这只是计次 mock，不是物理仿真。
 
 ## 完整验证
 
