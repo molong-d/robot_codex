@@ -24,7 +24,8 @@ def generate_launch_description():
                 "motion_component": LaunchConfiguration("motion_component"),
                 "mock_action_ticks": ParameterValue(LaunchConfiguration("mock_action_ticks"), value_type=int),
                 "mock_fail_pick": ParameterValue(LaunchConfiguration("mock_fail_pick"), value_type=bool),
-                "mock_motion_permitted": ParameterValue(LaunchConfiguration("mock_motion_permitted"), value_type=bool),
+                "mock_motion_permitted": ParameterValue(
+                    LaunchConfiguration("mock_motion_permitted"), value_type=bool),
             }],
         ),
     ])

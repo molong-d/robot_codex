@@ -97,14 +97,26 @@ class Bindings {
   std::map<std::string, std::string> roles_;
 };
 
+struct Pose {
+  double x{0.0};
+  double y{0.0};
+  double z{0.0};
+  double qx{0.0};
+  double qy{0.0};
+  double qz{0.0};
+  double qw{1.0};
+};
 struct Observation {
   std::string object_id;
   std::string frame_id;
+  Pose pose;
   Time stamp;
   bool valid{false};
 };
 struct WorldState {
   std::map<std::string, Observation> observations;
+  std::string attached_object;
+  std::map<std::string, std::string> known_locations;
 };
 struct Requirement {
   std::string role;
