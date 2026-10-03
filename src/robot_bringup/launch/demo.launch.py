@@ -11,6 +11,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     config = Path(get_package_share_directory("robot_bringup")) / "config" / "demo.yaml"
     return LaunchDescription([
+        DeclareLaunchArgument("config_file", default_value=str(config)),
         DeclareLaunchArgument("motion_component", default_value="mock_arm"),
         DeclareLaunchArgument("mock_action_ticks", default_value="3"),
         DeclareLaunchArgument("mock_fail_pick", default_value="false"),
@@ -20,7 +21,7 @@ def generate_launch_description():
             executable="robot_runtime",
             name="robot_runtime",
             output="screen",
-            parameters=[str(config), {
+            parameters=[LaunchConfiguration("config_file"), {
                 "motion_component": LaunchConfiguration("motion_component"),
                 "mock_action_ticks": ParameterValue(LaunchConfiguration("mock_action_ticks"), value_type=int),
                 "mock_fail_pick": ParameterValue(LaunchConfiguration("mock_fail_pick"), value_type=bool),

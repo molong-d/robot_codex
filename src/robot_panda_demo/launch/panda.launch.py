@@ -1,6 +1,7 @@
 from pathlib import Path
+import os
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory, get_package_prefix
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
@@ -20,6 +21,13 @@ def generate_launch_description():
         .to_moveit_configs()
     )
     # Hardware selection is fixed to GenericSystem; no real driver launch argument.
+    # Linux demo workaround: action-client weak control blocks can outlive the
+    # plugin loader during MoveIt teardown. Keep their defining library mapped
+    # until process exit, instead of unloading it before CallbackGroup cleanup.
+    controller_library = Path(get_package_prefix("moveit_simple_controller_manager")) / "lib/libmoveit_simple_controller_manager.so"
+    if not controller_library.is_file():
+        raise RuntimeError(f"MoveIt controller plugin library missing: {controller_library}")
+    preload = " ".join(filter(None, [str(controller_library), os.environ.get("LD_PRELOAD", "")]))
     return LaunchDescription([
         DeclareLaunchArgument("mock_motion_permitted", default_value="true"),
         Node(package="tf2_ros", executable="static_transform_publisher",
@@ -27,7 +35,7 @@ def generate_launch_description():
         Node(package="robot_state_publisher", executable="robot_state_publisher",
              parameters=[config.robot_description], output="screen"),
         Node(package="moveit_ros_move_group", executable="move_group",
-             parameters=[config.to_dict()], output="screen"),
+             parameters=[config.to_dict()], additional_env={"LD_PRELOAD": preload}, output="screen"),
         Node(package="controller_manager", executable="ros2_control_node",
              parameters=[config.robot_description, str(share / "config" / "controllers.yaml")],
              remappings=[("/controller_manager/robot_description", "/robot_description")], output="screen"),

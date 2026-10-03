@@ -1,4 +1,5 @@
 #include "robot_core/demo.hpp"
+#include "catalog_support.hpp"
 #include "robot_ros_adapters/adapters.hpp"
 #include "robot_interfaces/action/execute_task.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -29,20 +30,19 @@ struct Engine {
   bool fault_latched{false};
 
   Engine(std::string motion, int ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
-         bool ros_backend, robot_ros_adapters::Config config)
+         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene)
       : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
                               {"gripper", "mock_gripper"}, {"safety", "execution_gate"}}),
         context{bindings, world} {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
+    components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(scene));
     rc::ManipulationPolicy policy;
+    policy.frame_id = scene.frame();
     if (ros_backend) {
-      policy.frame_id = config.frame;
-      components.add("mock_camera", std::make_shared<robot_ros_adapters::DemoTargets>(config.frame));
       components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
       components.add("mock_gripper", std::make_shared<robot_ros_adapters::ParallelGripper>(node, config));
     } else {
-      components.add("mock_camera", std::make_shared<rc::MockLocator>());
       components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks));
       components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2));
       components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp));
@@ -83,8 +83,8 @@ class SkillNode final : public BT::StatefulActionNode {
   BT::NodeStatus onStart() override {
     const auto skill = required("skill");
     rc::Arguments args;
-    for (const auto& input : engine_.skills.definition(skill).required_inputs)
-      args[input] = required(input);
+    for (const auto& input : engine_.skills.definition(skill).inputs)
+      args[input.name] = required(input.name);
     session_ = engine_.start(skill, required("implementation"), std::move(args));
     return btStatus();
   }
@@ -117,7 +117,8 @@ class RuntimeNode final : public rclcpp::Node {
     robot_ros_adapters::Config config;
     config.move_action = declare_parameter<std::string>("move_action", config.move_action);
     config.gripper_action = declare_parameter<std::string>("gripper_action", config.gripper_action);
-    config.frame = declare_parameter<std::string>("base_frame", config.frame);
+    config.frame = catalog_support::startup_parameter<std::string>(this, "base_frame",
+        backend == "panda_ros" ? config.frame : "base_link");
     config.tip = declare_parameter<std::string>("end_effector_link", config.tip);
     config.group = declare_parameter<std::string>("planning_group", config.group);
     config.arm_joints = declare_parameter<std::vector<std::string>>("arm_joints", config.arm_joints);
@@ -135,18 +136,34 @@ class RuntimeNode final : public rclcpp::Node {
     if (ticks <= 0 || ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
-    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted, this, backend == "panda_ros", config);
+    scene_ = std::make_unique<rc::DemoScene>(catalog_support::load_scene(this, config.frame, backend == "panda_ros"));
+    tasks_ = std::make_unique<rc::TaskCatalog>(catalog_support::load_tasks(this));
+    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_);
+    tasks_->validate_configuration(*scene_, engine_->skills, engine_->bindings);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
       return std::make_unique<SkillNode>(name, config, *engine_);
     });
-    tree_path_ = ament_index_cpp::get_package_share_directory("robot_bt_runtime") + "/trees/pick_place.xml";
+    const auto tree_dir = ament_index_cpp::get_package_share_directory("robot_bt_runtime") + "/trees/";
+    // Load reviewed templates at startup, before accepting any task.
+    factory_.registerBehaviorTreeFromFile(tree_dir + "pick_place.xml");
+    factory_.registerBehaviorTreeFromFile(tree_dir + "locate_object.xml");
+    catalog_server_ = create_service<catalog_support::GetCatalog>("get_catalog",
+        [this](const std::shared_ptr<catalog_support::GetCatalog::Request>,
+               const std::shared_ptr<catalog_support::GetCatalog::Response> response) {
+          catalog_support::describe(engine_->skills, engine_->bindings, *tasks_, *scene_, *response);
+        });
     server_ = rclcpp_action::create_server<ExecuteTask>(this, "execute_task",
         [this](const rclcpp_action::GoalUUID&, std::shared_ptr<const ExecuteTask::Goal> goal) {
           if (reserved_ || engine_->fault_latched || !engine_->resources.empty() ||
-              goal->task_name != "pick_place" || goal->object_id != "workpiece" ||
-              goal->target_id != "tray" || goal->timeout_ms == 0 || goal->timeout_ms > 600000)
+              goal->timeout_ms == 0 || goal->timeout_ms > 600000)
             return rclcpp_action::GoalResponse::REJECT;
+          try {
+            tasks_->admit(goal->task_name, goal->object_id, goal->target_id, *scene_, engine_->skills, engine_->bindings);
+          } catch (const std::exception& e) {
+            RCLCPP_WARN(get_logger(), "Task rejected before execution: %s", e.what());
+            return rclcpp_action::GoalResponse::REJECT;
+          }
           reserved_ = true;
           return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
         },
@@ -158,7 +175,7 @@ class RuntimeNode final : public rclcpp::Node {
         },
         [this](const std::shared_ptr<GoalHandle> handle) { accept(handle); });
     timer_ = create_wall_timer(std::chrono::milliseconds(period), [this] { tick(); });
-    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task; backend=%s; motion=%s; permitted=%s",
+    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task, /get_catalog; backend=%s; motion=%s; permitted=%s",
                 backend.c_str(), motion.c_str(), motion_permitted ? "true" : "false");
   }
   void request_shutdown() {
@@ -179,7 +196,13 @@ class RuntimeNode final : public rclcpp::Node {
       auto blackboard = BT::Blackboard::create();
       blackboard->set("object", handle->get_goal()->object_id);
       blackboard->set("target", handle->get_goal()->target_id);
-      tree_ = std::make_unique<BT::Tree>(factory_.createTreeFromFile(tree_path_, blackboard));
+      const auto& task = tasks_->admit(handle->get_goal()->task_name, handle->get_goal()->object_id,
+                                      handle->get_goal()->target_id, *scene_, engine_->skills, engine_->bindings);
+      blackboard->set("implementation", task.implementation);
+      tree_ = std::make_unique<BT::Tree>(factory_.createTree(
+          task.template_id == "pick_place" ? "PickPlace" : "LocateObject", blackboard));
+      success_message_ = task.template_id == "pick_place" ?
+          "release verified; object placement needs perception confirmation" : "fresh configured demo pose obtained";
       deadline_ = rc::Clock::now() + std::chrono::milliseconds(handle->get_goal()->timeout_ms);
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
   }
@@ -212,7 +235,7 @@ class RuntimeNode final : public rclcpp::Node {
       } else {
         const auto status = tree_->tickOnce();
         if (status == BT::NodeStatus::SUCCESS) {
-          finish(true, "succeeded", "", "release verified; object placement needs perception confirmation"); return;
+          finish(true, "succeeded", "", success_message_); return;
         }
         if (status == BT::NodeStatus::FAILURE) {
           rc::Result failure{rc::Status::failed, "TASK_FAILED", "behavior tree failed"};
@@ -254,7 +277,10 @@ class RuntimeNode final : public rclcpp::Node {
   std::unique_ptr<Engine> engine_;
   BT::BehaviorTreeFactory factory_;
   std::unique_ptr<BT::Tree> tree_;
-  std::string tree_path_;
+  std::unique_ptr<rc::DemoScene> scene_;
+  std::unique_ptr<rc::TaskCatalog> tasks_;
+  std::string success_message_;
+  rclcpp::Service<catalog_support::GetCatalog>::SharedPtr catalog_server_;
   rclcpp_action::Server<ExecuteTask>::SharedPtr server_;
   rclcpp::TimerBase::SharedPtr timer_;
   std::shared_ptr<GoalHandle> active_;

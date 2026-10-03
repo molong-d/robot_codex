@@ -1,4 +1,5 @@
-# v0 accepts only the installed, reviewed pick_place task template.
+# Select a configured alias of an installed, reviewed template; see /get_catalog.
+# IDs must be in the configured scene. Locate-only tasks require empty target_id.
 string task_name
 string object_id
 string target_id

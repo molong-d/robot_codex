@@ -1,6 +1,7 @@
 #pragma once
 #include "robot_core/geometry.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <map>
@@ -13,6 +14,16 @@
 
 namespace robot_core {
 using Arguments = std::map<std::string, std::string>;
+
+// Identifiers can also be used as ROS parameter path segments. No dots or XML.
+inline bool valid_id(const std::string& id) {
+  if (id.empty() || id.size() > 64) return false;
+  const auto alpha = [](char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+  };
+  if (!alpha(id.front())) return false;
+  return std::all_of(id.begin(), id.end(), [&](char c) { return alpha(c) || (c >= '0' && c <= '9'); });
+}
 
 enum class Status { idle, running, canceling, succeeded, failed, canceled, timed_out, faulted };
 inline const char* name(Status s) {
@@ -116,9 +127,11 @@ struct Requirement {
   unsigned version{1};
 };
 struct SkillDefinition {
+  struct Input { std::string name; std::string type; std::string description; };
   std::string id;
   std::string description;
-  std::vector<std::string> required_inputs;
+  // v0.4 supports required entity_id inputs only; no implicit string coercion.
+  std::vector<Input> inputs;
   // Descriptive contract; implementations enforce the conditions, not a rule parser.
   std::string precondition;
   std::string invariant;
@@ -135,6 +148,17 @@ struct Context {
   WorldState& world;
 };
 
+struct ImplementationInfo {
+  std::string id;
+  Dependencies dependencies;
+  bool dependencies_satisfied{false};
+  std::string unavailable_reason;
+};
+struct SkillInfo {
+  SkillDefinition definition;
+  std::vector<ImplementationInfo> implementations;
+};
+
 class Skill {
  public:
   virtual ~Skill() = default;
@@ -148,7 +172,11 @@ class Skills {
  public:
   using Factory = std::function<std::unique_ptr<Skill>(Context&)>;
   void define(SkillDefinition definition) {
-    if (definition.id.empty()) throw std::invalid_argument("empty skill ID");
+    if (!valid_id(definition.id)) throw std::invalid_argument("invalid skill ID");
+    std::set<std::string> inputs;
+    for (const auto& input : definition.inputs)
+      if (!valid_id(input.name) || input.type != "entity_id" || !inputs.insert(input.name).second)
+        throw std::invalid_argument("invalid or duplicate input schema");
     const auto id = definition.id;
     if (!definitions_.emplace(id, std::move(definition)).second)
       throw std::invalid_argument("duplicate skill: " + id);
@@ -156,7 +184,7 @@ class Skills {
   void implement(const std::string& skill, const std::string& implementation, Factory factory,
                  Dependencies dependencies) {
     definition(skill);
-    if (implementation.empty() || !factory) throw std::invalid_argument("invalid implementation");
+    if (!valid_id(implementation) || !factory) throw std::invalid_argument("invalid implementation");
     if (!factories_.emplace(std::make_pair(skill, implementation),
                            Implementation{std::move(factory), std::move(dependencies)}).second)
       throw std::invalid_argument("duplicate implementation");
@@ -166,6 +194,44 @@ class Skills {
   }
   const SkillDefinition& definition(const std::string& id) const {
     return definitions_.at(id);
+  }
+  void validate_arguments(const std::string& id, const Arguments& arguments) const {
+    const auto& inputs = definition(id).inputs;
+    if (arguments.size() != inputs.size()) throw std::invalid_argument("unexpected or missing input");
+    for (const auto& input : inputs) {
+      const auto it = arguments.find(input.name);
+      if (it == arguments.end() || !valid_id(it->second))
+        throw std::invalid_argument("invalid entity_id input: " + input.name);
+    }
+  }
+  void validate_dependencies(const std::string& id, const std::string& implementation,
+                             const Bindings& bindings) const {
+    const auto& deps = dependencies(id, implementation);
+    for (const auto& requirement : deps.components) {
+      const auto component = bindings.get<Component>(requirement.role);
+      if (component->interface_id() != requirement.interface_id ||
+          component->interface_version() != requirement.version)
+        throw std::invalid_argument("incompatible component: " + requirement.role);
+    }
+    for (const auto& role : deps.exclusive_roles) bindings.get<Component>(role);
+    if (!deps.execution_gate_role.empty()) bindings.get<ExecutionGate>(deps.execution_gate_role);
+  }
+  std::vector<SkillInfo> catalog(const Bindings& bindings) const {
+    std::vector<SkillInfo> result;
+    for (const auto& definition : definitions_) {
+      SkillInfo info{definition.second, {}};
+      for (const auto& factory : factories_) {
+        if (factory.first.first != definition.first) continue;
+        ImplementationInfo impl{factory.first.second, factory.second.dependencies, false, ""};
+        try {
+          validate_dependencies(definition.first, impl.id, bindings);
+          impl.dependencies_satisfied = true;
+        } catch (const std::exception& e) { impl.unavailable_reason = e.what(); }
+        info.implementations.push_back(std::move(impl));
+      }
+      result.push_back(std::move(info));
+    }
+    return result;
   }
   std::unique_ptr<Skill> create(const std::string& id, const std::string& implementation,
                               Context& context) const {
@@ -227,21 +293,9 @@ class Session {
     try {
       if (request_.id.empty() || request_.timeout.count() <= 0)
         throw std::invalid_argument("ID and positive timeout required");
-      const auto& definition = skills_.definition(request_.skill);
+      skills_.validate_arguments(request_.skill, request_.arguments);
+      skills_.validate_dependencies(request_.skill, request_.implementation, context_.bindings);
       const auto& dependencies = skills_.dependencies(request_.skill, request_.implementation);
-      if (request_.arguments.size() != definition.required_inputs.size())
-        throw std::invalid_argument("unexpected or missing input");
-      for (const auto& key : definition.required_inputs) {
-        auto it = request_.arguments.find(key);
-        if (it == request_.arguments.end() || it->second.empty())
-          throw std::invalid_argument("missing input: " + key);
-      }
-      for (const auto& requirement : dependencies.components) {
-        auto component = context_.bindings.get<Component>(requirement.role);
-        if (component->interface_id() != requirement.interface_id ||
-            component->interface_version() != requirement.version)
-          throw std::invalid_argument("incompatible component: " + requirement.role);
-      }
       if (!dependencies.execution_gate_role.empty()) {
         const auto gate = context_.bindings.get<ExecutionGate>(dependencies.execution_gate_role);
         const auto admission = gate->admit(request_.skill, request_.arguments, now);

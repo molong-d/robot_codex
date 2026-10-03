@@ -32,14 +32,18 @@ class PandaTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
+        forced_kill = False
         if cls.process.poll() is None:
             cls.process.send_signal(signal.SIGINT)  # launch propagates once to its children
             try:
                 cls.process.wait(timeout=15)
             except subprocess.TimeoutExpired:
+                forced_kill = True
                 os.killpg(cls.process.pid, signal.SIGKILL); cls.process.wait(timeout=5)
-        cls.log.seek(0); print(cls.log.read()); cls.log.close()
+        cls.log.seek(0); output = cls.log.read(); print(output); cls.log.close()
         rclpy.shutdown()
+        if forced_kill or "Segmentation fault" in output or "process has died" in output:
+            raise AssertionError("Panda stack did not exit cleanly; inspect subprocess logs")
 
     def wait(self, future, timeout=100):
         rclpy.spin_until_future_complete(self.node, future, timeout_sec=timeout)
@@ -77,6 +81,15 @@ class PandaTests(unittest.TestCase):
         next_handle = self.wait(self.client.send_goal_async(next_goal))
         self.assertTrue(next_handle.accepted, "resource ownership not released after measured stop")
         self.assertTrue(self.wait(next_handle.get_result_async()).result.success)
+
+    def test_03_second_configured_object_target_and_alias(self):
+        self.ready()
+        goal = ExecuteTask.Goal(task_name="transfer_two", object_id="workpiece_two", target_id="tray_two", timeout_ms=90000)
+        handle = self.wait(self.client.send_goal_async(goal))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_SUCCEEDED, result.result.message)
+        self.assertTrue(result.result.success, result.result.error_code)
 
 
 if __name__ == "__main__":
