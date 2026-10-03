@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>robot_panda_demo</name><version>0.3.0</version>
+  <description>Panda MoveIt and ros2_control GenericSystem integration demo, no physical hardware.</description>
+  <maintainer email="44089363+molong-d@users.noreply.github.com">molong-d</maintainer>
+  <license>LicenseRef-Proprietary</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>robot_bt_runtime</exec_depend><exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend><exec_depend>moveit_configs_utils</exec_depend>
+  <exec_depend>moveit_resources_panda_moveit_config</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend><exec_depend>moveit_planners_ompl</exec_depend>
+  <exec_depend>moveit_simple_controller_manager</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend><exec_depend>controller_manager</exec_depend>
+  <exec_depend>joint_state_broadcaster</exec_depend><exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>parallel_gripper_controller</exec_depend><exec_depend>hardware_interface</exec_depend>
+  <test_depend>rclpy</test_depend><test_depend>action_msgs</test_depend><test_depend>control_msgs</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

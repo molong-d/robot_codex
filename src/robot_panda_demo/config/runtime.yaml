@@ -1,0 +1,17 @@
+robot_runtime:
+  ros__parameters:
+    backend: panda_ros
+    ros_backend_enabled: true
+    simulation_only: true
+    simulation_grasp_detection: true  # synthetic contact, not a physical sensor
+    motion_component: ros_arm
+    mock_motion_permitted: true       # demo admission only
+    base_frame: panda_link0
+    end_effector_link: panda_hand
+    planning_group: panda_arm
+    move_action: /move_action
+    gripper_action: /panda_hand_controller/gripper_cmd
+    finger_joint: panda_finger_joint1
+    skill_timeout_ms: 30000
+    stop_timeout_ms: 5000
+    tick_period_ms: 20

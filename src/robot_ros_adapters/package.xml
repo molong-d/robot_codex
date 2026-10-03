@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>robot_ros_adapters</name><version>0.3.0</version>
+  <description>Asynchronous MoveIt and parallel gripper adapters for simulation-first integration.</description>
+  <maintainer email="44089363+molong-d@users.noreply.github.com">molong-d</maintainer>
+  <license>LicenseRef-Proprietary</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>robot_core</depend><depend>rclcpp</depend><depend>rclcpp_action</depend>
+  <depend>moveit_msgs</depend><depend>control_msgs</depend><depend>sensor_msgs</depend>
+  <depend>std_msgs</depend><depend>shape_msgs</depend><depend>tf2_ros</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>
