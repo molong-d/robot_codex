@@ -1,5 +1,6 @@
 #include "robot_core/demo.hpp"
 #include "catalog_support.hpp"
+#include "plan_support.hpp"
 #include "robot_ros_adapters/adapters.hpp"
 #include "robot_interfaces/action/execute_task.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -9,10 +10,13 @@
 #include <algorithm>
 #include <chrono>
 #include <memory>
+#include <type_traits>
 
 namespace rc = robot_core;
 using ExecuteTask = robot_interfaces::action::ExecuteTask;
+using ExecutePlan = plan_support::ExecutePlan;
 using GoalHandle = rclcpp_action::ServerGoalHandle<ExecuteTask>;
+using PlanGoalHandle = rclcpp_action::ServerGoalHandle<ExecutePlan>;
 using namespace std::chrono_literals;
 
 // Sessions outlive BT nodes: halting a tree requests stop, the timer drains confirmation.
@@ -153,29 +157,14 @@ class RuntimeNode final : public rclcpp::Node {
                const std::shared_ptr<catalog_support::GetCatalog::Response> response) {
           catalog_support::describe(engine_->skills, engine_->bindings, *tasks_, *scene_, *response);
         });
-    server_ = rclcpp_action::create_server<ExecuteTask>(this, "execute_task",
-        [this](const rclcpp_action::GoalUUID&, std::shared_ptr<const ExecuteTask::Goal> goal) {
-          if (reserved_ || engine_->fault_latched || !engine_->resources.empty() ||
-              goal->timeout_ms == 0 || goal->timeout_ms > 600000)
-            return rclcpp_action::GoalResponse::REJECT;
-          try {
-            tasks_->admit(goal->task_name, goal->object_id, goal->target_id, *scene_, engine_->skills, engine_->bindings);
-          } catch (const std::exception& e) {
-            RCLCPP_WARN(get_logger(), "Task rejected before execution: %s", e.what());
-            return rclcpp_action::GoalResponse::REJECT;
-          }
-          reserved_ = true;
-          return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
-        },
-        [this](const std::shared_ptr<GoalHandle> handle) {
-          if (handle != active_) return rclcpp_action::CancelResponse::REJECT;
-          cancel_requested_ = true;
-          engine_->cancel();
-          return rclcpp_action::CancelResponse::ACCEPT;
-        },
-        [this](const std::shared_ptr<GoalHandle> handle) { accept(handle); });
+    server_ = serve<ExecuteTask>("execute_task", [this](const ExecuteTask::Goal& goal) {
+      tasks_->admit(goal.task_name, goal.object_id, goal.target_id, *scene_, engine_->skills, engine_->bindings);
+    }, [this](const std::shared_ptr<GoalHandle>& handle) { accept_task(handle); });
+    plan_server_ = serve<ExecutePlan>("execute_plan", [this](const ExecutePlan::Goal& goal) {
+      rc::validate_plan(plan_support::decode(goal), *scene_, engine_->skills, engine_->bindings, engine_->world);
+    }, [this](const std::shared_ptr<PlanGoalHandle>& handle) { accept_plan(handle); });
     timer_ = create_wall_timer(std::chrono::milliseconds(period), [this] { tick(); });
-    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task, /get_catalog; backend=%s; motion=%s; permitted=%s",
+    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task, /execute_plan, /get_catalog; backend=%s; motion=%s; permitted=%s",
                 backend.c_str(), motion.c_str(), motion_permitted ? "true" : "false");
   }
   void request_shutdown() {
@@ -185,13 +174,76 @@ class RuntimeNode final : public rclcpp::Node {
       RCLCPP_WARN(get_logger(), "Shutdown stop not confirmed. Real hardware needs an independent stop/watchdog.");
   }
  private:
-  void accept(const std::shared_ptr<GoalHandle>& handle) {
-    active_ = handle;
+  // Both action APIs share a single active goal and the same stop/resource path.
+  struct ActiveGoal {
+    const void* identity;
+    std::function<bool()> is_canceling;
+    std::function<void(bool, const std::string&, const std::string&, const std::string&)> complete;
+    std::function<void()> feedback;
+  };
+  template<class Action, class Validator, class Acceptor>
+  typename rclcpp_action::Server<Action>::SharedPtr serve(const std::string& endpoint,
+                                                         Validator validate, Acceptor accept) {
+    using Handle = rclcpp_action::ServerGoalHandle<Action>;
+    return rclcpp_action::create_server<Action>(this, endpoint,
+        [this, validate](const rclcpp_action::GoalUUID&, std::shared_ptr<const typename Action::Goal> goal) {
+          if (reserved_ || engine_->fault_latched || !engine_->resources.empty() ||
+              goal->timeout_ms == 0 || goal->timeout_ms > 600000)
+            return rclcpp_action::GoalResponse::REJECT;
+          try {
+            validate(*goal);
+          } catch (const std::exception& e) {
+            RCLCPP_WARN(get_logger(), "Task rejected before execution: %s", e.what());
+            return rclcpp_action::GoalResponse::REJECT;
+          }
+          reserved_ = true;
+          return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+        },
+        [this](const std::shared_ptr<Handle> handle) {
+          if (!active_ || handle.get() != active_->identity) return rclcpp_action::CancelResponse::REJECT;
+          cancel_requested_ = true;
+          engine_->cancel();
+          return rclcpp_action::CancelResponse::ACCEPT;
+        },
+        [accept](const std::shared_ptr<Handle> handle) { accept(handle); });
+  }
+  template<class Action> void begin(const std::shared_ptr<rclcpp_action::ServerGoalHandle<Action>>& handle) {
+    active_ = std::make_unique<ActiveGoal>();
+    active_->identity = handle.get();
+    active_->is_canceling = [handle] { return handle->is_canceling(); };
+    active_->complete = [this, handle](bool success, const std::string& status,
+                                      const std::string& code, const std::string& message) {
+      auto result = std::make_shared<typename Action::Result>();
+      result->success = success; result->status = status;
+      result->error_code = code; result->message = message;
+      if constexpr (std::is_same_v<Action, ExecutePlan>)
+        result->completed_steps = static_cast<uint32_t>(std::count_if(engine_->sessions.begin(), engine_->sessions.end(),
+            [](const Engine::Entry& e) { return e.session->result().status == rc::Status::succeeded; }));
+      if (success) handle->succeed(result);
+      else if (handle->is_canceling() && engine_->stopped()) handle->canceled(result);
+      else handle->abort(result);
+    };
+    active_->feedback = [this, handle] {
+      auto feedback = std::make_shared<typename Action::Feedback>();
+      if (!engine_->sessions.empty()) {
+        const auto& last = engine_->sessions.back();
+        feedback->active_skill = last.skill;
+        feedback->status = rc::name(last.session->result().status);
+        feedback->message = last.session->result().message;
+        if constexpr (std::is_same_v<Action, ExecutePlan>)
+          feedback->step_index = static_cast<uint32_t>(engine_->sessions.size()-1);
+      }
+      handle->publish_feedback(feedback);
+    };
     stopping_ = false;
     cancel_requested_ = false;
     timeout_ = false;
     engine_->sessions.clear();
     engine_->world.observations.clear();
+    deadline_ = rc::Clock::now() + std::chrono::milliseconds(handle->get_goal()->timeout_ms);
+  }
+  void accept_task(const std::shared_ptr<GoalHandle>& handle) {
+    begin<ExecuteTask>(handle);
     try {
       auto blackboard = BT::Blackboard::create();
       blackboard->set("object", handle->get_goal()->object_id);
@@ -203,8 +255,16 @@ class RuntimeNode final : public rclcpp::Node {
           task.template_id == "pick_place" ? "PickPlace" : "LocateObject", blackboard));
       success_message_ = task.template_id == "pick_place" ?
           "release verified; object placement needs perception confirmation" : "fresh configured demo pose obtained";
-      deadline_ = rc::Clock::now() + std::chrono::milliseconds(handle->get_goal()->timeout_ms);
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
+  }
+  void accept_plan(const std::shared_ptr<PlanGoalHandle>& handle) {
+    begin<ExecutePlan>(handle);
+    try {
+      const auto xml = plan_support::tree_xml(plan_support::decode(*handle->get_goal()),
+          *scene_, engine_->skills, engine_->bindings, engine_->world);
+      tree_ = std::make_unique<BT::Tree>(factory_.createTreeFromText(xml));
+      success_message_ = "all skill steps verified; inferred placement still needs perception confirmation";
+    } catch (const std::exception& e) { finish(false, "failed", "INVALID_PLAN", e.what()); }
   }
   void tick() {
     const auto now = rc::Clock::now();
@@ -245,14 +305,7 @@ class RuntimeNode final : public rclcpp::Node {
           finish(false, rc::name(failure.status), failure.code, failure.message); return;
         }
       }
-      auto feedback = std::make_shared<ExecuteTask::Feedback>();
-      if (!engine_->sessions.empty()) {
-        const auto& last = engine_->sessions.back();
-        feedback->active_skill = last.skill;
-        feedback->status = rc::name(last.session->result().status);
-        feedback->message = last.session->result().message;
-      }
-      active_->publish_feedback(feedback);
+      active_->feedback();
     } catch (const std::exception& e) {
       engine_->fault_latched = true;
       if (active_) finish(false, "faulted", "RUNTIME_EXCEPTION", e.what());
@@ -261,14 +314,7 @@ class RuntimeNode final : public rclcpp::Node {
   void finish(bool success, const std::string& status, const std::string& code, const std::string& message) {
     if (tree_) tree_->haltTree();
     engine_->cancel();
-    auto result = std::make_shared<ExecuteTask::Result>();
-    result->success = success;
-    result->status = status;
-    result->error_code = code;
-    result->message = message;
-    if (success) active_->succeed(result);
-    else if (active_->is_canceling() && engine_->stopped()) active_->canceled(result);
-    else active_->abort(result);
+    active_->complete(success, status, code, message);
     RCLCPP_INFO(get_logger(), "Task %s: %s %s", status.c_str(), code.c_str(), message.c_str());
     active_.reset();
     tree_.reset();
@@ -282,8 +328,9 @@ class RuntimeNode final : public rclcpp::Node {
   std::string success_message_;
   rclcpp::Service<catalog_support::GetCatalog>::SharedPtr catalog_server_;
   rclcpp_action::Server<ExecuteTask>::SharedPtr server_;
+  rclcpp_action::Server<ExecutePlan>::SharedPtr plan_server_;
   rclcpp::TimerBase::SharedPtr timer_;
-  std::shared_ptr<GoalHandle> active_;
+  std::unique_ptr<ActiveGoal> active_;
   rc::Time deadline_, stop_deadline_;
   std::chrono::milliseconds stop_timeout_{2000};
   bool reserved_{false}, stopping_{false}, timeout_{false}, cancel_requested_{false};

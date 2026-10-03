@@ -1,0 +1,17 @@
+# Bounded sequential skill plan; no XML, scripts, branching or retries.
+uint32 schema_version
+SkillStep[] steps
+uint32 timeout_ms
+---
+bool success
+string status
+string error_code
+string message
+# Count of skills that reported verified success, including read-only steps.
+uint32 completed_steps
+---
+string active_skill
+string status
+string message
+# Zero-based step index; terminal outcome is returned through the result.
+uint32 step_index

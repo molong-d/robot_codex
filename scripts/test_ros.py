@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import time
 import unittest
+import copy
 from pathlib import Path
 
 import rclpy
@@ -12,7 +13,8 @@ from action_msgs.msg import GoalStatus
 from rclpy.action import ActionClient
 from rclpy.parameter import Parameter
 from rclpy.parameter_client import AsyncParameterClient
-from robot_interfaces.action import ExecuteTask
+from robot_interfaces.action import ExecuteTask, ExecutePlan
+from robot_interfaces.msg import SkillStep
 from robot_interfaces.srv import GetCatalog
 
 
@@ -30,9 +32,11 @@ class RuntimeTests(unittest.TestCase):
         self.log = tempfile.TemporaryFile(mode="w+")
         self.node = rclpy.create_node("robot_runtime_test")
         self.client = ActionClient(self.node, ExecuteTask, "execute_task")
+        self.plan_client = ActionClient(self.node, ExecutePlan, "execute_plan")
 
     def tearDown(self):
         self.client.destroy()
+        self.plan_client.destroy()
         self.node.destroy_node()
         if self.process is not None:
             if self.process.poll() is None:
@@ -72,6 +76,100 @@ class RuntimeTests(unittest.TestCase):
             return self.wait(client.call_async(GetCatalog.Request()))
         finally:
             self.node.destroy_client(client)
+
+    def plan_steps(self, object_id="workpiece", target_id="tray"):
+        return [SkillStep(skill_id=skill, implementation_id="standard", argument_names=list(args), argument_values=list(args.values()))
+                for skill, args in [("locate_object", {"object": object_id}), ("pick_object", {"object": object_id}),
+                                    ("locate_object", {"object": target_id}),
+                                    ("place_object", {"object": object_id, "target": target_id})]]
+
+    def send_plan(self, steps=None, version=1, timeout=5000, feedback=None):
+        self.assertTrue(self.plan_client.wait_for_server(timeout_sec=5))
+        goal = ExecutePlan.Goal(schema_version=version, steps=self.plan_steps() if steps is None else steps, timeout_ms=timeout)
+        return self.wait(self.plan_client.send_goal_async(goal, feedback_callback=feedback))
+
+    def test_plan_second_pair_succeeds_with_four_verified_steps(self):
+        self.start(config=Path(__file__).resolve().parents[1] / "src/robot_bringup/config/demo.yaml")
+        handle = self.send_plan(self.plan_steps("workpiece_two", "tray_two"))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertTrue(result.result.success)
+        self.assertEqual(result.result.completed_steps, 4)
+
+    def test_plan_invalid_late_steps_and_transport_shapes_rejected(self):
+        self.start()
+        invalid = []
+        for field, value in [("skill_id", "unknown"), ("implementation_id", "missing")]:
+            steps = self.plan_steps(); setattr(steps[-1], field, value); invalid.append(steps)
+        steps = self.plan_steps(); steps[-1].argument_values[-1] = "unknown_target"; invalid.append(steps)
+        steps = self.plan_steps(); steps[-1].argument_names = ["object", "object"]; invalid.append(steps)
+        steps = self.plan_steps(); steps[-1].argument_values = ["workpiece"]; invalid.append(steps)
+        steps = self.plan_steps(); steps[0].argument_values = ["{injected}"]; invalid.append(steps)
+        invalid.extend([[], [copy.deepcopy(self.plan_steps()[0]) for _ in range(33)]])
+        for steps in invalid:
+            self.assertFalse(self.send_plan(steps).accepted)
+        self.assertFalse(self.send_plan(version=2).accepted)
+        self.assertFalse(self.send_plan(timeout=0).accepted)
+        self.assertTrue(self.wait(self.send().get_result_async()).result.success)
+
+    def test_plan_invalid_semantic_order_rejected(self):
+        self.start()
+        steps = self.plan_steps(); steps[0], steps[1] = steps[1], steps[0]
+        self.assertFalse(self.send_plan(steps).accepted)
+        steps = self.plan_steps(); del steps[2]
+        self.assertFalse(self.send_plan(steps).accepted)
+        steps = self.plan_steps(); steps[-1].argument_values[0] = "tray"
+        self.assertFalse(self.send_plan(steps).accepted)
+
+    def test_plan_and_task_share_busy_guard_and_cancel_confirmation(self):
+        self.start("mock_action_ticks:=50")
+        feedback = []
+        handle = self.send_plan(feedback=lambda msg: feedback.append(msg.feedback))
+        self.assertTrue(handle.accepted)
+        end = time.monotonic()+5
+        while not any(f.step_index == 1 and f.active_skill == "pick_object" and f.status == "running" for f in feedback):
+            self.assertLess(time.monotonic(), end)
+            rclpy.spin_once(self.node, timeout_sec=0.02)
+        self.assertFalse(self.send().accepted)
+        self.assertFalse(self.send_plan().accepted)
+        self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_CANCELED)
+        self.assertEqual(result.result.completed_steps, 1)
+        # The opposite direction also shares the same guard and stop path.
+        task = self.send()
+        self.assertTrue(task.accepted)
+        self.assertFalse(self.send_plan().accepted)
+        self.assertTrue(self.wait(task.cancel_goal_async()).goals_canceling)
+        self.assertEqual(self.wait(task.get_result_async()).status, GoalStatus.STATUS_CANCELED)
+        self.assertTrue(self.wait(self.send_plan().get_result_async()).result.success)
+
+    def test_plan_deadline_stops_then_allows_next_plan(self):
+        self.start("mock_action_ticks:=50")
+        handle = self.send_plan(timeout=100)
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.result.status, "timed_out")
+        self.assertIn(result.result.completed_steps, (0, 1))  # deadline may precede the first tick
+        self.assertTrue(self.wait(self.send_plan().get_result_async()).result.success)
+
+    def test_plan_skill_failure_aborts_remaining_steps(self):
+        self.start("mock_fail_pick:=true")
+        handle = self.send_plan()
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.result.error_code, "GRIPPER_FAILED")
+        self.assertEqual(result.result.completed_steps, 1)
+        self.assertFalse(result.result.success)
+        inspect = self.send(task="inspect_object", target_id="")
+        self.assertTrue(self.wait(inspect.get_result_async()).result.success)
+
+    def test_planner_example_queries_catalog_and_submits_plan(self):
+        self.start(config=Path(__file__).resolve().parents[1] / "src/robot_bringup/config/demo.yaml")
+        planner = Path(__file__).resolve().parent / "plan_pick_place.py"
+        result = subprocess.run(["python3", str(planner), "--object", "workpiece_two", "--target", "tray_two", "--timeout-ms", "5000"],
+                                capture_output=True, text=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        self.assertIn('"completed_steps": 4', result.stdout)
 
     def test_catalog_describes_schemas_and_implementation_dependencies(self):
         self.start("mock_motion_permitted:=false")
