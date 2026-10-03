@@ -15,5 +15,6 @@
   <exec_depend>parallel_gripper_controller</exec_depend><exec_depend>hardware_interface</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <test_depend>rclpy</test_depend><test_depend>action_msgs</test_depend><test_depend>control_msgs</test_depend>
+  <test_depend>controller_manager_msgs</test_depend>
   <export><build_type>ament_cmake</build_type></export>
 </package>

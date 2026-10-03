@@ -9,7 +9,8 @@ import unittest
 
 import rclpy
 from action_msgs.msg import GoalStatus
-from control_msgs.action import ParallelGripperCommand
+from control_msgs.action import FollowJointTrajectory, ParallelGripperCommand
+from controller_manager_msgs.srv import ListControllers
 from moveit_msgs.action import MoveGroup
 from rclpy.action import ActionClient
 from sensor_msgs.msg import JointState
@@ -29,13 +30,14 @@ class PandaTests(unittest.TestCase):
         cls.client = ActionClient(cls.node, ExecuteTask, "execute_task")
         cls.plan_client = ActionClient(cls.node, ExecutePlan, "execute_plan")
         cls.arm = ActionClient(cls.node, MoveGroup, "move_action")
+        cls.trajectory = ActionClient(cls.node, FollowJointTrajectory, "panda_arm_controller/follow_joint_trajectory")
         cls.hand = ActionClient(cls.node, ParallelGripperCommand, "panda_hand_controller/gripper_cmd")
         cls.states = []
         cls.subscription = cls.node.create_subscription(JointState, "joint_states", lambda s: cls.states.append(s), 10)
 
     @classmethod
     def tearDownClass(cls):
-        cls.client.destroy(); cls.plan_client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
+        cls.client.destroy(); cls.plan_client.destroy(); cls.arm.destroy(); cls.trajectory.destroy(); cls.hand.destroy(); cls.node.destroy_node()
         forced_kill = False
         if cls.process.poll() is None:
             cls.process.send_signal(signal.SIGINT)  # launch propagates once to its children
@@ -56,8 +58,23 @@ class PandaTests(unittest.TestCase):
 
     def ready(self):
         self.assertTrue(self.arm.wait_for_server(timeout_sec=60), "MoveIt server unavailable")
+        self.assertTrue(self.trajectory.wait_for_server(timeout_sec=60), "arm trajectory controller unavailable")
         self.assertTrue(self.hand.wait_for_server(timeout_sec=60), "gripper controller unavailable")
         self.assertTrue(self.client.wait_for_server(timeout_sec=30), "runtime unavailable")
+        controllers = self.node.create_client(ListControllers, "/controller_manager/list_controllers")
+        try:
+            self.assertTrue(controllers.wait_for_service(timeout_sec=30), "controller manager unavailable")
+            end = time.monotonic()+30
+            while time.monotonic() < end:
+                response = self.wait(controllers.call_async(ListControllers.Request()), timeout=5)
+                active = {controller.name for controller in response.controller if controller.state == "active"}
+                if {"joint_state_broadcaster", "panda_arm_controller", "panda_hand_controller"} <= active:
+                    break
+                rclpy.spin_once(self.node, timeout_sec=0.05)
+            else:
+                self.fail("Panda controllers did not become active")
+        finally:
+            self.node.destroy_client(controllers)
         # Action servers may exist before the state broadcaster is activated.
         # Wait for actual fresh stationary samples, never dispatch/retry a probe goal.
         required = [f"panda_joint{i}" for i in range(1, 8)]+["panda_finger_joint1"]
@@ -173,7 +190,12 @@ class PandaTests(unittest.TestCase):
                 self.assertGreaterEqual(proof.samples, 3)
                 self.assertGreaterEqual(proof.stable_ms, 100)
                 self.assertEqual(proof.source, "demo_outcome")
-            self.assertFalse(record.record.snapshot.placement_candidates)
+                self.assertEqual(proof.entity_id, "workpiece")
+                self.assertEqual(proof.target_id, "" if index == 2 else "tray")
+            candidates = {entry.entity_id: entry.location_id for entry in record.record.snapshot.placement_candidates}
+            locations = {entry.entity_id: entry.location_id for entry in record.record.snapshot.known_locations}
+            self.assertNotIn("workpiece", candidates)
+            self.assertEqual(locations.get("workpiece"), "tray")
             self.assertTrue(record.record.snapshot.stop_confirmed)
         finally:
             self.node.destroy_client(client)
