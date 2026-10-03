@@ -9,10 +9,13 @@
 | `stable/v0.3.0-contracts-20261003` | `9798623861b6b13c0ac78fcb38ba2002d900a58b` | 4A 契约阶段通过测试的快照 |
 | `stable/v0.3.0-panda-demo-20261003` | `5c879f08a389876bb06b3790c8b1c022003001a0` | 4B Panda 阶段通过测试的快照 |
 | `stable/v0.4.0-catalog-r1-20261003` | `d2ec8e8768c21ccb1c836077c899b50d33ea585c` | 5A 修订快照；功能测试与 Panda 子进程退出检查通过 |
+| `stable/v0.4.0-plans-20261003` | `ba8368dbedc7216e0cdd47f88192cc5be4d08085` | 5B 快照；核心、ROS 结构化计划及 Panda 测试通过 |
 
 备份分支固定指向原提交，后续开发不向该分支推送。备份保留的是当时经过测试的软件行为，不代表已经通过实机或功能安全验证。
 
 初版 `stable/v0.4.0-catalog-20261003`（`2fcfe9c`）保留作追溯，但发现 MoveIt 退出崩溃，复现 5A 请使用 `catalog-r1` 修订快照。5B 使用独立分支和堆叠 PR；先合并 5A，再调整 5B 的目标为 main，核对差异并合并。
+
+6A 分支 `framework/execution-records-v04` 在 5B 基础上开发；合并顺序为 5A → 5B → 6A。每次前置 PR 合并后，调整下一 PR 的目标为 main，再检查差异和 CI。6A 验证通过后创建新的 `stable/v0.4.0-records-20261003` 快照，保留全部旧备份；主线合并前继续以 v0.3 作为已合并稳定基线。
 
 ## 升级流程
 

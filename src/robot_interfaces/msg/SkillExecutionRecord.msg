@@ -1,0 +1,9 @@
+uint32 step_index
+string request_id
+SkillStep step
+uint64 started_ms
+uint64 updated_ms
+string status
+string error_code
+string message
+StateTransition[<=8] transitions

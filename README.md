@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.4 技能目录与结构化计划开发版（5A/5B）**。包含 ROS 2 Action 服务、技能目录查询、可配置对象/目标/任务别名、结构化技能计划、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
+当前版本为 **v0.4 技能目录、结构化计划与执行记录开发版（5A/5B/6A）**。包含 ROS 2 Action 服务、技能目录查询、可配置对象/目标/任务别名、结构化技能计划、有界执行记录及状态查询、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
 
 ## 技能与组件
 
@@ -20,7 +20,7 @@
 | 路径 | 内容 |
 |---|---|
 | `src/robot_core` | 无 ROS 依赖的 C++17 契约、注册、绑定、资源管理、技能会话；mock 示例 |
-| `src/robot_interfaces` | `ExecuteTask.action`、`ExecutePlan.action`、`GetCatalog.srv` 与技能/计划消息 |
+| `src/robot_interfaces` | 任务/计划 Action、技能目录、运行状态与执行记录服务及消息 |
 | `src/robot_bt_runtime` | BehaviorTree.CPP 4 执行引擎与 ROS 2 Action 服务 |
 | `src/robot_bringup` | 启动文件及组件选择配置 |
 | `src/robot_ros_adapters` | 非阻塞 MoveIt/并联夹爪 Action 客户端、JointState/TF 反馈 |
@@ -108,6 +108,17 @@ ros2 launch robot_bringup demo.launch.py mock_motion_permitted:=false
 
 此时抓取返回 `SAFETY_INTERLOCK`，不会取得手臂/夹爪资源或下发动作。参数 `mock_action_ticks` 可增大动作持续时间，方便观察取消和超时；这只是计次 mock，不是物理仿真。
 
+## 执行记录与状态查询
+
+查看当前执行、资源占用、示例世界状态和最近任务记录，或导出诊断 JSON：
+
+```bash
+python3 scripts/inspect_runtime.py
+python3 scripts/inspect_runtime.py --output execution-snapshot.json
+```
+
+任务可按 Action goal UUID 查询；记录包含实际技能结果与状态变化，并区分观测事实和推断放置位置。内存历史默认保留 32 个完成任务，不支持跨重启恢复或自动重试。接口与字段语义见 [执行记录](docs/execution_records.md)。
+
 ## 完整验证
 
 停止手动启动的 runtime，source 上述环境后运行：
@@ -149,6 +160,6 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 - 停止未确认或异常时保留资源并拒绝后续任务；mock 节点可重启复位。真实设备必须先确认物理状态，不能将进程重启当作停机确认。
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
-阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
 
 稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

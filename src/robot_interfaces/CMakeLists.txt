@@ -11,6 +11,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/SkillImplementation.msg"
   "msg/SkillInfo.msg"
   "msg/TaskInfo.msg"
-  "srv/GetCatalog.srv")
+  "msg/StateTransition.msg"
+  "msg/SkillExecutionRecord.msg"
+  "msg/ObservationSnapshot.msg"
+  "msg/EntityLocation.msg"
+  "msg/ResourceLease.msg"
+  "msg/WorldSnapshot.msg"
+  "msg/ExecutionRecord.msg"
+  "srv/GetCatalog.srv"
+  "srv/GetRuntimeState.srv"
+  "srv/GetExecution.srv")
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()

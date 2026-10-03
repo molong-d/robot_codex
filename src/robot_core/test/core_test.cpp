@@ -1,6 +1,7 @@
 #include "robot_core/demo.hpp"
 #include "robot_core/task_catalog.hpp"
 #include "robot_core/plan.hpp"
+#include "robot_core/execution_record.hpp"
 #include <iostream>
 #include <limits>
 
@@ -109,6 +110,88 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("execution journal keeps terminal evidence and snapshot copies", [] {
+      Fixture f; ExecutionJournal journal;
+      check(!journal.get("", f.now), "initially no records");
+      journal.begin("goal", "execute_plan", "", 1, 5000, f.now, 123456);
+      auto request = f.request("session", "locate_object");
+      journal.observe(request, {Status::running, "", "first"}, f.now);
+      journal.observe(request, {Status::running, "", "updated"}, f.now+10ms);
+      journal.observe(request, {Status::succeeded, "", "verified"}, f.now+20ms);
+      journal.observe(request, {Status::running, "", "regression"}, f.now+30ms);
+      f.world.placement_candidates["workpiece"] = "tray";
+      journal.finish({Status::succeeded, "", "done"},
+          {f.now+20ms, f.world, {}, true, false, true}, f.now+20ms);
+      f.world.placement_candidates.clear();
+      auto record = journal.get("goal", f.now+100ms);
+      check(record && record->elapsed_ms == 20 && record->started_unix_ms == 123456, "frozen duration");
+      check(record->steps.size() == 1 && record->steps[0].transitions.size() == 2 &&
+            record->steps[0].result.status == Status::succeeded, "status transitions, immutable completion");
+      check(record->snapshot.world.placement_candidates.at("workpiece") == "tray" &&
+            record->snapshot.world.known_locations.empty(), "copy inferred facts without promoting them");
+      record->snapshot.world.placement_candidates.clear();
+      check(!journal.get("goal", f.now)->snapshot.world.placement_candidates.empty(), "query copies cannot change history");
+    });
+    test("execution history evicts oldest completion and preserves active task", [] {
+      ExecutionJournal journal(2); const auto now = Clock::now();
+      for (int i = 0; i < 3; ++i) {
+        journal.begin(std::to_string(i), "execute_task", "inspect_object", 1, 5000, now, 1);
+        journal.finish({Status::failed, "TEST", ""}, {}, now);
+      }
+      check(journal.evicted_count() == 1 && journal.recent_ids() == std::vector<std::string>{"2", "1"}, "bounded newest-first history");
+      check(!journal.get("0", now) && !journal.get("missing", now) && journal.get("", now)->id == "2", "missing has no fallback");
+      journal.begin("active", "execute_plan", "", 1, 5000, now, 1);
+      check(journal.get("", now+50ms)->elapsed_ms == 50 && journal.active_id() == "active", "active lookup");
+      check(journal.get("2", now)->result.status == Status::failed, "history remains queryable during next task");
+    });
+    test("execution recording rejects invalid bounds and duplicate starts", [] {
+      const auto now = Clock::now();
+      rejects([] { ExecutionJournal invalid(0); }, "zero capacity");
+      rejects([] { ExecutionJournal invalid(129); }, "excess capacity");
+      ExecutionJournal journal;
+      rejects([&] { journal.begin("g", "execute_plan", "", 33, 1, now, 1); }, "excess steps");
+      journal.begin("g", "execute_plan", "", 1, 1, now, 1);
+      rejects([&] { journal.begin("h", "execute_plan", "", 1, 1, now, 1); }, "second active execution");
+      Request request{"1", "locate_object", "standard", {{"object", "tray"}}, 1ms};
+      journal.observe(request, {Status::succeeded, "", ""}, now);
+      request.id = "2";
+      rejects([&] { journal.observe(request, {}, now); }, "excess started steps");
+      journal.finish({Status::succeeded, "", ""}, {}, now);
+      rejects([&] { journal.begin("g", "execute_plan", "", 1, 1, now, 1); }, "duplicate retained UUID");
+    });
+    test("fault diagnostic snapshot retains unknown resource ownership", [] {
+      Fixture f; ExecutionJournal journal;
+      f.skills.implement("pick_object", "broken", [](Context&) { return std::make_unique<ProbeSkill>(true); },
+                        {{{"motion", "arm_motion", 2}}, {"motion"}, ""});
+      auto request = f.request("broken", "pick_object"); request.implementation = "broken";
+      journal.begin("fault", "execute_plan", "", 1, 5000, f.now, 1);
+      Session session(f.skills, f.resources, f.context, request);
+      journal.observe(session.request(), session.start(f.now), f.now);
+      const auto result = session.tick(f.now+10ms);
+      journal.observe(session.request(), result, f.now+10ms);
+      journal.finish(result, {f.now+10ms, f.world, f.resources.owners(), f.resources.empty(), true, false}, f.now+10ms);
+      auto copy = f.resources.owners(); copy.clear();
+      const auto record = journal.get("fault", f.now);
+      check(record->result.status == Status::faulted && !record->snapshot.stop_confirmed &&
+            record->snapshot.fault_latched && record->snapshot.resource_owners.at("demo_arm") == "broken", "fault is not stop");
+      check(!f.resources.empty() && !f.resources.acquire("other", {"demo_arm"}), "diagnostic reads leave ownership intact");
+    });
+    test("cancel recording distinguishes stop request from confirmation", [] {
+      Fixture f; f.locate(); ExecutionJournal journal;
+      journal.begin("cancel", "execute_task", "pick_place", 4, 5000, f.now, 1);
+      Session session(f.skills, f.resources, f.context, f.request("pick", "pick_object"));
+      journal.observe(session.request(), session.start(f.now), f.now);
+      session.cancel(); journal.observe(session.request(), session.result(), f.now+1ms);
+      journal.update({Status::canceling, "CANCEL_REQUESTED", ""},
+          {f.now+1ms, f.world, f.resources.owners(), f.resources.empty(), false, false}, f.now+1ms);
+      check(!journal.get("", f.now)->snapshot.stop_confirmed && !f.resources.empty(), "request is not confirmation");
+      session.tick(f.now+2ms); const auto result = session.tick(f.now+3ms);
+      journal.observe(session.request(), result, f.now+3ms);
+      journal.finish(result, {f.now+3ms, f.world, f.resources.owners(), f.resources.empty(), false, true}, f.now+3ms);
+      const auto record = journal.get("cancel", f.now);
+      check(record->steps[0].transitions.size() == 3 && record->result.status == Status::canceled &&
+            record->snapshot.stop_confirmed && record->snapshot.resources_empty, "confirmed cancel recorded");
+    });
     test("plan validation never writes predicted effects or dispatches", [] {
       Fixture f; auto scene = plan_scene();
       validate_plan(transfer_plan(), scene, f.skills, f.bindings, f.world);

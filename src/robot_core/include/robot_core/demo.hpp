@@ -35,9 +35,9 @@ struct MockRobotState {
 
 class MockArmMotion final : public ArmMotion {
  public:
-  MockArmMotion(std::shared_ptr<MockRobotState> state, int ticks = 3, bool fail = false)
-      : state_(std::move(state)), duration_(ticks), fail_(fail) {
-    if (!state_ || ticks <= 0) throw std::invalid_argument("invalid mock arm configuration");
+  MockArmMotion(std::shared_ptr<MockRobotState> state, int ticks = 3, bool fail = false, int stop_ticks = 2)
+      : state_(std::move(state)), duration_(ticks), stop_duration_(stop_ticks), fail_(fail) {
+    if (!state_ || ticks <= 0 || stop_ticks <= 0) throw std::invalid_argument("invalid mock arm configuration");
   }
   std::string resource_id() const override { return "demo_arm"; }
   void begin_move(const CartesianTarget& target) override {
@@ -71,23 +71,23 @@ class MockArmMotion final : public ArmMotion {
     return last_ = Status::succeeded;
   }
   void request_stop() override {
-    if (busy_ && !stopping_) { stopping_ = true; remaining_ = 2; }
+    if (busy_ && !stopping_) { stopping_ = true; remaining_ = stop_duration_; }
   }
   MotionFeedback feedback() const override { return feedback_; }
  private:
   std::shared_ptr<MockRobotState> state_;
   CartesianTarget target_;
   MotionFeedback feedback_{"base_link", {}, {}, false, true};
-  int duration_{0}, remaining_{0};
+  int duration_{0}, stop_duration_{2}, remaining_{0};
   bool fail_{false}, busy_{false}, stopping_{false};
   Status last_{Status::idle};
 };
 
 class MockGripper final : public Gripper {
  public:
-  MockGripper(std::shared_ptr<MockRobotState> state, int ticks = 2, bool fail_grasp = false)
-      : state_(std::move(state)), duration_(ticks), fail_grasp_(fail_grasp) {
-    if (!state_ || ticks <= 0) throw std::invalid_argument("invalid mock gripper configuration");
+  MockGripper(std::shared_ptr<MockRobotState> state, int ticks = 2, bool fail_grasp = false, int stop_ticks = 2)
+      : state_(std::move(state)), duration_(ticks), stop_duration_(stop_ticks), fail_grasp_(fail_grasp) {
+    if (!state_ || ticks <= 0 || stop_ticks <= 0) throw std::invalid_argument("invalid mock gripper configuration");
   }
   std::string resource_id() const override { return "demo_gripper"; }
   void begin_grasp(const GraspCommand& command) override {
@@ -125,7 +125,7 @@ class MockGripper final : public Gripper {
     return last_ = Status::succeeded;
   }
   void request_stop() override {
-    if (busy_ && !stopping_) { stopping_ = true; remaining_ = 2; }
+    if (busy_ && !stopping_) { stopping_ = true; remaining_ = stop_duration_; }
   }
   GripperFeedback feedback() const override {
     auto f = feedback_;
@@ -136,7 +136,7 @@ class MockGripper final : public Gripper {
  private:
   void begin() { busy_ = true; stopping_ = false; remaining_ = duration_; last_ = Status::running; }
   std::shared_ptr<MockRobotState> state_;
-  int duration_{0}, remaining_{0};
+  int duration_{0}, stop_duration_{2}, remaining_{0};
   GripperFeedback feedback_;
   double commanded_width_{0.08};
   bool fail_grasp_{false}, busy_{false}, stopping_{false}, closing_{false};
