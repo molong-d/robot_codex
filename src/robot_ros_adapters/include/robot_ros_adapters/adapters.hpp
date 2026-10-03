@@ -114,7 +114,8 @@ class MoveItArm final : public rc::ArmMotion {
     position.header.frame_id = config_.frame; position.link_name = config_.tip; position.weight = 1.0;
     shape_msgs::msg::SolidPrimitive sphere;
     sphere.type = shape_msgs::msg::SolidPrimitive::SPHERE;
-    sphere.dimensions = {target.tolerance.position_m};
+    // Plan inside the acceptance envelope, leaving margin for numerical error.
+    sphere.dimensions = {target.tolerance.position_m/2.0};
     geometry_msgs::msg::Pose center;
     center.position.x = target.pose.x; center.position.y = target.pose.y; center.position.z = target.pose.z;
     center.orientation.w = 1.0;
@@ -124,9 +125,13 @@ class MoveItArm final : public rc::ArmMotion {
     orientation.header.frame_id = config_.frame; orientation.link_name = config_.tip;
     orientation.orientation.x = target.pose.qx; orientation.orientation.y = target.pose.qy;
     orientation.orientation.z = target.pose.qz; orientation.orientation.w = target.pose.qw;
-    orientation.absolute_x_axis_tolerance = target.tolerance.orientation_rad;
-    orientation.absolute_y_axis_tolerance = target.tolerance.orientation_rad;
-    orientation.absolute_z_axis_tolerance = target.tolerance.orientation_rad;
+    // Per-axis bounds do not equal the total quaternion angular error. With a
+    // rotation-vector parameterization, norm <= sqrt(3) * axis_bound.
+    orientation.parameterization = moveit_msgs::msg::OrientationConstraint::ROTATION_VECTOR;
+    const double axis_bound = target.tolerance.orientation_rad/(2.0*std::sqrt(3.0));
+    orientation.absolute_x_axis_tolerance = axis_bound;
+    orientation.absolute_y_axis_tolerance = axis_bound;
+    orientation.absolute_z_axis_tolerance = axis_bound;
     orientation.weight = 1.0;
     constraints.position_constraints.push_back(position);
     constraints.orientation_constraints.push_back(orientation);

@@ -33,7 +33,7 @@ class PandaTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
         if cls.process.poll() is None:
-            os.killpg(cls.process.pid, signal.SIGINT)
+            cls.process.send_signal(signal.SIGINT)  # launch propagates once to its children
             try:
                 cls.process.wait(timeout=15)
             except subprocess.TimeoutExpired:

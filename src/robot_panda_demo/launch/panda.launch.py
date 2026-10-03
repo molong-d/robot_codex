@@ -22,6 +22,8 @@ def generate_launch_description():
     # Hardware selection is fixed to GenericSystem; no real driver launch argument.
     return LaunchDescription([
         DeclareLaunchArgument("mock_motion_permitted", default_value="true"),
+        Node(package="tf2_ros", executable="static_transform_publisher",
+             arguments=["--frame-id", "world", "--child-frame-id", "panda_link0"], output="screen"),
         Node(package="robot_state_publisher", executable="robot_state_publisher",
              parameters=[config.robot_description], output="screen"),
         Node(package="moveit_ros_move_group", executable="move_group",
