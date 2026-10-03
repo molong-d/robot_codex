@@ -31,6 +31,18 @@ inline uint64_t unix_ms() {
   return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::system_clock::now().time_since_epoch()).count());
 }
+inline msg::VerificationSnapshot describe(const rc::OutcomeVerification& value, rc::Time captured_at) {
+  msg::VerificationSnapshot proof;
+  proof.entity_id = value.evidence.object_id; proof.target_id = value.evidence.target_id;
+  proof.source = value.evidence.evidence.source; proof.synthetic = value.evidence.evidence.synthetic;
+  proof.quality = value.evidence.evidence.quality; proof.sample_id = value.evidence.sample_id;
+  proof.samples = value.samples; proof.stable_ms = static_cast<uint64_t>(value.stable_for.count());
+  proof.stamp_valid = value.evidence.stamp != rc::Time{} && value.evidence.stamp <= captured_at;
+  if (proof.stamp_valid)
+    proof.age_ms = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
+        captured_at-value.evidence.stamp).count());
+  return proof;
+}
 inline msg::WorldSnapshot describe(const rc::ExecutionSnapshot& snapshot) {
   msg::WorldSnapshot result;
   result.attached_object = snapshot.world.attached_object;
@@ -42,8 +54,9 @@ inline msg::WorldSnapshot describe(const rc::ExecutionSnapshot& snapshot) {
     msg::ObservationSnapshot observation;
     observation.entity_id = o.object_id; observation.frame_id = o.frame_id;
     observation.pose = {o.pose.x, o.pose.y, o.pose.z, o.pose.qx, o.pose.qy, o.pose.qz, o.pose.qw};
-    // Both current backends use ConfiguredDemoLocator, not vision.
-    observation.source = "configured_demo";
+    observation.source = o.evidence.source;
+    observation.synthetic = o.evidence.synthetic; observation.quality = o.evidence.quality;
+    observation.pose_meaning = rc::name(o.meaning);
     observation.valid = o.valid;
     observation.stamp_valid = o.stamp != rc::Time{} && o.stamp <= snapshot.captured_at;
     if (observation.stamp_valid)
@@ -60,6 +73,11 @@ inline msg::WorldSnapshot describe(const rc::ExecutionSnapshot& snapshot) {
   };
   locations(snapshot.world.known_locations, result.known_locations);
   locations(snapshot.world.placement_candidates, result.placement_candidates);
+  const auto verifications = [&](const auto& entries, auto& output) {
+    for (const auto& entry : entries) output.push_back(describe(entry.second, snapshot.captured_at));
+  };
+  verifications(snapshot.world.grasp_verifications, result.grasp_verifications);
+  verifications(snapshot.world.placement_verifications, result.placement_verifications);
   for (const auto& entry : snapshot.resource_owners) {
     msg::ResourceLease lease;
     lease.resource_id = entry.first; lease.owner_request_id = entry.second;
@@ -86,6 +104,8 @@ inline msg::ExecutionRecord describe(const rc::ExecutionRecord& record) {
     step.started_ms = entry.started_ms; step.updated_ms = entry.updated_ms;
     step.status = rc::name(entry.result.status); step.error_code = entry.result.code; step.message = entry.result.message;
     if (entry.result.status == rc::Status::succeeded) ++result.completed_steps;
+    step.has_verification = entry.verification.has_value();
+    if (entry.verification) step.verification = describe(*entry.verification, record.snapshot.captured_at);
     for (const auto& value : entry.transitions) {
       msg::StateTransition transition;
       transition.elapsed_ms = value.elapsed_ms; transition.status = rc::name(value.result.status);

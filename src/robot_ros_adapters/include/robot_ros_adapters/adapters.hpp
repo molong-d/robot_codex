@@ -191,6 +191,7 @@ class ParallelGripper final : public rc::Gripper {
       if (i < joints_.position.size()) {
         measured_.width_m = 2.0*joints_.position[i];
         measured_.stamp = monotonic_stamp(node_, joints_.header.stamp, now);
+        measured_.sample_id = static_cast<uint64_t>(rclcpp::Time(joints_.header.stamp).nanoseconds());
         measured_.valid = measured_.stamp != rc::Time{} && std::isfinite(measured_.width_m) && measured_.width_m >= 0.0;
         measured_.stopped = measured_.valid && stationary(joints_, {config_.finger_joint});
       }

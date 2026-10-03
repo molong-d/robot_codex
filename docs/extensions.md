@@ -3,7 +3,7 @@
 ## 新增组件实现
 
 1. 确定职责：感知、运动规划、动作策略、控制或硬件适配。
-2. 实现对应的类型化契约。示例见 `ObjectLocator`、`ArmMotion`、`Gripper`、`ExecutionGate`。
+2. 实现对应的类型化契约。示例见 `ObjectLocator`、`ManipulationObserver`、`ArmMotion`、`Gripper`、`ExecutionGate`。
 3. 声明接口类型、接口版本和物理资源 ID。两个适配器控制同一机械臂时必须使用相同资源 ID。
 4. 在启动组合处注册实例；将技能使用的角色绑定到该实例。
 5. 验证输入、输出单位/坐标系/时序及取消行为；增加契约测试。
@@ -55,7 +55,9 @@ v0 的 `mock_arm` 与 `slow_mock_arm` 展示配置替换。注册表支持显式
 
 模型规划不得直接绕过任务运行时调用驱动；动作策略可绕过传统几何规划，但仍通过本地控制权仲裁与执行约束。模型超时后不能盲目重发动作。
 
-5B 已提供 [结构化计划协议](structured_plans.md) 和 `scripts/plan_pick_place.py` 确定性分解示例。模型规划输出可转换为技能 ID、实现 ID 和 entity_id 参数，通过 `/execute_plan` 的全计划校验。当前顺序语义只支持三种示例技能；扩展技能时需同时增加校验规则，不能直接执行模型生成的 XML。
+5B 已提供 [结构化计划协议](structured_plans.md) 和 `scripts/plan_pick_place.py` 确定性分解示例。模型规划输出可转换为技能 ID、实现 ID 和 entity_id 参数，通过 `/execute_plan` 的全计划校验。6B 增加抓稳/放置验证后支持五种示例技能；扩展技能时需同时增加校验规则，不能直接执行模型生成的 XML。
+
+新增感知/结果组件时按 [6B 证据契约](perception_verification.md) 提供明确来源、样本身份、时间与质量。原生物体姿态通过显式目标解析后才能供运动实现使用；保持合成与真实证据分离。验证策略由技能承担，不把一个组件的 condition_met 直接当成整个任务成功。
 
 ## 数据与评测
 

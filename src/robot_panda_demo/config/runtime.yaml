@@ -4,6 +4,7 @@ robot_runtime:
     ros_backend_enabled: true
     simulation_only: true
     simulation_grasp_detection: true  # synthetic contact, not a physical sensor
+    simulation_outcome_evidence: true  # synthetic object outcome from robot feedback
     motion_component: ros_arm
     mock_motion_permitted: true       # demo admission only
     base_frame: panda_link0
@@ -13,7 +14,8 @@ robot_runtime:
     entities.tray.pose: [0.45, -0.15, 0.40, 1.0, 0.0, 0.0, 0.0]
     entities.workpiece_two.pose: [0.35, 0.05, 0.40, 1.0, 0.0, 0.0, 0.0]
     entities.tray_two.pose: [0.40, -0.10, 0.40, 1.0, 0.0, 0.0, 0.0]
-    task_names: [pick_place, inspect_object, transfer_two]
+    task_names: [pick_place, inspect_object, transfer_two, verified_pick_place]
+    tasks.verified_pick_place.template_id: verified_pick_place
     tasks.pick_place.template_id: pick_place
     tasks.inspect_object.template_id: locate_object
     tasks.transfer_two.template_id: pick_place

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<root BTCPP_format="4" main_tree_to_execute="VerifiedPickPlace">
+  <BehaviorTree ID="VerifiedPickPlace">
+    <Sequence>
+      <Skill skill="locate_object" implementation="{implementation}" object="{object}"/>
+      <Skill skill="pick_object" implementation="{implementation}" object="{object}"/>
+      <Skill skill="verify_grasp" implementation="{implementation}" object="{object}"/>
+      <Skill skill="locate_object" implementation="{implementation}" object="{target}"/>
+      <Skill skill="place_object" implementation="{implementation}" object="{object}" target="{target}"/>
+      <Skill skill="verify_placement" implementation="{implementation}" object="{object}" target="{target}"/>
+    </Sequence>
+  </BehaviorTree>
+</root>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""查询技能目录，将抓取放置目标确定性分解为四步，并提交给统一运行时。"""
+"""查询技能目录，将抓取放置目标分解为技能步骤，可显式增加结果验证。"""
 import argparse
 import json
 
@@ -11,19 +11,23 @@ from robot_interfaces.msg import SkillStep
 from robot_interfaces.srv import GetCatalog
 
 
-def assemble(catalog, object_id, target_id, implementation):
+def assemble(catalog, object_id, target_id, implementation, verify_outcomes=False):
     if catalog.schema_version != 1:
         raise ValueError("不支持的目录版本")
     if object_id not in catalog.object_ids or target_id not in catalog.target_ids:
         raise ValueError("对象或目标不在配置目录中")
     skills = {skill.skill_id: skill for skill in catalog.skills}
     steps = []
-    for skill_id, arguments in [
+    sequence = [
         ("locate_object", {"object": object_id}),
         ("pick_object", {"object": object_id}),
         ("locate_object", {"object": target_id}),
         ("place_object", {"object": object_id, "target": target_id}),
-    ]:
+    ]
+    if verify_outcomes:
+        sequence.insert(2, ("verify_grasp", {"object": object_id}))
+        sequence.append(("verify_placement", {"object": object_id, "target": target_id}))
+    for skill_id, arguments in sequence:
         skill = skills[skill_id]
         if {p.name for p in skill.inputs} != set(arguments) or any(p.type != "entity_id" or not p.required for p in skill.inputs):
             raise ValueError(f"技能输入模式不兼容：{skill_id}")
@@ -48,6 +52,7 @@ def main():
     parser.add_argument("--implementation", default="standard")
     parser.add_argument("--timeout-ms", type=int, default=90000)
     parser.add_argument("--dry-run", action="store_true", help="查询目录并打印计划，不提交执行")
+    parser.add_argument("--verify-outcomes", action="store_true", help="增加抓稳和放置证据验证；示例证据为合成数据")
     args = parser.parse_args()
     if not 1 <= args.timeout_ms <= 600000:
         parser.error("timeout-ms 必须为 1～600000")
@@ -59,7 +64,7 @@ def main():
         if not catalog_client.wait_for_service(timeout_sec=10):
             raise RuntimeError("技能目录服务不可用")
         catalog = wait(node, catalog_client.call_async(GetCatalog.Request()), 10)
-        steps = assemble(catalog, args.object, args.target, args.implementation)
+        steps = assemble(catalog, args.object, args.target, args.implementation, args.verify_outcomes)
         print(json.dumps({"schema_version": 1, "steps": [
             {"skill_id": s.skill_id, "implementation_id": s.implementation_id,
              "arguments": dict(zip(s.argument_names, s.argument_values))} for s in steps

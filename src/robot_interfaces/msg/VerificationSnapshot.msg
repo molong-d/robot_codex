@@ -1,0 +1,10 @@
+string entity_id
+string target_id
+string source
+bool synthetic
+float64 quality
+uint64 sample_id
+bool stamp_valid
+uint64 age_ms
+uint32 samples
+uint64 stable_ms

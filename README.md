@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.4 技能目录、结构化计划与执行记录开发版（5A/5B/6A）**。包含 ROS 2 Action 服务、技能目录查询、可配置对象/目标/任务别名、结构化技能计划、有界执行记录及状态查询、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
+当前版本为 **v0.4 感知证据与结果验证开发版（6B）**。包含 ROS 2 Action、技能目录、配置任务、结构化计划、执行记录、感知来源/质量/位姿语义，以及抓稳和放置证据验证技能。位姿、反馈时效、样本窗口和停止确认均参与验收。当前证据为显式合成示例，尚未连接真实机器人。
 
 ## 技能与组件
 
@@ -119,6 +119,16 @@ python3 scripts/inspect_runtime.py --output execution-snapshot.json
 
 任务可按 Action goal UUID 查询；记录包含实际技能结果与状态变化，并区分观测事实和推断放置位置。内存历史默认保留 32 个完成任务，不支持跨重启恢复或自动重试。接口与字段语义见 [执行记录](docs/execution_records.md)。
 
+## 感知证据与抓稳、放置验证
+
+示例配置新增 `verified_pick_place` 六步模板，或使用规划客户端显式增加结果验证：
+
+```bash
+python3 scripts/plan_pick_place.py --verify-outcomes --timeout-ms 5000
+```
+
+默认四步流程保持原样。新增 `verify_grasp`、`verify_placement` 接受动作后的多份独立样本；验证通过后保留来源、质量与合成标记。示例组件根据机器人反馈生成合成条件，没有真实视觉、滑移或落点检测。原生 object_pose 必须经过明确的运动目标转换，不能直接下发。契约、六步任务与 ROS 迁移说明见 [感知证据与结果验证](docs/perception_verification.md)。
+
 ## 完整验证
 
 停止手动启动的 runtime，source 上述环境后运行：
@@ -156,10 +166,10 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 - 条件描述用于契约说明；当前条件由技能 C++ 实现检查，没有通用谓词解释器或自动规划器。
 - 技能/组件通过显式工厂注册，不支持运行时下载插件；扩展实际第三方适配器时可再接 pluginlib 或 ROS Action 客户端。
 - 任务模板是手写行为树；LLM/VLM 任务规划和 VLA 动作策略只预留架构位置，没有模型调用或 API key 要求。
-- 输入类型仅为必填 `entity_id`；对象/目标角色由任务模板或计划校验器检查。结构化计划 v1 支持三种现有技能、1～32 个顺序步骤；没有通用位姿、力、轨迹参数、分支或自动重试。
+- 输入类型仅为必填 `entity_id`；对象/目标角色由任务模板或计划校验器检查。结构化计划 v1 支持五种现有技能、1～32 个顺序步骤；没有通用位姿、力、轨迹参数、分支或自动重试。
 - 停止未确认或异常时保留资源并拒绝后续任务；mock 节点可重启复位。真实设备必须先确认物理状态，不能将进程重启当作停机确认。
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
-阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [感知证据与结果验证](docs/perception_verification.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
 
 稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

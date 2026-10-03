@@ -125,6 +125,31 @@ class PandaTests(unittest.TestCase):
         finally:
             self.node.destroy_client(client); self.node.destroy_client(state_client)
 
+    def test_05_verified_template_marks_synthetic_outcome_proofs(self):
+        self.ready()
+        handle = self.wait(self.client.send_goal_async(ExecuteTask.Goal(
+            task_name="verified_pick_place", object_id="workpiece", target_id="tray", timeout_ms=90000)))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertTrue(result.result.success, result.result.error_code+": "+result.result.message)
+        client = self.node.create_client(GetExecution, "get_execution")
+        try:
+            self.assertTrue(client.wait_for_service(timeout_sec=5))
+            record = self.wait(client.call_async(GetExecution.Request(execution_id=bytes(handle.goal_id.uuid).hex())))
+            self.assertEqual(record.schema_version, 2)
+            self.assertEqual(record.record.completed_steps, 6)
+            for index in (2, 5):
+                self.assertTrue(record.record.steps[index].has_verification)
+                proof = record.record.steps[index].verification
+                self.assertTrue(proof.synthetic)
+                self.assertGreaterEqual(proof.samples, 3)
+                self.assertGreaterEqual(proof.stable_ms, 100)
+                self.assertEqual(proof.source, "demo_outcome")
+            self.assertFalse(record.record.snapshot.placement_candidates)
+            self.assertTrue(record.record.snapshot.stop_confirmed)
+        finally:
+            self.node.destroy_client(client)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

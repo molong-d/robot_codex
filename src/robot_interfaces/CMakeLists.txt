@@ -17,6 +17,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/EntityLocation.msg"
   "msg/ResourceLease.msg"
   "msg/WorldSnapshot.msg"
+  "msg/VerificationSnapshot.msg"
   "msg/ExecutionRecord.msg"
   "srv/GetCatalog.srv"
   "srv/GetRuntimeState.srv"

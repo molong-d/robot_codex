@@ -1,18 +1,23 @@
 #pragma once
 #include "robot_core/components.hpp"
+#include "robot_core/verification.hpp"
 
 namespace robot_core {
 class Locate final : public Skill {
  public:
-  explicit Locate(Context& c) : locator_(c.bindings.get<ObjectLocator>("perception")), world_(c.world) {}
+  explicit Locate(Context& c, EvidencePolicy policy = {std::chrono::milliseconds(2000), 0.8, false})
+      : locator_(c.bindings.get<ObjectLocator>("perception")), world_(c.world), policy_(policy) {
+    if (!valid_evidence_policy(policy_)) throw std::invalid_argument("invalid locate evidence policy");
+  }
   Result start(const Arguments& args, Time now) override {
     const auto object = args.at("object");
     world_.observations.erase(object);
     auto observation = locator_->locate(object, now);
     if (!observation || !observation->valid || observation->object_id != object ||
         observation->frame_id.empty() || !valid_pose(observation->pose) ||
-        !fresh(observation->stamp, now, std::chrono::milliseconds(2000)))
-      return result_ = {Status::failed, "INVALID_OBSERVATION", "no fresh, valid pose observation"};
+        (observation->meaning != PoseMeaning::object_pose && observation->meaning != PoseMeaning::motion_target) ||
+        !acceptable_evidence(observation->evidence, observation->stamp, now, policy_))
+      return result_ = {Status::failed, "INVALID_OBSERVATION", "no fresh valid pose with accepted source and quality"};
     world_.observations[object] = *observation;
     return result_ = {Status::succeeded, "", "fresh pose observation stored"};
   }
@@ -21,6 +26,7 @@ class Locate final : public Skill {
  private:
   std::shared_ptr<ObjectLocator> locator_;
   WorldState& world_;
+  EvidencePolicy policy_;
   Result result_;
 };
 
@@ -30,7 +36,8 @@ class Manipulate final : public Skill {
       : arm_(c.bindings.get<ArmMotion>("motion")), gripper_(c.bindings.get<Gripper>("gripper")),
         world_(c.world), pick_(pick), policy_(std::move(policy)) {
     if (policy_.frame_id.empty() || !valid_tolerance(policy_.tolerance) ||
-        policy_.observation_max_age.count() <= 0 || policy_.feedback_max_age.count() <= 0 ||
+        !valid_evidence_policy({policy_.observation_max_age, policy_.minimum_observation_quality, policy_.allow_synthetic}) ||
+        policy_.feedback_max_age.count() <= 0 ||
         !std::isfinite(policy_.grasp.width_m) || policy_.grasp.width_m < 0.0 ||
         !std::isfinite(policy_.grasp.max_effort_n) || policy_.grasp.max_effort_n <= 0.0 ||
         !std::isfinite(policy_.release_width_m) || policy_.release_width_m <= policy_.grasp.width_m ||
@@ -56,10 +63,20 @@ class Manipulate final : public Skill {
     const auto it = world_.observations.find(observation_id);
     if (it == world_.observations.end() || !it->second.valid ||
         it->second.object_id != observation_id || it->second.frame_id != policy_.frame_id ||
-        !valid_pose(it->second.pose) || !fresh(it->second.stamp, now, policy_.observation_max_age))
+        !valid_pose(it->second.pose) || !acceptable_evidence(it->second.evidence, it->second.stamp, now,
+            {policy_.observation_max_age, policy_.minimum_observation_quality, policy_.allow_synthetic}))
       return {Status::failed, "STALE_OBSERVATION", "locate a valid motion target before manipulation"};
+    if (it->second.meaning != PoseMeaning::motion_target)
+      return {Status::failed, "TARGET_RESOLUTION_REQUIRED", "object pose needs an explicit calibrated motion-target transform"};
     target_ = {it->second.object_id, it->second.frame_id, it->second.pose, policy_.tolerance};
     world_.observations.erase(observation_id);
+    world_.grasp_verifications.erase(object_);
+    world_.placement_verifications.erase(object_);
+    if (pick_) {
+      world_.known_locations.erase(object_);
+      world_.placement_candidates.erase(object_);
+      world_.release_stamps.erase(object_);
+    }
     // Set phase before dispatch so a throwing adapter can still receive best-effort stop.
     phase_ = Phase::moving;
     arm_->begin_move(target_);
@@ -96,11 +113,14 @@ class Manipulate final : public Skill {
     // Reconcile completed grasp/release even if cancellation won the ROS result race.
     if (g.grasp_detected && pick_) {
       world_.attached_object = object_;
+      world_.attachment_stamp = g.stamp;
       world_.known_locations[object_] = "gripper";
     } else if (!g.grasp_detected && !pick_) {
       world_.attached_object.clear();
+      world_.attachment_stamp = {};
       world_.known_locations.erase(object_);
       world_.placement_candidates[object_] = target_id_;
+      world_.release_stamps[object_] = g.stamp;
     }
     if (stopping_) return complete({Status::canceled, "CANCELED", "gripper stopped; state reconciled"});
     if (status != Status::succeeded)
@@ -136,7 +156,7 @@ class Manipulate final : public Skill {
   CartesianTarget target_;
 };
 
-inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {}) {
+inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {}, VerificationPolicy verification = {}) {
   skills.define({"locate_object", "Obtain a fresh object pose", {{"object", "entity_id", "Entity to locate"}},
       "camera ready", "observation valid", "fresh object pose in a known frame"});
   skills.define({"pick_object", "Move to and grasp a previously located object", {{"object", "entity_id", "Object to grasp"}},
@@ -144,12 +164,21 @@ inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {})
   skills.define({"place_object", "Move to a located target and release the held object",
       {{"object", "entity_id", "Held object"}, {"target", "entity_id", "Release target"}},
       "requested object held and fresh target pose", "exclusive arm and gripper control", "release detected"});
-  skills.implement("locate_object", "standard", [](Context& c) { return std::make_unique<Locate>(c); },
-      {{{"perception", "object_locator", 1}}, {}, ""});
+  const EvidencePolicy observation_policy{policy.observation_max_age, policy.minimum_observation_quality, policy.allow_synthetic};
+  skills.implement("locate_object", "standard", [observation_policy](Context& c) { return std::make_unique<Locate>(c, observation_policy); },
+      {{{"perception", "object_locator", 2}}, {}, ""});
   const Dependencies manipulation{
       {{"motion", "arm_motion", 2}, {"gripper", "gripper", 2}, {"safety", "execution_gate", 1}},
       {"motion", "gripper"}, "safety"};
   skills.implement("pick_object", "standard", [policy](Context& c) { return std::make_unique<Manipulate>(c, true, policy); }, manipulation);
   skills.implement("place_object", "standard", [policy](Context& c) { return std::make_unique<Manipulate>(c, false, policy); }, manipulation);
+  skills.define({"verify_grasp", "Verify stable post-grasp evidence", {{"object", "entity_id", "Held object"}},
+      "matching measured grasp", "read-only exclusive arm and gripper access", "accepted post-grasp evidence stable over a sample window"});
+  skills.define({"verify_placement", "Verify stable post-release evidence",
+      {{"object", "entity_id", "Released object"}, {"target", "entity_id", "Expected location"}},
+      "matching measured release candidate", "read-only exclusive arm and gripper access", "accepted post-release evidence stable over a sample window"});
+  const Dependencies verify{{{"outcome", "manipulation_observer", 1}}, {"motion", "gripper"}, ""};
+  skills.implement("verify_grasp", "standard", [verification](Context& c) { return std::make_unique<VerifyOutcome>(c, true, verification); }, verify);
+  skills.implement("verify_placement", "standard", [verification](Context& c) { return std::make_unique<VerifyOutcome>(c, false, verification); }, verify);
 }
 }  // namespace robot_core

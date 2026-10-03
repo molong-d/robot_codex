@@ -2,6 +2,8 @@
 
 本阶段增加只读诊断：查询当前执行、按 Action goal UUID 查找任务记录、导出 JSON。规划器或操作界面可以查看实际完成的技能、失败位置、资源占用和示例世界状态，再决定后续处理。查询不会创建技能、读取新的传感器测量、解除故障或下发动作。
 
+6B 将诊断协议升级为 schema_version=2，新增观测质量/合成/位姿语义、验证状态及每个验证步骤的证据。须重新构建一致的 ROS overlay；旧 6A 备份使用相应旧客户端。字段及迁移见 [感知证据与结果验证](perception_verification.md)。
+
 ## 查询入口
 
 启动 mock 或 Panda 示例后，在已 source ROS 2 Jazzy 与本仓库 overlay 的终端运行：
@@ -37,12 +39,12 @@ python3 scripts/inspect_runtime.py --execution-id <32位十六进制UUID> --outp
 
 ## 状态证据
 
-`WorldSnapshot` 明确分开 observations、attached_object、known_locations、placement_candidates 和 resource_leases。当前两个后端都使用 `ConfiguredDemoLocator`，所以观测来源为 `configured_demo`。其位姿为示例运动目标，不能当作真实物体的视觉姿态。新增真实感知组件时必须同时扩展来源、质量和坐标变换契约，不能保留这个合成来源标记。
+`WorldSnapshot` 明确分开 observations、attached_object、known_locations、placement_candidates、grasp_verifications、placement_verifications 和 resource_leases。来源直接来自组件证据；当前配置位姿来自 configured_demo，验证来自 demo_outcome，均带 synthetic=true。其位姿为示例运动目标，不能当作真实物体的视觉姿态。
 
 - 位姿数组顺序为 x,y,z,qx,qy,qz,qw；位置单位米，包含 frame_id。
 - `age_ms` 相对于快照采集的单调时钟，只有 `stamp_valid=true` 时有意义；它不代表观测通过了某个技能的时效要求，也不是 ROS 时间戳。
 - 任务记录中的世界与资源快照冻结在该任务完成时；当前状态服务重新计算观测年龄。历史年龄不会随之后的查询增长。
-- attached_object/known_locations 由示例夹持反馈更新；释放只生成 placement_candidates。任务 succeeded 不能证明物体实际在托盘上。
+- attached_object/known_locations 由示例夹持反馈更新；释放只生成 placement_candidates。6B 的放置证据验收后可提升 known_locations，仍需查看验证来源与 synthetic 标记。任务 succeeded 不能证明物体实际在托盘上。
 - `stop_confirmed` 表示本运行时会话和资源已经静止/释放，依据现有组件反馈；它不覆盖外部控制源，也不是独立硬件停机保证。活动任务尚未下发动作时也可能为 true。
 - busy 表示当前占有 Action 执行入口；故障任务结束后可以 busy=false，但 fault_latched=true、stop_confirmed=false 和资源占用仍阻止下一任务。
 

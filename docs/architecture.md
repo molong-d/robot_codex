@@ -52,7 +52,7 @@ flowchart TD
 | 任务执行 | BehaviorTree.CPP `SkillNode` + ROS `RuntimeNode` |
 | 技能目录 | `Skills::catalog` 与 ROS `/get_catalog`，定义/实现依赖分别描述 |
 | 示例场景与任务别名 | `DemoScene` / `TaskCatalog`，启动配置与接收前校验，不是完整世界模型或任务规划器 |
-| 结构化计划 | `Plan` / `validate_plan`，检查三种技能的顺序语义；ROS 转换与 XML 生成留在适配层 |
+| 结构化计划 | `Plan` / `validate_plan`，检查五种技能的顺序语义；ROS 转换与 XML 生成留在适配层 |
 
 示例 `ObjectLocator`、`ArmMotion`、`Gripper` 和 `ExecutionGate` 是用于证明分层的最小类型化契约。`Manipulate` 技能先驱动手臂到时效有效的笛卡尔位姿，再执行夹持/释放，并分别验收运动和夹爪反馈；技能在整个过程中共同持有手臂与夹爪资源。
 
@@ -67,6 +67,8 @@ flowchart TD
 高频力控、轨迹跟踪和硬件保护保持在控制层。ROS、Python 或模型推理服务不自动提供实时保证。当前 timer 只是任务轮询，不是伺服控制循环。
 
 环境状态需保留观测来源、坐标系、时间和质量；执行期不能把计划的预期效果直接写成观测事实。MoveIt PlanningScene 应作为运动规划视图，与世界状态同步，而不是任意多个模块互相覆盖的数据库。
+
+6B 已实现位姿证据来源、合成标记、质量与 object_pose/motion_target 语义。`ManipulationObserver` 提供技术证据，`VerifyOutcome` 技能检查动作后样本身份、时间窗口和条件，再更新带来源的验证状态。配置示例使用合成观察组件；真实感知、工具/抓取目标变换和物理抓稳条件仍需按设备实现，见 [感知证据与结果验证](perception_verification.md)。
 
 ## 复用边界
 

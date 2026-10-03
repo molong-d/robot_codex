@@ -42,6 +42,7 @@ inline rc::TaskCatalog load_tasks(rclcpp::Node* node) {
   for (const auto& name : names) {
     if (!rc::valid_id(name)) throw std::invalid_argument("invalid configured task name: " + name);
     const std::string fallback = name == "pick_place" ? "pick_place" :
+                                 name == "verified_pick_place" ? "verified_pick_place" :
                                  name == "inspect_object" ? "locate_object" : "";
     tasks.push_back({name, startup_parameter<std::string>(node, "tasks." + name + ".template_id", fallback),
                     startup_parameter<std::string>(node, "tasks." + name + ".implementation_id", "standard")});

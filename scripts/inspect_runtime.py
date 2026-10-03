@@ -35,12 +35,12 @@ def main():
 
         state = query(GetRuntimeState, "get_runtime_state", GetRuntimeState.Request())
         execution = query(GetExecution, "get_execution", GetExecution.Request(execution_id=args.execution_id))
-        if state.schema_version != 1 or execution.schema_version != 1:
+        if state.schema_version != 2 or execution.schema_version != 2:
             raise RuntimeError("不支持的诊断协议版本")
         if state.runtime_id != execution.runtime_id:
             raise RuntimeError("两次查询之间 runtime 已重启；请重新查询")
         # Separate service calls are not an atomic snapshot. Preserve both responses.
-        result = {"schema_version": 1, "runtime_state": message_to_ordereddict(state),
+        result = {"schema_version": 2, "runtime_state": message_to_ordereddict(state),
                   "execution": message_to_ordereddict(execution)}
         output = json.dumps(result, ensure_ascii=False, indent=2)
         print(output)

@@ -36,11 +36,51 @@ class ConfiguredDemoLocator final : public ObjectLocator {
   explicit ConfiguredDemoLocator(DemoScene scene) : scene_(std::move(scene)) {}
   std::string resource_id() const override { return "configured_demo_scene"; }
   std::optional<Observation> locate(const std::string& id, Time now) override {
-    try { return Observation{id, scene_.frame(), scene_.at(id).pose, now, true}; }
+    try { return Observation{id, scene_.frame(), scene_.at(id).pose, now, true,
+                             {"configured_demo", true, 1.0}, PoseMeaning::motion_target}; }
     catch (const std::out_of_range&) { return std::nullopt; }
   }
  private:
   DemoScene scene_;
+};
+
+// Deliberately synthetic: robot feedback plus configured end-effector targets,
+// NOT independent object/contact sensing. Never reads placement_candidates.
+class DemoOutcomeObserver final : public ManipulationObserver {
+ public:
+  DemoOutcomeObserver(std::shared_ptr<ArmMotion> arm, std::shared_ptr<Gripper> gripper,
+                      DemoScene scene, std::string failure = "none")
+      : arm_(std::move(arm)), gripper_(std::move(gripper)), scene_(std::move(scene)), failure_(std::move(failure)) {
+    if (!arm_ || !gripper_ || (failure_ != "none" && failure_ != "grasp" && failure_ != "placement"))
+      throw std::invalid_argument("invalid demo outcome observer");
+  }
+  std::string resource_id() const override { return "demo_outcome_feedback"; }
+  std::optional<OutcomeEvidence> grasp(const std::string& object, Time now) override {
+    return observe(object, "", now);
+  }
+  std::optional<OutcomeEvidence> placement(const std::string& object, const std::string& target, Time now) override {
+    return observe(object, target, now);
+  }
+ private:
+  std::optional<OutcomeEvidence> observe(const std::string& object, const std::string& target, Time now) {
+    // Refresh cached measurements/status; poll never dispatches a new command.
+    arm_->poll(now); gripper_->poll(now);
+    const auto arm = arm_->feedback(); const auto gripper = gripper_->feedback();
+    try {
+      const auto& pose = scene_.at(target.empty() ? object : target).pose;
+      const bool condition = arm.stopped && gripper.stopped && arm.frame_id == scene_.frame() &&
+          pose_near(arm.pose, pose, {}) &&
+          (target.empty() ? gripper.grasp_detected :
+              !gripper.grasp_detected && std::abs(gripper.width_m-0.08) <= 0.002) &&
+          failure_ != (target.empty() ? "grasp" : "placement");
+      return OutcomeEvidence{object, target, std::min(arm.stamp, gripper.stamp),
+          arm.valid && gripper.valid, condition, {"demo_outcome", true, 1.0}, gripper.sample_id};
+    } catch (const std::out_of_range&) { return std::nullopt; }
+  }
+  std::shared_ptr<ArmMotion> arm_;
+  std::shared_ptr<Gripper> gripper_;
+  DemoScene scene_;
+  std::string failure_;
 };
 
 struct TaskDefinition {
@@ -57,7 +97,7 @@ class TaskCatalog {
     if (definitions.empty()) throw std::invalid_argument("empty task catalog");
     for (auto& task : definitions) {
       if (!valid_id(task.name) || !valid_id(task.implementation) ||
-          (task.template_id != "pick_place" && task.template_id != "locate_object"))
+          (task.template_id != "pick_place" && task.template_id != "locate_object" && task.template_id != "verified_pick_place"))
         throw std::invalid_argument("invalid task definition: " + task.name);
       const auto name = task.name;
       if (!definitions_.emplace(name, std::move(task)).second)
@@ -66,8 +106,11 @@ class TaskCatalog {
   }
   const std::map<std::string, TaskDefinition>& definitions() const { return definitions_; }
   static std::vector<std::string> required_inputs(const TaskDefinition& task) {
-    return task.template_id == "pick_place" ? std::vector<std::string>{"object", "target"} :
+    return task.template_id != "locate_object" ? std::vector<std::string>{"object", "target"} :
                                              std::vector<std::string>{"object"};
+  }
+  static uint32_t step_count(const TaskDefinition& task) {
+    return task.template_id == "verified_pick_place" ? 6 : task.template_id == "pick_place" ? 4 : 1;
   }
   const TaskDefinition& admit(const std::string& name, const std::string& object,
                             const std::string& target, const DemoScene& scene,
@@ -75,7 +118,7 @@ class TaskCatalog {
     const auto& task = definitions_.at(name);
     if (!valid_id(object)) throw std::invalid_argument("invalid object ID");
     const auto& entity = scene.at(object);
-    if (task.template_id == "pick_place") {
+    if (task.template_id != "locate_object") {
       if (!valid_id(target) || entity.role != EntityRole::object ||
           scene.at(target).role != EntityRole::target)
         throw std::invalid_argument("object and target roles do not match task");
@@ -83,6 +126,10 @@ class TaskCatalog {
       check_step(skills, bindings, task, "pick_object", {{"object", object}});
       check_step(skills, bindings, task, "locate_object", {{"object", target}});
       check_step(skills, bindings, task, "place_object", {{"object", object}, {"target", target}});
+      if (task.template_id == "verified_pick_place") {
+        check_step(skills, bindings, task, "verify_grasp", {{"object", object}});
+        check_step(skills, bindings, task, "verify_placement", {{"object", object}, {"target", target}});
+      }
     } else {
       if (!target.empty()) throw std::invalid_argument("locate task takes no target");
       check_step(skills, bindings, task, "locate_object", {{"object", object}});
@@ -93,11 +140,15 @@ class TaskCatalog {
     for (const auto& entry : definitions_) {
       const auto& task = entry.second;
       skills.validate_dependencies("locate_object", task.implementation, bindings);
-      if (task.template_id == "pick_place") {
+      if (task.template_id != "locate_object") {
         if (scene.ids(EntityRole::object).empty() || scene.ids(EntityRole::target).empty())
           throw std::invalid_argument("pick_place requires configured objects and targets");
         skills.validate_dependencies("pick_object", task.implementation, bindings);
         skills.validate_dependencies("place_object", task.implementation, bindings);
+        if (task.template_id == "verified_pick_place") {
+          skills.validate_dependencies("verify_grasp", task.implementation, bindings);
+          skills.validate_dependencies("verify_placement", task.implementation, bindings);
+        }
       }
     }
   }
