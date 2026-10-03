@@ -78,7 +78,15 @@ class RuntimeTests(unittest.TestCase):
         goal = self.send()
         outcome = self.wait(goal.get_result_async())
         self.assertEqual(outcome.status, GoalStatus.STATUS_ABORTED)
-        self.assertEqual(outcome.result.error_code, "EXECUTION_FAILED")
+        self.assertEqual(outcome.result.error_code, "GRIPPER_FAILED")
+        self.assertFalse(outcome.result.success)
+
+    def test_execution_gate_denies_before_actuation(self):
+        self.start("mock_motion_permitted:=false")
+        goal = self.send()
+        outcome = self.wait(goal.get_result_async())
+        self.assertEqual(outcome.status, GoalStatus.STATUS_ABORTED)
+        self.assertEqual(outcome.result.error_code, "SAFETY_INTERLOCK")
         self.assertFalse(outcome.result.success)
 
     def test_unknown_task_rejected(self):

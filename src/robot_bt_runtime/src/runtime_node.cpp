@@ -27,14 +27,19 @@ struct Engine {
   std::chrono::milliseconds skill_timeout{2000};
   bool fault_latched{false};
 
-  Engine(std::string motion, int ticks, bool fail, bool permitted)
-      : bindings(components, {{"perception", "mock_camera"}, {"motion", std::move(motion)}, {"safety", "execution_gate"}}),
+  Engine(std::string motion, int ticks, bool fail_grasp, bool permitted)
+      : bindings(components, {{"perception", "mock_camera"}, {"motion", std::move(motion)},
+                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}}),
         context{bindings, world} {
+    const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("mock_camera", std::make_shared<rc::MockLocator>());
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
-    components.add("mock_arm", std::make_shared<rc::MockManipulator>(ticks, fail));
-    components.add("slow_mock_arm", std::make_shared<rc::MockManipulator>(ticks * 2, fail));
-    bindings.get<rc::Manipulator>("motion"); // fail startup on invalid configuration
+    components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks));
+    components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2));
+    components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp));
+    bindings.get<rc::ArmMotion>("motion");
+    bindings.get<rc::Gripper>("gripper");
+    bindings.get<rc::ExecutionGate>("safety");
     rc::register_demo_skills(skills);
   }
   std::shared_ptr<rc::Session> start(std::string skill, std::string implementation, rc::Arguments args) {

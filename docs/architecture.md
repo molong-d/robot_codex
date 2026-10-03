@@ -51,7 +51,9 @@ flowchart TD
 | 世界状态 | `WorldState`，仅保存示例观测；不能当作完整世界模型 |
 | 任务执行 | BehaviorTree.CPP `SkillNode` + ROS `RuntimeNode` |
 
-示例 `ObjectLocator` 和 `Manipulator` 是用于证明分层的最小类型化契约，不是生产机械臂、6D 感知或 VLA 的最终接口。未来应增加专用类型，不用无类型字符串字典承载轨迹和传感器数据。
+示例 `ObjectLocator`、`ArmMotion`、`Gripper` 和 `ExecutionGate` 是用于证明分层的最小类型化契约。`Manipulate` 技能先驱动手臂到时效有效的笛卡尔位姿，再执行夹持/释放，并分别验收运动和夹爪反馈；技能在整个过程中共同持有手臂与夹爪资源。
+
+未来 MoveIt 适配器实现 `ArmMotion`；ros2_control 负责 MoveIt/适配器下游的控制器与硬件接口，不伪装成任务技能。当前类型仍不是生产机械臂、真实 6D 感知或 VLA 的最终接口。
 
 ## 依赖方向与实时边界
 

@@ -4,6 +4,7 @@
     <Sequence>
       <Skill skill="locate_object" implementation="standard" object="{object}"/>
       <Skill skill="pick_object" implementation="standard" object="{object}"/>
+      <Skill skill="locate_object" implementation="standard" object="{target}"/>
       <Skill skill="place_object" implementation="standard" object="{object}" target="{target}"/>
     </Sequence>
   </BehaviorTree>

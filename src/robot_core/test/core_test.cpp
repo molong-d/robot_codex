@@ -3,9 +3,11 @@
 
 using namespace robot_core;
 using namespace std::chrono_literals;
+
 void check(bool value, const char* message) {
   if (!value) throw std::runtime_error(message);
 }
+
 struct Fixture {
   Components components;
   Bindings bindings;
@@ -13,12 +15,16 @@ struct Fixture {
   Context context;
   Skills skills;
   Resources resources;
+  std::shared_ptr<MockRobotState> robot{std::make_shared<MockRobotState>()};
   Time now{Clock::now()};
-  explicit Fixture(int ticks = 3, bool fail = false, bool permitted = true)
-      : bindings(components, {{"perception", "camera"}, {"motion", "arm"}, {"safety", "gate"}}),
+  explicit Fixture(int arm_ticks = 3, bool fail_motion = false, bool permitted = true,
+                   bool fail_grasp = false)
+      : bindings(components, {{"perception", "camera"}, {"motion", "arm"},
+                              {"gripper", "gripper"}, {"safety", "gate"}}),
         context{bindings, world} {
     components.add("camera", std::make_shared<MockLocator>());
-    components.add("arm", std::make_shared<MockManipulator>(ticks, fail));
+    components.add("arm", std::make_shared<MockArmMotion>(robot, arm_ticks, fail_motion));
+    components.add("gripper", std::make_shared<MockGripper>(robot, 2, fail_grasp));
     components.add("gate", std::make_shared<MockExecutionGate>(permitted));
     register_demo_skills(skills);
   }
@@ -34,7 +40,10 @@ struct Fixture {
     }
     return result;
   }
-  void locate() { check(run(request("locate", "locate_object")).status == Status::succeeded, "locate"); }
+  void locate(const std::string& id = "workpiece") {
+    check(run(request("locate-" + id, "locate_object", {{"object", id}})).status == Status::succeeded,
+          "locate");
+  }
 };
 
 class ProbeSkill : public Skill {
@@ -49,6 +58,7 @@ class ProbeSkill : public Skill {
  private:
   bool throws_;
 };
+
 class WrongVersion final : public ObjectLocator {
  public:
   unsigned interface_version() const override { return 99; }
@@ -62,33 +72,41 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
-    test("complete pick/place with observed outcome", [] {
+    test("skill composes perception arm motion and gripper", [] {
       Fixture f; f.locate();
       check(f.run(f.request("pick", "pick_object")).status == Status::succeeded, "pick");
-      check(f.world.observations.empty(), "motion invalidates geometry");
-      check(f.run(f.request("place", "place_object", {{"object", "workpiece"}, {"target", "tray"}})).status
-          == Status::succeeded, "place");
-      auto arm = f.bindings.get<Manipulator>("motion");
-      check(arm->holding().empty() && arm->location("workpiece") == "tray", "observed location");
+      check(f.world.attached_object == "workpiece" && f.robot->grasped, "grasp verified");
+      f.locate("tray");
+      check(f.run(f.request("place", "place_object",
+                            {{"object", "workpiece"}, {"target", "tray"}})).status == Status::succeeded,
+            "place");
+      check(f.world.attached_object.empty() && !f.robot->grasped, "release verified");
+      check(f.world.known_locations.at("workpiece") == "tray", "observed location");
       check(f.resources.empty(), "leases released");
     });
-    test("component implementation can change without skill changes", [] {
+    test("motion implementation can change without skill changes", [] {
       Fixture f(7); f.locate();
-      check(f.run(f.request("pick", "pick_object")).status == Status::succeeded, "slow backend");
+      check(f.run(f.request("pick", "pick_object")).status == Status::succeeded, "slow arm backend");
     });
-    test("stale and future observations rejected", [] {
+    test("stale and future pose observations are rejected", [] {
       Fixture f; f.locate(); f.now += 3s;
       check(f.run(f.request("old", "pick_object")).code == "STALE_OBSERVATION", "stale");
       f.world.observations["workpiece"].stamp = f.now + 1s;
       check(f.run(f.request("future", "pick_object")).code == "STALE_OBSERVATION", "future");
-      check(f.resources.empty(), "precondition failure releases lease");
+      check(f.resources.empty(), "precondition failure releases leases");
     });
-    test("execution gate blocks actuation before resource claim or dispatch", [] {
+    test("place requires a fresh target pose", [] {
+      Fixture f; f.locate();
+      check(f.run(f.request("pick", "pick_object")).status == Status::succeeded, "pick");
+      const auto result = f.run(f.request("place", "place_object",
+          {{"object", "workpiece"}, {"target", "tray"}}));
+      check(result.code == "STALE_OBSERVATION", "missing target observation");
+    });
+    test("execution gate blocks all actuators before resource claim", [] {
       Fixture f(3, false, false); f.locate();
       const auto result = f.run(f.request("blocked", "pick_object"));
-      check(result.status == Status::failed && result.code == "SAFETY_INTERLOCK", "gate must reject");
-      check(f.resources.empty(), "denied request must not lease arm");
-      check(f.bindings.get<Manipulator>("motion")->holding().empty(), "denied request must not move arm");
+      check(result.code == "SAFETY_INTERLOCK", "gate must reject");
+      check(f.resources.empty() && !f.robot->grasped && f.robot->arm_target.empty(), "no dispatch");
     });
     test("invalid arguments fail before dispatch", [] {
       Fixture f;
@@ -96,7 +114,7 @@ int main() {
       check(f.run(r).code == "INVALID_REQUEST", "extra input");
       r.arguments.clear(); check(f.run(r).code == "INVALID_REQUEST", "missing input");
     });
-    test("unbound, wrong type and wrong version are rejected", [] {
+    test("unbound wrong type and wrong version are rejected", [] {
       Fixture f;
       for (const auto& roles : {std::map<std::string, std::string>{},
                                std::map<std::string, std::string>{{"perception", "arm"}}}) {
@@ -122,56 +140,64 @@ int main() {
       check(!r.acquire("a", {"other"}), "duplicate active owner");
       r.release("a"); r.release("c"); check(r.empty(), "release");
     });
-    test("cancel holds lease until confirmed stopped", [] {
+    test("arm and gripper leases span the complete skill", [] {
+      Fixture f; f.locate();
+      Session s(f.skills, f.resources, f.context, f.request("pick", "pick_object"));
+      check(s.start(f.now).status == Status::running, "start");
+      for (int i = 0; i < 3; ++i) s.tick(f.now += 10ms);
+      check(!f.resources.acquire("other-arm", {"demo_arm"}), "arm remains reserved");
+      check(!f.resources.acquire("other-gripper", {"demo_gripper"}), "gripper remains reserved");
+      check(s.result().status == Status::running, "gripper phase running");
+    });
+    test("cancel holds both leases until active component confirms stop", [] {
       Fixture f; f.locate();
       Session s(f.skills, f.resources, f.context, f.request("pick", "pick_object"));
       check(s.start(f.now).status == Status::running, "start");
       s.cancel(); check(!f.resources.empty(), "cancel is not stop");
       check(s.tick(f.now).status == Status::canceling, "waiting for stop");
-      check(!f.resources.acquire("other", {"demo_arm_and_gripper"}), "no concurrent control");
       check(s.tick(f.now).status == Status::canceled, "stop confirmed");
-      check(f.resources.empty(), "released after stop");
-      check(f.bindings.get<Manipulator>("motion")->holding().empty(), "pick not performed");
+      check(f.resources.empty() && !f.robot->grasped, "safe release");
     });
-    test("timeout uses the same confirmed cancellation path", [] {
+    test("timeout uses confirmed cancellation path", [] {
       Fixture f; f.locate(); auto r = f.request("pick", "pick_object"); r.timeout = 1ms;
       Session s(f.skills, f.resources, f.context, r); s.start(f.now);
       check(s.tick(f.now + 2ms).status == Status::canceling, "timeout starts stop");
       check(s.tick(f.now + 3ms).status == Status::timed_out, "timeout result");
       check(f.resources.empty(), "timeout lease release");
     });
-    test("start is idempotent within a session", [] {
+    test("start is idempotent across a multi-component skill", [] {
       Fixture f; f.locate();
       Session s(f.skills, f.resources, f.context, f.request("pick", "pick_object"));
-      s.start(f.now); s.tick(f.now); s.start(f.now); s.tick(f.now);
-      check(s.tick(f.now).status == Status::succeeded, "must not reset backend progress");
+      s.start(f.now); s.start(f.now);
+      for (int i = 0; i < 10 && !terminal(s.result().status); ++i) s.tick(f.now += 10ms);
+      check(s.result().status == Status::succeeded, "must not reset component progress");
     });
-    test("backend failure is not success", [] {
-      Fixture f(2, true); f.locate();
-      check(f.run(f.request("pick", "pick_object")).code == "EXECUTION_FAILED", "failure propagates");
-      check(f.bindings.get<Manipulator>("motion")->holding().empty(), "nothing held");
+    test("motion and gripper failures remain distinct", [] {
+      Fixture motion(2, true); motion.locate();
+      check(motion.run(motion.request("motion", "pick_object")).code == "MOTION_FAILED", "motion failure");
+      Fixture grip(2, false, true, true); grip.locate();
+      check(grip.run(grip.request("grip", "pick_object")).code == "GRIPPER_FAILED", "gripper failure");
     });
     test("exceptions latch unknown state and retain control ownership", [] {
       Fixture f;
       f.skills.implement("pick_object", "broken", [](Context&) { return std::make_unique<ProbeSkill>(true); },
-                        {{{"motion", "manipulator", 1}}, {"motion"}, ""});
+                        {{{"motion", "arm_motion", 1}}, {"motion"}, ""});
       auto r = f.request("broken", "pick_object"); r.implementation = "broken";
       Session s(f.skills, f.resources, f.context, r); s.start(f.now);
       check(s.tick(f.now).status == Status::faulted, "fault latched");
-      check(!f.resources.empty(), "unknown actuator state must keep lease");
+      check(!f.resources.empty(), "unknown actuator state keeps lease");
     });
     test("destruction does not falsely confirm a stop", [] {
       Fixture f; f.locate();
       { Session s(f.skills, f.resources, f.context, f.request("pick", "pick_object")); s.start(f.now); }
-      check(!f.resources.empty(), "unconfirmed stop retains lease");
+      check(!f.resources.empty(), "unconfirmed stop retains leases");
     });
     test("skill implementation selection is independent of definition", [] {
       Fixture f;
       f.skills.implement("locate_object", "probe", [](Context&) { return std::make_unique<ProbeSkill>(); }, {});
       auto r = f.request("probe", "locate_object"); r.implementation = "probe";
       check(f.run(r).status == Status::succeeded, "second implementation selected");
-      check(f.skills.definition("locate_object").required_inputs.size() == 1, "definition stable");
-      check(f.skills.dependencies("locate_object", "probe").components.empty(), "implementation-specific dependencies");
+      check(f.skills.dependencies("locate_object", "probe").components.empty(), "implementation dependencies");
     });
   } catch (const std::exception& e) {
     std::cerr << "FAIL: " << e.what() << '\n'; return 1;

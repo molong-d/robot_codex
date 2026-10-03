@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.1 mock 骨架**。包含实际的 ROS 2 Action 服务、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。没有连接真实机器人，也没有实现 MoveIt、ros2_control、6D 感知、力控或具体大模型适配。
+当前版本为 **v0.2 mock 骨架**。包含实际的 ROS 2 Action 服务、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。抓取/放置技能已经组合独立的位姿感知、手臂运动和夹爪组件，但尚未连接真实机器人，也没有实现 MoveIt、ros2_control、真实 6D 感知、力控或具体大模型适配。
 
 ## 技能与组件
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | 任务 | 组织完整目标 | 定位、抓取并放到托盘 |
 | 技能 | 对目标行为及结果负责 | locate_object、pick_object、place_object |
-| 组件 | 实现可复用技术功能 | 感知、运动规划、动作策略、控制 |
+| 组件 | 实现可复用技术功能 | 位姿感知、手臂运动、夹爪、动作策略、控制 |
 | 适配器 | 对接设备或第三方框架 | 厂商 SDK、MoveIt、ros2_control |
 
 技能定义与技能实现分离；实现通过角色绑定获取组件。替换 `mock_arm` 为 `slow_mock_arm` 不需要修改技能或行为树。这里的“组件”不等于 ROS 2 Composable Node。
@@ -72,13 +72,13 @@ ros2 launch robot_bringup demo.launch.py motion_component:=slow_mock_arm
 ros2 launch robot_bringup demo.launch.py mock_fail_pick:=true
 ```
 
-预期 `EXECUTION_FAILED`，不会执行后续放置技能。模拟执行许可拒绝（真实接入时应由急停、围栏、控制器模式等系统提供）：
+预期 `GRIPPER_FAILED`，不会执行后续定位托盘与放置技能。模拟执行许可拒绝：
 
 ```bash
 ros2 launch robot_bringup demo.launch.py mock_motion_permitted:=false
 ```
 
-此时抓取和放置会返回 `SAFETY_INTERLOCK`，不会取得机械臂资源或下发动作。参数 `mock_action_ticks` 可增大动作持续时间，方便观察取消和超时；这只是计次 mock，不是物理仿真。
+此时抓取返回 `SAFETY_INTERLOCK`，不会取得手臂/夹爪资源或下发动作。参数 `mock_action_ticks` 可增大动作持续时间，方便观察取消和超时；这只是计次 mock，不是物理仿真。
 
 ## 完整验证
 
@@ -90,12 +90,12 @@ colcon test-result --verbose
 python3 scripts/test_ros.py
 ```
 
-ROS 集成测试会自行启动/停止节点，验证实际行为树及 Action 的成功、组件替换、失败、未知任务拒绝、超时、忙碌拒绝和取消确认。GitHub Actions 配置运行核心与 ROS 两类测试，结果见仓库 Actions 页面。
+ROS 集成测试会自行启动/停止节点，验证实际行为树及 Action 的成功、组件替换、运动/夹爪失败、执行许可拒绝、未知任务拒绝、超时、忙碌拒绝和取消确认。GitHub Actions 配置运行核心与 ROS 两类测试，结果见仓库 Actions 页面。
 
 ## 当前边界
 
 - 单机器人、单活动任务、单线程 executor；没有分布式资源锁。
-- 定位示例只提供对象 ID、坐标系与时间戳，**不是 6D 感知算法**。
+- 定位示例返回固定 mock 位姿、坐标系与时间戳，**不是 6D 感知算法**。
 - 条件描述用于契约说明；当前条件由技能 C++ 实现检查，没有通用谓词解释器或自动规划器。
 - 技能/组件通过显式工厂注册，不支持运行时下载插件；扩展实际第三方适配器时可再接 pluginlib 或 ROS Action 客户端。
 - 任务模板是手写行为树；LLM/VLM 任务规划和 VLA 动作策略只预留架构位置，没有模型调用或 API key 要求。
