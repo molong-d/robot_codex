@@ -1,4 +1,5 @@
 #pragma once
+#include "robot_core/geometry.hpp"
 
 #include <chrono>
 #include <functional>
@@ -11,8 +12,6 @@
 #include <vector>
 
 namespace robot_core {
-using Clock = std::chrono::steady_clock;
-using Time = Clock::time_point;
 using Arguments = std::map<std::string, std::string>;
 
 enum class Status { idle, running, canceling, succeeded, failed, canceled, timed_out, faulted };
@@ -97,15 +96,6 @@ class Bindings {
   std::map<std::string, std::string> roles_;
 };
 
-struct Pose {
-  double x{0.0};
-  double y{0.0};
-  double z{0.0};
-  double qx{0.0};
-  double qy{0.0};
-  double qz{0.0};
-  double qw{1.0};
-};
 struct Observation {
   std::string object_id;
   std::string frame_id;
@@ -117,6 +107,8 @@ struct WorldState {
   std::map<std::string, Observation> observations;
   std::string attached_object;
   std::map<std::string, std::string> known_locations;
+  // An inferred release location is not a new perception measurement.
+  std::map<std::string, std::string> placement_candidates;
 };
 struct Requirement {
   std::string role;

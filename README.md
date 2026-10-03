@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.2 mock 骨架**。包含实际的 ROS 2 Action 服务、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。抓取/放置技能已经组合独立的位姿感知、手臂运动和夹爪组件，但尚未连接真实机器人，也没有实现 MoveIt、ros2_control、真实 6D 感知、力控或具体大模型适配。
+当前版本为 **v0.3 执行契约开发版**。包含 ROS 2 Action 服务、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
 
 ## 技能与组件
 
@@ -103,3 +103,5 @@ ROS 集成测试会自行启动/停止节点，验证实际行为树及 Action �
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
 阅读：[架构与术语](docs/architecture.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+
+稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

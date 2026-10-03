@@ -125,6 +125,8 @@ class RuntimeNode final : public rclcpp::Node {
         },
         [this](const std::shared_ptr<GoalHandle> handle) {
           if (handle != active_) return rclcpp_action::CancelResponse::REJECT;
+          cancel_requested_ = true;
+          engine_->cancel();
           return rclcpp_action::CancelResponse::ACCEPT;
         },
         [this](const std::shared_ptr<GoalHandle> handle) { accept(handle); });
@@ -142,6 +144,7 @@ class RuntimeNode final : public rclcpp::Node {
   void accept(const std::shared_ptr<GoalHandle>& handle) {
     active_ = handle;
     stopping_ = false;
+    cancel_requested_ = false;
     timeout_ = false;
     engine_->sessions.clear();
     engine_->world.observations.clear();
@@ -155,18 +158,20 @@ class RuntimeNode final : public rclcpp::Node {
   }
   void tick() {
     const auto now = rc::Clock::now();
-    engine_->pump(now);
-    if (!active_) return;
     try {
+      // Process stop before pumping: a tick must not start a new sub-action
+      // after the task cancellation/deadline was already observed.
+      if (active_ && !stopping_ && (cancel_requested_ || active_->is_canceling() || now >= deadline_)) {
+        stopping_ = true;
+        timeout_ = !cancel_requested_ && !active_->is_canceling();
+        stop_deadline_ = now + stop_timeout_;
+        if (tree_) tree_->haltTree();
+        engine_->cancel();
+      }
+      engine_->pump(now);
+      if (!active_) return;
       if (engine_->fault_latched) {
         finish(false, "faulted", "STATE_UNKNOWN", "component fault; runtime latched"); return;
-      }
-      if (!stopping_ && (active_->is_canceling() || now >= deadline_)) {
-        stopping_ = true;
-        timeout_ = !active_->is_canceling();
-        stop_deadline_ = now + stop_timeout_;
-        tree_->haltTree();
-        engine_->cancel();
       }
       if (stopping_) {
         if (engine_->stopped()) {
@@ -200,7 +205,7 @@ class RuntimeNode final : public rclcpp::Node {
       active_->publish_feedback(feedback);
     } catch (const std::exception& e) {
       engine_->fault_latched = true;
-      finish(false, "faulted", "RUNTIME_EXCEPTION", e.what());
+      if (active_) finish(false, "faulted", "RUNTIME_EXCEPTION", e.what());
     }
   }
   void finish(bool success, const std::string& status, const std::string& code, const std::string& message) {
@@ -228,7 +233,7 @@ class RuntimeNode final : public rclcpp::Node {
   std::shared_ptr<GoalHandle> active_;
   rc::Time deadline_, stop_deadline_;
   std::chrono::milliseconds stop_timeout_{2000};
-  bool reserved_{false}, stopping_{false}, timeout_{false};
+  bool reserved_{false}, stopping_{false}, timeout_{false}, cancel_requested_{false};
 };
 
 int main(int argc, char** argv) {

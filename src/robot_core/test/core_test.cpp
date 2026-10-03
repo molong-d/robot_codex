@@ -1,5 +1,6 @@
 #include "robot_core/demo.hpp"
 #include <iostream>
+#include <limits>
 
 using namespace robot_core;
 using namespace std::chrono_literals;
@@ -66,12 +67,93 @@ class WrongVersion final : public ObjectLocator {
   std::optional<Observation> locate(const std::string&, Time) override { return std::nullopt; }
 };
 
+// A real action server may report success even after a cancel request was sent.
+class ProbeMotion final : public ArmMotion {
+ public:
+  MotionFeedback measured;
+  bool dispatched{false}, stop_requested{false}, throw_after_dispatch{false};
+  Status status{Status::succeeded};
+  std::string resource_id() const override { return "demo_arm"; }
+  void begin_move(const CartesianTarget& target) override {
+    dispatched = true;
+    measured.frame_id = target.frame_id;
+    measured.pose = target.pose;
+    if (throw_after_dispatch) throw std::runtime_error("transport failed after dispatch");
+  }
+  Status poll(Time) override { return status; }
+  void request_stop() override { stop_requested = true; }
+  MotionFeedback feedback() const override { return measured; }
+};
+
 int main() {
   int passed = 0;
   auto test = [&passed](const char* name, const std::function<void()>& run) {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("pose validation rejects NaN and invalid quaternion", [] {
+      Pose p;
+      check(valid_pose(p), "identity quaternion");
+      p.x = std::numeric_limits<double>::quiet_NaN();
+      check(!valid_pose(p), "NaN");
+      p = {}; p.qw = 0.0; check(!valid_pose(p), "zero quaternion");
+      p.qw = 2.0; check(!valid_pose(p), "nonunit quaternion");
+      p = {}; auto q = p; q.qw = -1.0;
+      check(pose_near(p, q, {}), "quaternion sign equivalence");
+      q.x = 0.1; check(!pose_near(p, q, {}), "position tolerance");
+      check(!fresh(Time{}, Clock::now(), 500ms), "unstamped data");
+    });
+    test("cancel winning completion race never dispatches gripper", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<ProbeMotion>();
+      f.components.add("race", arm);
+      Bindings b(f.components, {{"motion", "race"}, {"gripper", "gripper"}, {"safety", "gate"}});
+      Context c{b, f.world};
+      Session s(f.skills, f.resources, c, f.request("race", "pick_object"));
+      s.start(f.now);
+      arm->measured.stamp = f.now; arm->measured.valid = true; arm->measured.stopped = true;
+      s.cancel();
+      check(s.tick(f.now).status == Status::canceled, "race canceled");
+      check(arm->stop_requested && !f.robot->grasped, "no grasp dispatched");
+      check(f.bindings.get<Gripper>("gripper")->poll(f.now) == Status::idle, "gripper still idle");
+    });
+    test("terminal result needs fresh stationary feedback to release lease", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<ProbeMotion>(); f.components.add("probe", arm);
+      Bindings b(f.components, {{"motion", "probe"}, {"gripper", "gripper"}, {"safety", "gate"}});
+      Context c{b, f.world};
+      Session s(f.skills, f.resources, c, f.request("probe", "pick_object")); s.start(f.now);
+      arm->measured = {"base_link", {}, f.now-2s, true, true};
+      s.cancel(); check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "stale feedback retains lease");
+      arm->measured.stamp = f.now; arm->measured.stopped = false;
+      check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "moving feedback retains lease");
+      arm->measured.stopped = true; arm->measured.stamp = f.now-1ms;
+      check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "pre-result stop sample retains lease");
+      arm->measured.stamp = f.now;
+      arm->measured.stopped = true;
+      check(s.tick(f.now).status == Status::canceled && f.resources.empty(), "measured stop releases lease");
+    });
+    test("outside-tolerance pose blocks grasp after successful action", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<ProbeMotion>(); f.components.add("probe", arm);
+      Bindings b(f.components, {{"motion", "probe"}, {"gripper", "gripper"}, {"safety", "gate"}});
+      Context c{b, f.world};
+      Session s(f.skills, f.resources, c, f.request("probe", "pick_object")); s.start(f.now);
+      arm->measured.stamp = f.now; arm->measured.valid = true; arm->measured.stopped = true;
+      arm->measured.pose.x += 0.1;
+      check(s.tick(f.now).code == "MOTION_VERIFICATION_FAILED", "pose mismatch");
+      check(!f.robot->grasped, "no grasp");
+    });
+    test("dispatch exception still requests stop and keeps ownership", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<ProbeMotion>(); arm->throw_after_dispatch = true;
+      f.components.add("probe", arm);
+      Bindings b(f.components, {{"motion", "probe"}, {"gripper", "gripper"}, {"safety", "gate"}});
+      Context c{b, f.world};
+      Session s(f.skills, f.resources, c, f.request("probe", "pick_object"));
+      check(s.start(f.now).status == Status::faulted, "fault after dispatch");
+      check(arm->stop_requested && !f.resources.empty(), "phase set before dispatch");
+    });
     test("skill composes perception arm motion and gripper", [] {
       Fixture f; f.locate();
       check(f.run(f.request("pick", "pick_object")).status == Status::succeeded, "pick");
@@ -81,7 +163,8 @@ int main() {
                             {{"object", "workpiece"}, {"target", "tray"}})).status == Status::succeeded,
             "place");
       check(f.world.attached_object.empty() && !f.robot->grasped, "release verified");
-      check(f.world.known_locations.at("workpiece") == "tray", "observed location");
+      check(f.world.placement_candidates.at("workpiece") == "tray", "inferred placement");
+      check(f.world.known_locations.count("workpiece") == 0, "release is not a perception observation");
       check(f.resources.empty(), "leases released");
     });
     test("motion implementation can change without skill changes", [] {
@@ -181,7 +264,7 @@ int main() {
     test("exceptions latch unknown state and retain control ownership", [] {
       Fixture f;
       f.skills.implement("pick_object", "broken", [](Context&) { return std::make_unique<ProbeSkill>(true); },
-                        {{{"motion", "arm_motion", 1}}, {"motion"}, ""});
+                        {{{"motion", "arm_motion", 2}}, {"motion"}, ""});
       auto r = f.request("broken", "pick_object"); r.implementation = "broken";
       Session s(f.skills, f.resources, f.context, r); s.start(f.now);
       check(s.tick(f.now).status == Status::faulted, "fault latched");
