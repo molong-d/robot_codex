@@ -3,7 +3,7 @@
 ## 新增组件实现
 
 1. 确定职责：感知、运动规划、动作策略、控制或硬件适配。
-2. 实现对应的类型化契约。示例见 `ObjectLocator`、`ManipulationObserver`、`ArmMotion`、`Gripper`、`ExecutionGate`。
+2. 实现对应的类型化契约。示例见 `ObjectLocator`、`MotionTargetResolver`、`ManipulationObserver`、`ArmMotion`、`Gripper`、`ExecutionGate`。
 3. 声明接口类型、接口版本和物理资源 ID。两个适配器控制同一机械臂时必须使用相同资源 ID。
 4. 在启动组合处注册实例；将技能使用的角色绑定到该实例。
 5. 验证输入、输出单位/坐标系/时序及取消行为；增加契约测试。
@@ -24,6 +24,8 @@ v0 的 `mock_arm` 与 `slow_mock_arm` 展示配置替换。注册表支持显式
 5A 使用 `SkillDefinition::inputs` 注册 `{name, type, description}`，当前只支持必填 `entity_id`。`/get_catalog` 返回技能定义及每种实现的依赖；配置化对象/目标和任务别名的扩展步骤见 [技能目录与任务配置](task_catalog.md)。目录中的绑定匹配不代表执行许可或成功条件已经满足。
 
 同一技能可有传统实现与学习策略实现。技能定义共享时，输入语义、成功条件和执行约束必须一致；如果两种实现对外承诺不同，应拆分定义或版本。每种实现通过 `Dependencies` 独立声明组件需求和独占资源角色，因此 VLA 实现不必假装使用传统 6D 感知组件。
+
+7A 提供可运行的第二种实现 pose_resolved：仅抓取/放置额外依赖 MotionTargetResolver，定位与验证复用既有行为。它验证原生位姿、基坐标与工具匹配、标定身份及证据未被刷新后执行动作。新增动态 TF 或物体相关抓取点解析器时实现此组件契约，详见 [显式位姿解析](target_resolution.md)；不要在定位组件里偷偷改变原生位姿语义。
 
 ## 执行许可门
 

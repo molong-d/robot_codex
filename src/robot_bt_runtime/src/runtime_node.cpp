@@ -37,15 +37,21 @@ struct Engine {
 
   Engine(std::string motion, int ticks, int stop_ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
          bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity,
-         bool outcome_enabled, const std::string& verification_failure, int verification_window_ms)
+         bool outcome_enabled, const std::string& verification_failure, int verification_window_ms,
+         const rc::DemoScene& perception_scene, rc::PoseMeaning perception_meaning,
+         std::shared_ptr<rc::MotionTargetResolver> target_resolver)
       : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
-                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}, {"outcome", "demo_outcome"}}),
+                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}, {"outcome", "demo_outcome"},
+                              {"target_resolver", "static_target_resolver"}}),
         context{bindings, world}, journal(history_capacity) {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
-    components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(scene));
+    components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(perception_scene, perception_meaning,
+        perception_meaning == rc::PoseMeaning::object_pose ? "configured_native_demo" : "configured_demo"));
+    if (target_resolver) components.add("static_target_resolver", std::move(target_resolver));
     rc::ManipulationPolicy policy;
     policy.frame_id = scene.frame();
+    policy.tool_frame = config.tip;
     policy.allow_synthetic = true;  // this runtime only has demonstration backends
     if (ros_backend) {
       components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
@@ -155,7 +161,7 @@ class RuntimeNode final : public rclcpp::Node {
     config.gripper_action = declare_parameter<std::string>("gripper_action", config.gripper_action);
     config.frame = catalog_support::startup_parameter<std::string>(this, "base_frame",
         backend == "panda_ros" ? config.frame : "base_link");
-    config.tip = declare_parameter<std::string>("end_effector_link", config.tip);
+    config.tip = catalog_support::startup_parameter<std::string>(this, "end_effector_link", backend == "panda_ros" ? config.tip : "tool0");
     config.group = declare_parameter<std::string>("planning_group", config.group);
     config.arm_joints = declare_parameter<std::vector<std::string>>("arm_joints", config.arm_joints);
     config.finger_joint = declare_parameter<std::string>("finger_joint", config.finger_joint);
@@ -182,10 +188,17 @@ class RuntimeNode final : public rclcpp::Node {
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
     scene_ = std::make_unique<rc::DemoScene>(catalog_support::load_scene(this, config.frame, backend == "panda_ros"));
+    const auto perception_mode = catalog_support::startup_parameter<std::string>(this, "perception_mode", "motion_target");
+    if (perception_mode != "motion_target" && perception_mode != "object_pose")
+      throw std::invalid_argument("perception_mode must be motion_target or object_pose");
+    const auto perception_scene = perception_mode == "object_pose" ? catalog_support::load_native_scene(this, *scene_) : *scene_;
+    auto target_resolver = catalog_support::load_target_resolver(this, config.frame, config.tip);
     tasks_ = std::make_unique<rc::TaskCatalog>(catalog_support::load_tasks(this));
     if (history_capacity < 1 || history_capacity > 128) throw std::invalid_argument("execution history capacity requires 1..128");
     engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_,
-                                     static_cast<size_t>(history_capacity), outcome_enabled, verification_failure, verification_window_ms);
+                                     static_cast<size_t>(history_capacity), outcome_enabled, verification_failure, verification_window_ms,
+                                     perception_scene, perception_mode == "object_pose" ? rc::PoseMeaning::object_pose : rc::PoseMeaning::motion_target,
+                                     std::move(target_resolver));
     tasks_->validate_configuration(*scene_, engine_->skills, engine_->bindings);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
@@ -332,7 +345,7 @@ class RuntimeNode final : public rclcpp::Node {
       success_message_ = task.template_id == "verified_pick_place" ?
           "synthetic grasp and placement evidence verified; no physical object/contact sensing" :
           task.template_id == "pick_place" ? "release verified; object placement needs perception confirmation" :
-          "fresh configured demo motion target obtained";
+          "fresh configured demo pose obtained; inspect pose_meaning for its semantics";
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
   }
   void accept_plan(const std::shared_ptr<PlanGoalHandle>& handle) {

@@ -33,15 +33,22 @@ class DemoScene {
 
 class ConfiguredDemoLocator final : public ObjectLocator {
  public:
-  explicit ConfiguredDemoLocator(DemoScene scene) : scene_(std::move(scene)) {}
+  explicit ConfiguredDemoLocator(DemoScene scene, PoseMeaning meaning = PoseMeaning::motion_target,
+                                std::string source = "configured_demo")
+      : scene_(std::move(scene)), meaning_(meaning), source_(std::move(source)) {
+    if (!valid_id(source_) || (meaning_ != PoseMeaning::object_pose && meaning_ != PoseMeaning::motion_target))
+      throw std::invalid_argument("invalid configured perception semantics");
+  }
   std::string resource_id() const override { return "configured_demo_scene"; }
   std::optional<Observation> locate(const std::string& id, Time now) override {
     try { return Observation{id, scene_.frame(), scene_.at(id).pose, now, true,
-                             {"configured_demo", true, 1.0}, PoseMeaning::motion_target}; }
+                             {source_, true, 1.0}, meaning_}; }
     catch (const std::out_of_range&) { return std::nullopt; }
   }
  private:
   DemoScene scene_;
+  PoseMeaning meaning_;
+  std::string source_;
 };
 
 // Deliberately synthetic: robot feedback plus configured end-effector targets,

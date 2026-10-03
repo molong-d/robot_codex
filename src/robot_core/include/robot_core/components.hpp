@@ -22,6 +22,18 @@ struct CartesianTarget {
   Pose pose;
   PoseTolerance tolerance;
 };
+enum class TargetPurpose { grasp, placement };
+struct ResolvedMotionTarget {
+  Observation observation;
+  std::string calibration_id, tool_frame;
+};
+// Converts a native object/target pose to the commanded tool-frame pose.
+// It supplies geometry; the skill owns freshness, admission and dispatch.
+class MotionTargetResolver : public Component {
+ public:
+  std::string interface_id() const final { return "motion_target_resolver"; }
+  virtual std::optional<ResolvedMotionTarget> resolve(const Observation&, TargetPurpose) = 0;
+};
 struct MotionFeedback {
   std::string frame_id;
   Pose pose;
@@ -69,6 +81,7 @@ struct ManipulationPolicy {
   double gripper_tolerance_m{0.002};
   double minimum_observation_quality{0.8};
   bool allow_synthetic{false};
+  std::string tool_frame{"tool0"};
 };
 struct VerificationPolicy {
   EvidencePolicy evidence;

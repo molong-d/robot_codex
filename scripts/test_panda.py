@@ -6,6 +6,7 @@ import tempfile
 import time
 import math
 import unittest
+from pathlib import Path
 
 import rclpy
 from action_msgs.msg import GoalStatus
@@ -20,12 +21,20 @@ from robot_interfaces.srv import GetExecution, GetRuntimeState
 
 
 class PandaTests(unittest.TestCase):
+    native_poses = False
+    implementation = "standard"
+
     @classmethod
     def setUpClass(cls):
-        rclpy.init()
+        domain = (int(os.environ.get("ROS_DOMAIN_ID", "42")) + (110 if cls.native_poses else 0)) % 201
+        rclpy.init(domain_id=domain)
         cls.log = tempfile.TemporaryFile(mode="w+")
-        cls.process = subprocess.Popen(["ros2", "launch", "robot_panda_demo", "panda.launch.py"],
-                                       stdout=cls.log, stderr=subprocess.STDOUT, start_new_session=True)
+        command = ["ros2", "launch", "robot_panda_demo", "panda.launch.py"]
+        if cls.native_poses:
+            config = Path(__file__).resolve().parents[1]/"src/robot_panda_demo/config/runtime_native_poses.yaml"
+            command.append(f"config_file:={config}")
+        cls.process = subprocess.Popen(command, stdout=cls.log, stderr=subprocess.STDOUT, start_new_session=True,
+                                       env=dict(os.environ, ROS_DOMAIN_ID=str(domain)))
         cls.node = rclpy.create_node("panda_adapter_tests")
         cls.client = ActionClient(cls.node, ExecuteTask, "execute_task")
         cls.plan_client = ActionClient(cls.node, ExecutePlan, "execute_plan")
@@ -142,7 +151,7 @@ class PandaTests(unittest.TestCase):
     def test_04_structured_plan_uses_actual_moveit_and_controllers(self):
         self.ready()
         self.assertTrue(self.plan_client.wait_for_server(timeout_sec=10))
-        steps = [SkillStep(skill_id=skill, implementation_id="standard", argument_names=list(args), argument_values=list(args.values()))
+        steps = [SkillStep(skill_id=skill, implementation_id=self.implementation, argument_names=list(args), argument_values=list(args.values()))
                  for skill, args in [("locate_object", {"object": "workpiece"}), ("pick_object", {"object": "workpiece"}),
                                      ("locate_object", {"object": "tray"}),
                                      ("place_object", {"object": "workpiece", "target": "tray"})]]
@@ -183,6 +192,10 @@ class PandaTests(unittest.TestCase):
             record = self.wait(client.call_async(GetExecution.Request(execution_id=bytes(handle.goal_id.uuid).hex())))
             self.assertEqual(record.schema_version, 2)
             self.assertEqual(record.record.completed_steps, 6)
+            if self.native_poses:
+                for index in (1, 4):
+                    self.assertEqual(record.record.steps[index].step.implementation_id, "pose_resolved")
+                    self.assertIn("calibration=demo_camera_v1", record.record.steps[index].transitions[0].message)
             for index in (2, 5):
                 self.assertTrue(record.record.steps[index].has_verification)
                 proof = record.record.steps[index].verification
@@ -197,6 +210,30 @@ class PandaTests(unittest.TestCase):
             self.assertNotIn("workpiece", candidates)
             self.assertEqual(locations.get("workpiece"), "tray")
             self.assertTrue(record.record.snapshot.stop_confirmed)
+        finally:
+            self.node.destroy_client(client)
+
+
+class NativePandaTests(PandaTests):
+    native_poses = True
+    implementation = "pose_resolved"
+
+    def test_06_native_observation_is_not_a_precomputed_motion_target(self):
+        self.ready()
+        handle = self.wait(self.client.send_goal_async(ExecuteTask.Goal(
+            task_name="inspect_object", object_id="workpiece", target_id="", timeout_ms=5000)))
+        self.assertTrue(handle.accepted)
+        self.assertTrue(self.wait(handle.get_result_async()).result.success)
+        client = self.node.create_client(GetRuntimeState, "get_runtime_state")
+        try:
+            self.assertTrue(client.wait_for_service(timeout_sec=5))
+            state = self.wait(client.call_async(GetRuntimeState.Request()))
+            observation = next(o for o in state.snapshot.observations if o.entity_id == "workpiece")
+            self.assertEqual((observation.frame_id, observation.pose_meaning), ("demo_camera", "object_pose"))
+            self.assertEqual(observation.source, "configured_native_demo")
+            self.assertTrue(observation.synthetic)
+            self.assertAlmostEqual(observation.pose[0], 0.15)
+            self.assertAlmostEqual(observation.pose[2], 0.32)
         finally:
             self.node.destroy_client(client)
 

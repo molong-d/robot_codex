@@ -1,0 +1,47 @@
+# Synthetic native poses and calibration fixture; no real camera or physical contact.
+robot_runtime:
+  ros__parameters:
+    base_frame: base_link
+    object_ids: [workpiece, workpiece_two]
+    target_ids: [tray, tray_two]
+    entities.workpiece.pose: [0.4, 0.1, 0.2, 0.0, 0.0, 0.0, 1.0]
+    entities.tray.pose: [0.6, -0.2, 0.15, 0.0, 0.0, 0.0, 1.0]
+    entities.workpiece_two.pose: [0.3, -0.1, 0.2, 0.0, 0.0, 0.0, 1.0]
+    entities.tray_two.pose: [0.5, 0.2, 0.3, 0.0, 0.0, 0.0, 1.0]
+    task_names: [pick_place, inspect_object, transfer_two, verified_pick_place]
+    tasks.verified_pick_place.template_id: verified_pick_place
+    simulation_outcome_evidence: true
+    tasks.pick_place.template_id: pick_place
+    tasks.pick_place.implementation_id: pose_resolved
+    tasks.inspect_object.template_id: locate_object
+    tasks.inspect_object.implementation_id: pose_resolved
+    tasks.transfer_two.template_id: pick_place
+    tasks.transfer_two.implementation_id: pose_resolved
+    motion_component: mock_arm
+    mock_action_ticks: 3
+    mock_fail_pick: false
+    mock_motion_permitted: true
+    tick_period_ms: 20
+    skill_timeout_ms: 2000
+    stop_timeout_ms: 2000
+    perception_mode: object_pose
+    perception_frame: demo_camera
+    end_effector_link: tool0
+    target_resolution.enabled: true
+    target_resolution.calibration_id: demo_camera_v1
+    target_resolution.source_frame: demo_camera
+    target_resolution.tool_frame: tool0
+    target_resolution.synthetic: true
+    target_resolution.source_in_base: [0.1, -0.05, 0.1, 0.0, 0.0, 0.7071067811865476,
+      0.7071067811865476]
+    target_resolution.grasp_tool_offset: [0.0, 0.0, 0.02, 0.0, 0.0, 0.0, 1.0]
+    target_resolution.place_tool_offset: [0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 1.0]
+    native_entities.workpiece.pose: [0.15, -0.3, 0.08, 0.0, 0.0, -0.7071067811865476,
+      0.7071067811865476]
+    native_entities.workpiece_two.pose: [-0.05, -0.2, 0.08, 0.0, 0.0, -0.7071067811865476,
+      0.7071067811865476]
+    native_entities.tray.pose: [-0.15, -0.5, 0.04, 0.0, 0.0, -0.7071067811865476,
+      0.7071067811865476]
+    native_entities.tray_two.pose: [0.25, -0.4, 0.19, 0.0, 0.0, -0.7071067811865476,
+      0.7071067811865476]
+    tasks.verified_pick_place.implementation_id: pose_resolved
