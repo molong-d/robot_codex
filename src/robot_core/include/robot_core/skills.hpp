@@ -72,10 +72,12 @@ class Manipulate final : public Skill {
       return {Status::faulted, "COMPONENT_FAULT", "component state unknown"};
     if (!terminal(status))
       return {stopping_ ? Status::canceling : Status::running, "", "awaiting component completion"};
+    if (terminal_since_ == Time{}) terminal_since_ = now;
     // A server result (including canceled) is insufficient without current stop feedback.
     if (phase_ == Phase::moving) {
       const auto f = arm_->feedback();
-      if (!f.valid || !valid_pose(f.pose) || !fresh(f.stamp, now, policy_.feedback_max_age) || !f.stopped)
+      if (!f.valid || !valid_pose(f.pose) || !fresh(f.stamp, now, policy_.feedback_max_age) ||
+          f.stamp < terminal_since_ || !f.stopped)
         return {stopping_ ? Status::canceling : Status::running, "STOP_UNCONFIRMED", "awaiting fresh stationary arm feedback"};
       if (stopping_) return complete({Status::canceled, "CANCELED", "arm stopped; no next action dispatched"});
       if (status != Status::succeeded)
@@ -83,12 +85,13 @@ class Manipulate final : public Skill {
       if (f.frame_id != target_.frame_id || !pose_near(f.pose, target_.pose, target_.tolerance))
         return complete({Status::failed, "MOTION_VERIFICATION_FAILED", "measured pose outside tolerance"});
       phase_ = Phase::gripping;
+      terminal_since_ = {};
       if (pick_) gripper_->begin_grasp(policy_.grasp);
       else gripper_->begin_release(policy_.release_width_m);
       return {Status::running, "", pick_ ? "grasp started" : "release started"};
     }
     const auto g = gripper_->feedback();
-    if (!gripper_valid(g, now) || !g.stopped)
+    if (!gripper_valid(g, now) || g.stamp < terminal_since_ || !g.stopped)
       return {stopping_ ? Status::canceling : Status::running, "STOP_UNCONFIRMED", "awaiting fresh stationary gripper feedback"};
     // Reconcile completed grasp/release even if cancellation won the ROS result race.
     if (g.grasp_detected && pick_) {
@@ -128,6 +131,7 @@ class Manipulate final : public Skill {
   ManipulationPolicy policy_;
   Phase phase_{Phase::idle};
   Result result_;
+  Time terminal_since_{};
   std::string object_, target_id_;
   CartesianTarget target_;
 };

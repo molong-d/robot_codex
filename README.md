@@ -23,6 +23,8 @@
 | `src/robot_interfaces` | `ExecuteTask.action`，类型明确的任务入口 |
 | `src/robot_bt_runtime` | BehaviorTree.CPP 4 执行引擎与 ROS 2 Action 服务 |
 | `src/robot_bringup` | 启动文件及组件选择配置 |
+| `src/robot_ros_adapters` | 非阻塞 MoveIt/并联夹爪 Action 客户端、JointState/TF 反馈 |
+| `src/robot_panda_demo` | Panda + ros2_control GenericSystem 示例及配置 |
 | `docs` | 架构、扩展流程、执行约束和后续路线 |
 | `scripts` | 核心测试与 ROS 2 集成测试 |
 
@@ -88,9 +90,27 @@ ros2 launch robot_bringup demo.launch.py mock_motion_permitted:=false
 colcon test --event-handlers console_direct+ --return-code-on-test-failure
 colcon test-result --verbose
 python3 scripts/test_ros.py
+python3 scripts/test_panda.py
 ```
 
 ROS 集成测试会自行启动/停止节点，验证实际行为树及 Action 的成功、组件替换、运动/夹爪失败、执行许可拒绝、未知任务拒绝、超时、忙碌拒绝和取消确认。GitHub Actions 配置运行核心与 ROS 两类测试，结果见仓库 Actions 页面。
+
+## Panda ROS 后端示例
+
+停止 mock runtime 后运行：
+
+```bash
+ros2 launch robot_panda_demo panda.launch.py
+```
+
+另开终端，source ROS 与本仓库 overlay，等待 MoveIt 和控制器就绪后发送：
+
+```bash
+ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
+  "{task_name: pick_place, object_id: workpiece, target_id: tray, timeout_ms: 90000}" --feedback
+```
+
+此示例实际运行 MoveIt 规划、轨迹控制器、夹爪控制器和 TF，硬件固定为 GenericSystem。目标位姿为示例配置，夹持信号为显式合成信号；没有物体接触物理，也没有视觉检测。详细配置、停止语义与实机接入要求见 [ROS 后端](docs/ros_backend.md)。
 
 ## 当前边界
 
