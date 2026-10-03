@@ -223,7 +223,9 @@ class NativePandaTests(PandaTests):
         handle = self.wait(self.client.send_goal_async(ExecuteTask.Goal(
             task_name="inspect_object", object_id="workpiece", target_id="", timeout_ms=5000)))
         self.assertTrue(handle.accepted)
-        self.assertTrue(self.wait(handle.get_result_async()).result.success)
+        result = self.wait(handle.get_result_async()).result
+        self.assertTrue(result.success)
+        self.assertIn("demo object pose", result.message)
         client = self.node.create_client(GetRuntimeState, "get_runtime_state")
         try:
             self.assertTrue(client.wait_for_service(timeout_sec=5))

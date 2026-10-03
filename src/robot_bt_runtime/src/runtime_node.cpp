@@ -345,7 +345,8 @@ class RuntimeNode final : public rclcpp::Node {
       success_message_ = task.template_id == "verified_pick_place" ?
           "synthetic grasp and placement evidence verified; no physical object/contact sensing" :
           task.template_id == "pick_place" ? "release verified; object placement needs perception confirmation" :
-          "fresh configured demo pose obtained; inspect pose_meaning for its semantics";
+          get_parameter("perception_mode").as_string() == "object_pose" ?
+          "fresh configured demo object pose obtained" : "fresh configured demo motion target obtained";
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
   }
   void accept_plan(const std::shared_ptr<PlanGoalHandle>& handle) {

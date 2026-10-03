@@ -273,7 +273,9 @@ class RuntimeTests(unittest.TestCase):
     def test_native_pose_template_keeps_perception_and_calibration_semantics(self):
         self.start(config=self.native_config())
         inspection = self.send(task="inspect_object", target_id="")
-        self.assertTrue(self.wait(inspection.get_result_async()).result.success)
+        inspection_result = self.wait(inspection.get_result_async()).result
+        self.assertTrue(inspection_result.success)
+        self.assertIn("demo object pose", inspection_result.message)
         observation = self.state().snapshot.observations[0]
         self.assertEqual((observation.frame_id, observation.pose_meaning, observation.source),
                          ("demo_camera", "object_pose", "configured_native_demo"))
