@@ -50,6 +50,10 @@ class VerifyOutcome final : public Skill {
       return done(Status::failed, grasp_ ? "GRASP_NOT_VERIFIED" : "PLACEMENT_NOT_VERIFIED", "observer reports condition not met");
     if (samples_ != 0 && (value->evidence.source != source_ || value->evidence.synthetic != synthetic_))
       return done(Status::failed, "VERIFICATION_SOURCE_CHANGED", "cannot combine samples from different sources");
+    // Source sample identity is authoritative. Re-converting a cached ROS stamp
+    // can introduce sub-millisecond clock jitter; it is still the same frame.
+    if (samples_ != 0 && value->sample_id == last_sample_)
+      return result_ = {Status::running, "", "awaiting a distinct verification sample"};
     if (samples_ != 0 && (value->stamp < last_stamp_ || value->sample_id < last_sample_))
       return done(Status::failed, "OUT_OF_ORDER_EVIDENCE", "verification evidence went backwards");
     if (samples_ != 0 && value->stamp-last_stamp_ > policy_.evidence.max_age)

@@ -200,6 +200,8 @@ int main() {
       check(verify.start({{"object", "workpiece"}}, f.now).code == "PRE_EFFECT_EVIDENCE", "completion sample insufficient");
       observer->value.stamp = f.now+1ms;
       check(verify.tick(f.now+1ms).status == Status::running, "first post-effect frame");
+      observer->value.stamp = f.now+500us;
+      check(verify.tick(f.now+2ms).status == Status::running, "cached frame timestamp jitter is not an out-of-order new sample");
       observer->value.stamp = f.now+150ms;  // polling cannot turn an unchanged sample ID into a new frame
       check(verify.tick(f.now+150ms).status == Status::running, "same sample ID not counted");
       observer->value.sample_id = 2;

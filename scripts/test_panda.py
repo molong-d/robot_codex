@@ -4,6 +4,7 @@ import signal
 import subprocess
 import tempfile
 import time
+import math
 import unittest
 
 import rclpy
@@ -57,10 +58,37 @@ class PandaTests(unittest.TestCase):
         self.assertTrue(self.arm.wait_for_server(timeout_sec=60), "MoveIt server unavailable")
         self.assertTrue(self.hand.wait_for_server(timeout_sec=60), "gripper controller unavailable")
         self.assertTrue(self.client.wait_for_server(timeout_sec=30), "runtime unavailable")
-        # Give TF, state broadcaster and initial feedback time to reach runtime.
-        end = time.monotonic()+3
+        # Action servers may exist before the state broadcaster is activated.
+        # Wait for actual fresh stationary samples, never dispatch/retry a probe goal.
+        required = [f"panda_joint{i}" for i in range(1, 8)]+["panda_finger_joint1"]
+        end = time.monotonic()+30
+        first_stamp = last_stamp = None
+        samples = 0
         while time.monotonic() < end:
-            rclpy.spin_once(self.node, timeout_sec=0.1)
+            rclpy.spin_once(self.node, timeout_sec=0.02)
+            if not self.states:
+                continue
+            state = self.states[-1]
+            stamp = state.header.stamp.sec*1_000_000_000+state.header.stamp.nanosec
+            age = (self.node.get_clock().now().nanoseconds-stamp)/1_000_000_000
+            valid = stamp > 0 and 0 <= age <= 0.5
+            for name in required:
+                if name not in state.name:
+                    valid = False; break
+                i = state.name.index(name)
+                if i >= len(state.position) or i >= len(state.velocity) or not math.isfinite(state.position[i]) or \
+                        not math.isfinite(state.velocity[i]) or abs(state.velocity[i]) > 0.001:
+                    valid = False; break
+            if not valid:
+                first_stamp = last_stamp = None; samples = 0
+                continue
+            if last_stamp is None or stamp > last_stamp:
+                if first_stamp is None:
+                    first_stamp = stamp
+                last_stamp = stamp; samples += 1
+            if samples >= 3 and stamp-first_stamp >= 200_000_000:
+                return
+        self.fail("fresh stationary arm/gripper state broadcaster samples unavailable")
 
     def test_01_repeatable_pick_place_with_actual_ros_stack(self):
         self.ready()
