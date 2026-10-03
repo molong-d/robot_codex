@@ -2,6 +2,8 @@ ObservationSnapshot[] observations
 string attached_object
 EntityLocation[] known_locations
 EntityLocation[] placement_candidates
+VerificationSnapshot[] grasp_verifications
+VerificationSnapshot[] placement_verifications
 ResourceLease[] resource_leases
 bool resources_empty
 bool fault_latched

@@ -1,5 +1,7 @@
 # 技能目录与任务配置（5A）
 
+6B 新增 `verify_grasp`、`verify_placement` 技能和 `verified_pick_place` 受审六步模板；目录版本仍为 1。ObjectLocator 依赖版本升为 2，验证技能依赖 ManipulationObserver；证据与迁移规则见 [感知证据与结果验证](perception_verification.md)。
+
 ## 查询入口
 
 `/get_catalog` 使用 `robot_interfaces/srv/GetCatalog`，请求为空，响应 `schema_version=1`。
@@ -61,6 +63,7 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 | 已安装模板 | 输入与执行 |
 |---|---|
 | `pick_place` | `object_id` 必须是对象，`target_id` 必须是目标；定位对象、抓取、定位目标、放置 |
+| `verified_pick_place` | 同上，抓取后加入 verify_grasp，释放后加入 verify_placement；依赖结果观察组件 |
 | `locate_object` | `object_id` 可为任一配置实体，`target_id` 必须为空；只获取位姿 |
 
 任务名称只是模板别名，同一别名可用于多组对象/目标。`implementation_id` 当前为模板内所有技能选用同名实现，默认 `standard`。新增实现时必须覆盖该模板的每种技能；逐步骤实现选择留给 5B 的结构化计划。

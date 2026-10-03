@@ -28,14 +28,20 @@ struct Fixture {
   explicit Fixture(int arm_ticks = 3, bool fail_motion = false, bool permitted = true,
                    bool fail_grasp = false, std::optional<DemoScene> scene = std::nullopt)
       : bindings(components, {{"perception", "camera"}, {"motion", "arm"},
-                              {"gripper", "gripper"}, {"safety", "gate"}}),
+                              {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}}),
         context{bindings, world} {
     if (scene) components.add("camera", std::make_shared<ConfiguredDemoLocator>(*scene));
     else components.add("camera", std::make_shared<MockLocator>());
     components.add("arm", std::make_shared<MockArmMotion>(robot, arm_ticks, fail_motion));
     components.add("gripper", std::make_shared<MockGripper>(robot, 2, fail_grasp));
     components.add("gate", std::make_shared<MockExecutionGate>(permitted));
-    register_demo_skills(skills);
+    const auto outcome_scene = scene.value_or(DemoScene("base_link", {
+        {"workpiece", EntityRole::object, {0.4, 0.1, 0.2, 0.0, 0.0, 0.0, 1.0}},
+        {"tray", EntityRole::target, {0.6, -0.2, 0.15, 0.0, 0.0, 0.0, 1.0}}}));
+    components.add("observer", std::make_shared<DemoOutcomeObserver>(bindings.get<ArmMotion>("motion"), bindings.get<Gripper>("gripper"), outcome_scene));
+    ManipulationPolicy policy; policy.allow_synthetic = true;
+    VerificationPolicy verification; verification.evidence.allow_synthetic = true;
+    register_demo_skills(skills, policy, verification);
   }
   Request request(std::string id, std::string skill, Arguments args = {{"object", "workpiece"}}) {
     return {std::move(id), std::move(skill), "standard", std::move(args), 5000ms};
@@ -93,6 +99,14 @@ class ProbeMotion final : public ArmMotion {
   MotionFeedback feedback() const override { return measured; }
 };
 
+class ProbeObserver final : public ManipulationObserver {
+ public:
+  OutcomeEvidence value{"workpiece", "", {}, true, true, {"sensor", false, 0.95}, 1};
+  std::string resource_id() const override { return "probe_sensor"; }
+  std::optional<OutcomeEvidence> grasp(const std::string&, Time) override { return value; }
+  std::optional<OutcomeEvidence> placement(const std::string&, const std::string&, Time) override { return value; }
+};
+
 Plan transfer_plan(const std::string& object = "workpiece", const std::string& target = "tray") {
   return {1, {{"locate_object", "standard", {{"object", object}}},
               {"pick_object", "standard", {{"object", object}}},
@@ -103,6 +117,12 @@ DemoScene plan_scene() {
   return DemoScene("base_link", {{"workpiece", EntityRole::object, {}},
                                   {"other", EntityRole::object, {}}, {"tray", EntityRole::target, {}}});
 }
+Plan verified_transfer_plan() {
+  auto plan = transfer_plan();
+  plan.steps.insert(plan.steps.begin()+2, {"verify_grasp", "standard", {{"object", "workpiece"}}});
+  plan.steps.push_back({"verify_placement", "standard", {{"object", "workpiece"}, {"target", "tray"}}});
+  return plan;
+}
 
 int main() {
   int passed = 0;
@@ -110,6 +130,144 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("evidence policy rejects missing source quality and synthetic data by default", [] {
+      const auto now = Clock::now(); EvidenceMetadata value{"camera", false, 0.9}; EvidencePolicy policy;
+      check(acceptable_evidence(value, now, now, policy), "accepted real evidence");
+      for (double q : {-1.0, 0.2, 1.1, std::numeric_limits<double>::quiet_NaN()}) {
+        value.quality = q; check(!acceptable_evidence(value, now, now, policy), "bad quality");
+      }
+      value.quality = 0.9; value.source.clear(); check(!acceptable_evidence(value, now, now, policy), "missing source");
+      value.source = "camera"; value.synthetic = true;
+      check(!acceptable_evidence(value, now, now, policy), "synthetic requires explicit enablement");
+      policy.allow_synthetic = true; check(acceptable_evidence(value, now, now, policy), "explicit simulation");
+      check(!acceptable_evidence(value, now+1ms, now, policy) && !acceptable_evidence(value, now-1s, now, policy), "future/stale");
+    });
+    test("locate validates source quality and pose meaning before storing", [] {
+      Fixture f;
+      auto observation = *f.bindings.get<ObjectLocator>("perception")->locate("workpiece", f.now);
+      check(observation.meaning == PoseMeaning::motion_target && observation.evidence.synthetic, "demo target provenance");
+      Locate real(f.context);
+      check(real.start({{"object", "workpiece"}}, f.now).code == "INVALID_OBSERVATION", "default policy rejects demo source");
+      check(f.world.observations.empty(), "no invalid evidence retained");
+      f.locate(); f.world.observations["workpiece"].evidence.quality = 0.1;
+      check(f.run(f.request("quality", "pick_object")).code == "STALE_OBSERVATION" && f.robot->arm_target.empty(), "low quality blocks dispatch");
+    });
+    test("native object pose cannot be sent directly to arm motion", [] {
+      Fixture f; f.locate(); f.world.observations["workpiece"].meaning = PoseMeaning::object_pose;
+      check(f.run(f.request("native", "pick_object")).code == "TARGET_RESOLUTION_REQUIRED", "explicit target transform required");
+      check(f.robot->arm_target.empty() && f.resources.empty(), "no movement from object-center pose");
+    });
+    test("six-step verification promotes only accepted placement evidence", [] {
+      auto scene = plan_scene(); Fixture f(3, false, true, false, scene); const auto plan = verified_transfer_plan();
+      validate_plan(plan, scene, f.skills, f.bindings, f.world);
+      ExecutionJournal journal; journal.begin("verified", "execute_plan", "", 6, 5000, f.now, 1);
+      for (size_t i = 0; i < plan.steps.size(); ++i) {
+        const auto& step = plan.steps[i]; auto request = f.request(std::to_string(i), step.skill, step.arguments);
+        const auto result = f.run(request); check(result.status == Status::succeeded, "verified plan step");
+        std::optional<OutcomeVerification> proof;
+        if (step.skill == "verify_grasp") proof = f.world.grasp_verifications.at("workpiece");
+        if (step.skill == "verify_placement") proof = f.world.placement_verifications.at("workpiece");
+        journal.observe(request, result, f.now, proof);
+      }
+      journal.finish({Status::succeeded, "", ""}, {f.now, f.world, {}, true, false, true}, f.now);
+      check(f.world.known_locations.at("workpiece") == "tray" && f.world.placement_candidates.empty(), "placement promoted after sensor evidence");
+      const auto record = journal.get("verified", f.now);
+      check(record->steps[2].verification && record->steps[5].verification &&
+            record->steps[2].verification->evidence.evidence.synthetic, "historical grasp/placement provenance retained");
+      check(f.world.grasp_verifications.empty(), "grasp proof invalidated before placing");
+      const auto& proof = f.world.placement_verifications.at("workpiece");
+      check(proof.samples >= 3 && proof.stable_for >= 100ms && proof.evidence.evidence.synthetic, "distinct sample window and provenance");
+      f.locate(); f.run(f.request("pick_again", "pick_object"));
+      check(f.world.placement_verifications.empty(), "new manipulation invalidates old placement proof");
+    });
+    test("plan admission validates verification ordering without predicted facts", [] {
+      Fixture f; auto scene = plan_scene(); auto plan = verified_transfer_plan();
+      validate_plan(plan, scene, f.skills, f.bindings, f.world);
+      check(f.world.placement_verifications.empty() && f.world.grasp_verifications.empty(), "admission creates no proof");
+      std::swap(plan.steps[1], plan.steps[2]);
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "verification before grasp");
+      plan = verified_transfer_plan(); std::swap(plan.steps[4], plan.steps[5]);
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "verification before release");
+      plan = verified_transfer_plan(); plan.steps.push_back(plan.steps.back());
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "cannot consume release candidate twice");
+    });
+    test("verification requires post-effect samples and does not count cached data", [] {
+      Fixture f; f.locate(); f.run(f.request("pick", "pick_object"));
+      auto observer = std::make_shared<ProbeObserver>(); f.components.add("probe", observer);
+      Bindings b(f.components, {{"outcome", "probe"}, {"motion", "arm"}, {"gripper", "gripper"}}); Context c{b, f.world};
+      observer->value.stamp = f.world.attachment_stamp;
+      VerifyOutcome verify(c, true);
+      check(verify.start({{"object", "workpiece"}}, f.now).code == "PRE_EFFECT_EVIDENCE", "completion sample insufficient");
+      observer->value.stamp = f.now+1ms;
+      check(verify.tick(f.now+1ms).status == Status::running, "first post-effect frame");
+      observer->value.stamp = f.now+500us;
+      check(verify.tick(f.now+2ms).status == Status::running, "cached frame timestamp jitter is not an out-of-order new sample");
+      observer->value.stamp = f.now+150ms;  // polling cannot turn an unchanged sample ID into a new frame
+      check(verify.tick(f.now+150ms).status == Status::running, "same sample ID not counted");
+      observer->value.sample_id = 2;
+      check(verify.tick(f.now+150ms).status == Status::running, "only two actual frames");
+      observer->value.sample_id = 3; observer->value.stamp = f.now+160ms;
+      check(verify.tick(f.now+160ms).status == Status::succeeded, "three distinct post-effect samples");
+      check(f.world.grasp_verifications.at("workpiece").samples == 3, "cache polling excluded");
+    });
+    test("demo outcome identity advances only when oldest contributing sample advances", [] {
+      Fixture f; auto arm = std::make_shared<ProbeMotion>();
+      arm->measured = {"base_link", {0.6, -0.2, 0.15, 0.0, 0.0, 0.0, 1.0}, f.now, true, true, 7};
+      const DemoScene scene("base_link", {{"workpiece", EntityRole::object, {}},
+          {"tray", EntityRole::target, arm->measured.pose}});
+      DemoOutcomeObserver observer(arm, f.bindings.get<Gripper>("gripper"), scene);
+      const auto first = observer.placement("workpiece", "tray", f.now);
+      const auto duplicate = observer.placement("workpiece", "tray", f.now+20ms);
+      check(first && duplicate && first->sample_id == 7 && duplicate->sample_id == 7, "new gripper frame cannot refresh cached arm frame");
+      arm->measured.sample_id = 8; arm->measured.stamp = f.now+20ms;
+      check(observer.placement("workpiece", "tray", f.now+20ms)->sample_id == 8, "combined sample identity advances");
+    });
+    test("verification rejects malformed negative and misidentified evidence", [] {
+      for (int mode = 0; mode < 6; ++mode) {
+        Fixture f; f.locate(); f.run(f.request("pick", "pick_object"));
+        auto observer = std::make_shared<ProbeObserver>(); observer->value.stamp = f.now+1ms;
+        if (mode == 0) observer->value.evidence.quality = 0.2;
+        if (mode == 1) observer->value.object_id = "other";
+        if (mode == 2) observer->value.condition_met = false;
+        if (mode == 3) observer->value.sample_id = 0;
+        if (mode == 4) observer->value.stamp = f.now+1s;
+        if (mode == 5) observer->value.evidence.synthetic = true;
+        f.components.add("probe", observer); Bindings b(f.components, {{"outcome", "probe"}}); Context c{b, f.world};
+        VerifyOutcome verify(c, true);
+        check(verify.start({{"object", "workpiece"}}, f.now+1ms).status == Status::failed, "invalid proof rejected");
+        check(f.world.grasp_verifications.empty(), "no false verified state");
+      }
+    });
+    test("verification rejects source changes regressions and large sample gaps", [] {
+      for (int mode = 0; mode < 3; ++mode) {
+        Fixture f; f.locate(); f.run(f.request("pick", "pick_object"));
+        auto observer = std::make_shared<ProbeObserver>(); observer->value.stamp = f.now+10ms; observer->value.sample_id = 2;
+        f.components.add("probe", observer); Bindings b(f.components, {{"outcome", "probe"}}); Context c{b, f.world};
+        VerifyOutcome verify(c, true); check(verify.start({{"object", "workpiece"}}, f.now+10ms).status == Status::running, "first frame");
+        observer->value.sample_id = mode == 1 ? 1 : 3; observer->value.stamp = f.now+(mode == 2 ? 600ms : 20ms);
+        if (mode == 0) observer->value.evidence.source = "another_camera";
+        check(verify.tick(observer->value.stamp).status == Status::failed, "discontinuous proof rejected");
+        check(f.world.grasp_verifications.empty(), "no continuous stability claim");
+      }
+    });
+    test("failed placement evidence leaves candidate and does not promote location", [] {
+      Fixture f; f.locate(); f.run(f.request("pick", "pick_object")); f.locate("tray");
+      f.run(f.request("place", "place_object", {{"object", "workpiece"}, {"target", "tray"}}));
+      auto observer = std::make_shared<ProbeObserver>(); observer->value.target_id = "tray";
+      observer->value.stamp = f.now+1ms; observer->value.condition_met = false;
+      f.components.add("probe", observer); Bindings b(f.components, {{"outcome", "probe"}}); Context c{b, f.world};
+      VerifyOutcome verify(c, false);
+      check(verify.start({{"object", "workpiece"}, {"target", "tray"}}, f.now+1ms).code == "PLACEMENT_NOT_VERIFIED", "failed placement");
+      check(f.world.placement_candidates.at("workpiece") == "tray" && f.world.known_locations.empty() &&
+            f.world.placement_verifications.empty(), "inference remains inference");
+    });
+    test("read-only verification cancellation releases leases without manipulating", [] {
+      Fixture f; f.locate(); f.run(f.request("pick", "pick_object"));
+      Session verify(f.skills, f.resources, f.context, f.request("verify", "verify_grasp"));
+      check(verify.start(f.now).status == Status::running && !f.resources.empty(), "verification claims read access exclusively");
+      verify.cancel(); check(verify.tick(f.now+1ms).status == Status::canceled && f.resources.empty(), "read-only verification stops promptly");
+      check(f.world.attached_object == "workpiece" && f.robot->grasped && f.world.grasp_verifications.empty(), "cancel is not release or proof");
+    });
     test("execution journal keeps terminal evidence and snapshot copies", [] {
       Fixture f; ExecutionJournal journal;
       check(!journal.get("", f.now), "initially no records");
@@ -284,7 +442,7 @@ int main() {
         constructed = true; return std::make_unique<ProbeSkill>();
       }, {{{"depth", "object_locator", 1}}, {}, ""});
       const auto catalog = f.skills.catalog(f.bindings);
-      check(catalog.size() == 3, "all definitions visible");
+      check(catalog.size() == 5, "all definitions visible");
       const auto& pick = catalog.at(1);
       check(pick.definition.id == "pick_object" && pick.definition.inputs.at(0).type == "entity_id", "typed inputs");
       check(pick.implementations.size() == 2, "alternative implementations visible");

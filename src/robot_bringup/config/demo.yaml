@@ -7,7 +7,9 @@ robot_runtime:
     entities.tray.pose: [0.60, -0.20, 0.15, 0.0, 0.0, 0.0, 1.0]
     entities.workpiece_two.pose: [0.30, -0.10, 0.20, 0.0, 0.0, 0.0, 1.0]
     entities.tray_two.pose: [0.50, 0.20, 0.30, 0.0, 0.0, 0.0, 1.0]
-    task_names: [pick_place, inspect_object, transfer_two]
+    task_names: [pick_place, inspect_object, transfer_two, verified_pick_place]
+    tasks.verified_pick_place.template_id: verified_pick_place
+    simulation_outcome_evidence: true  # synthetic feedback, not object/contact sensing
     tasks.pick_place.template_id: pick_place
     tasks.pick_place.implementation_id: standard
     tasks.inspect_object.template_id: locate_object

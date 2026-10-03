@@ -19,9 +19,11 @@ class MockLocator final : public ObjectLocator {
   std::string resource_id() const override { return "demo_camera"; }
   std::optional<Observation> locate(const std::string& object, Time now) override {
     if (object == "workpiece")
-      return Observation{object, "base_link", {0.40, 0.10, 0.20, 0.0, 0.0, 0.0, 1.0}, now, true};
+      return Observation{object, "base_link", {0.40, 0.10, 0.20, 0.0, 0.0, 0.0, 1.0}, now, true,
+                         {"mock_locator", true, 1.0}, PoseMeaning::motion_target};
     if (object == "tray")
-      return Observation{object, "base_link", {0.60, -0.20, 0.15, 0.0, 0.0, 0.0, 1.0}, now, true};
+      return Observation{object, "base_link", {0.60, -0.20, 0.15, 0.0, 0.0, 0.0, 1.0}, now, true,
+                         {"mock_locator", true, 1.0}, PoseMeaning::motion_target};
     return std::nullopt;
   }
 };
@@ -51,6 +53,7 @@ class MockArmMotion final : public ArmMotion {
   }
   Status poll(Time now) override {
     feedback_.stamp = now;
+    feedback_.sample_id = static_cast<uint64_t>(now.time_since_epoch().count());
     feedback_.valid = true;
     feedback_.stopped = !busy_;
     if (!busy_) return last_;
@@ -107,6 +110,7 @@ class MockGripper final : public Gripper {
   }
   Status poll(Time now) override {
     feedback_.stamp = now;
+    feedback_.sample_id = static_cast<uint64_t>(now.time_since_epoch().count());
     feedback_.valid = true;
     feedback_.stopped = !busy_;
     if (!busy_) return last_;

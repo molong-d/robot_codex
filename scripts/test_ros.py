@@ -122,7 +122,7 @@ class RuntimeTests(unittest.TestCase):
     def test_diagnostics_idle_and_rejected_goals_have_no_record(self):
         self.start()
         state = self.state()
-        self.assertEqual(state.schema_version, 1)
+        self.assertEqual(state.schema_version, 2)
         self.assertEqual(len(state.runtime_id), 32)
         self.assertFalse(state.busy)
         self.assertTrue(state.simulation_only)
@@ -159,6 +159,9 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(self.record(handle).record, record)
         observation = self.state().snapshot.observations[0]
         self.assertEqual(observation.source, "configured_demo")
+        self.assertTrue(observation.synthetic)
+        self.assertEqual(observation.quality, 1.0)
+        self.assertEqual(observation.pose_meaning, "motion_target")
         self.assertTrue(observation.valid and observation.stamp_valid)
         self.assertEqual(observation.frame_id, "base_link")
         self.assertEqual(len(observation.pose), 7)
@@ -257,6 +260,91 @@ class RuntimeTests(unittest.TestCase):
         self.assertFalse(record.snapshot.resource_leases)
         self.assertTrue(record.snapshot.stop_confirmed)
 
+    def verified_steps(self):
+        steps = self.plan_steps()
+        steps.insert(2, SkillStep(skill_id="verify_grasp", implementation_id="standard", argument_names=["object"], argument_values=["workpiece"]))
+        steps.append(SkillStep(skill_id="verify_placement", implementation_id="standard",
+                               argument_names=["object", "target"], argument_values=["workpiece", "tray"]))
+        return steps
+
+    def test_verified_template_retains_both_step_proofs_and_provenance(self):
+        self.start(config=Path(__file__).resolve().parents[1]/"src/robot_bringup/config/demo.yaml")
+        handle = self.send(task="verified_pick_place", object_id="workpiece_two", target_id="tray_two")
+        self.assertTrue(handle.accepted)
+        outcome = self.wait(handle.get_result_async()).result
+        self.assertTrue(outcome.success, outcome.message)
+        record = self.record(handle).record
+        self.assertEqual((record.total_steps, record.completed_steps), (6, 6))
+        self.assertEqual([s.step.skill_id for s in record.steps], ["locate_object", "pick_object", "verify_grasp", "locate_object", "place_object", "verify_placement"])
+        for index in (2, 5):
+            self.assertTrue(record.steps[index].has_verification)
+            proof = record.steps[index].verification
+            self.assertEqual((proof.entity_id, proof.source), ("workpiece_two", "demo_outcome"))
+            self.assertTrue(proof.synthetic and proof.stamp_valid)
+            self.assertGreaterEqual(proof.samples, 3)
+            self.assertGreaterEqual(proof.stable_ms, 100)
+            self.assertGreater(proof.sample_id, 0)
+        self.assertFalse(record.snapshot.placement_candidates)
+        self.assertFalse(record.snapshot.grasp_verifications)
+        self.assertEqual([(p.entity_id, p.location_id) for p in record.snapshot.known_locations], [("workpiece_two", "tray_two")])
+        self.assertEqual(record.snapshot.placement_verifications[0].source, "demo_outcome")
+        self.assertTrue(record.snapshot.placement_verifications[0].synthetic)
+
+    def test_verified_plan_and_cli_succeed_with_six_steps(self):
+        self.start()
+        handle = self.send_plan(self.verified_steps())
+        result = self.wait(handle.get_result_async()).result
+        self.assertTrue(result.success, result.message)
+        self.assertEqual(result.completed_steps, 6)
+        self.assertTrue(self.record(handle).record.steps[5].has_verification)
+        planner = Path(__file__).resolve().parent/"plan_pick_place.py"
+        result = subprocess.run(["python3", str(planner), "--verify-outcomes", "--timeout-ms", "5000"],
+                                capture_output=True, text=True, timeout=20, env=self.runtime_env)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        self.assertIn('"completed_steps": 6', result.stdout)
+
+    def test_missing_outcome_component_rejects_before_execution(self):
+        self.start("simulation_outcome_evidence:=false")
+        catalog = self.catalog()
+        verify = next(s for s in catalog.skills if s.skill_id == "verify_placement")
+        self.assertFalse(verify.implementations[0].dependencies_satisfied)
+        self.assertFalse(self.send_plan(self.verified_steps()).accepted)
+        self.assertFalse(self.record().found)
+        self.assertFalse(self.state().snapshot.resource_leases)
+        self.assertTrue(self.wait(self.send().get_result_async()).result.success)
+
+    def test_verification_failure_aborts_without_promoting_placement(self):
+        self.start("mock_verification_failure:=placement")
+        handle = self.send_plan(self.verified_steps())
+        outcome = self.wait(handle.get_result_async()).result
+        self.assertEqual((outcome.success, outcome.error_code, outcome.completed_steps), (False, "PLACEMENT_NOT_VERIFIED", 5))
+        record = self.record(handle).record
+        self.assertFalse(record.steps[5].has_verification)
+        self.assertFalse(record.snapshot.placement_verifications)
+        self.assertFalse(record.snapshot.known_locations)
+        self.assertEqual([(p.entity_id, p.location_id) for p in record.snapshot.placement_candidates], [("workpiece", "tray")])
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertFalse(record.snapshot.resource_leases)
+
+    def test_cancellation_during_verification_preserves_held_state(self):
+        self.start("verification_window_ms:=1000")
+        feedback = []
+        handle = self.send_plan(self.verified_steps(), feedback=lambda msg: feedback.append(msg.feedback))
+        end = time.monotonic()+5
+        while not any(f.active_skill == "verify_grasp" and f.status == "running" for f in feedback):
+            self.assertLess(time.monotonic(), end)
+            self.executor.spin_once(timeout_sec=0.01)
+        self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
+        outcome = self.wait(handle.get_result_async())
+        self.assertEqual(outcome.status, GoalStatus.STATUS_CANCELED)
+        record = self.record(handle).record
+        self.assertEqual(record.completed_steps, 2)
+        self.assertEqual(record.snapshot.attached_object, "workpiece")
+        self.assertFalse(record.snapshot.grasp_verifications)
+        self.assertFalse(record.steps[2].has_verification)
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertFalse(record.snapshot.resource_leases)
+
     def test_plan_second_pair_succeeds_with_four_verified_steps(self):
         self.start(config=Path(__file__).resolve().parents[1] / "src/robot_bringup/config/demo.yaml")
         handle = self.send_plan(self.plan_steps("workpiece_two", "tray_two"))
@@ -345,7 +433,7 @@ class RuntimeTests(unittest.TestCase):
         catalog = self.catalog()
         self.assertEqual(catalog.schema_version, 1)
         skills = {s.skill_id: s for s in catalog.skills}
-        self.assertEqual(set(skills), {"locate_object", "pick_object", "place_object"})
+        self.assertEqual(set(skills), {"locate_object", "pick_object", "place_object", "verify_grasp", "verify_placement"})
         self.assertEqual([(p.name, p.type, p.required) for p in skills["place_object"].inputs],
                          [("object", "entity_id", True), ("target", "entity_id", True)])
         pick = skills["pick_object"].implementations[0]
@@ -353,6 +441,11 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(pick.execution_gate_role, "safety")
         self.assertEqual({r.role: r.interface_version for r in pick.components},
                          {"motion": 2, "gripper": 2, "safety": 1})
+        self.assertEqual(skills["locate_object"].implementations[0].components[0].interface_version, 2)
+        verify = skills["verify_placement"].implementations[0]
+        self.assertTrue(verify.dependencies_satisfied)
+        self.assertFalse(verify.execution_gate_role)
+        self.assertEqual({r.role: r.interface_id for r in verify.components}, {"outcome": "manipulation_observer"})
         self.assertEqual(set(catalog.object_ids), {"workpiece"})
         self.assertEqual(set(catalog.target_ids), {"tray"})
 
@@ -387,7 +480,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertTrue(handle.accepted)
         result = self.wait(handle.get_result_async())
         self.assertTrue(result.result.success)
-        self.assertIn("demo pose", result.result.message)
+        self.assertIn("demo motion target", result.result.message)
 
     def test_scene_parameters_are_read_only_after_startup(self):
         self.start()

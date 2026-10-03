@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -107,12 +108,51 @@ class Bindings {
   std::map<std::string, std::string> roles_;
 };
 
+struct EvidenceMetadata {
+  std::string source;
+  bool synthetic{false};
+  // Source-specific score in [0,1], not a calibrated probability. Missing is invalid.
+  double quality{-1.0};
+};
+struct EvidencePolicy {
+  std::chrono::milliseconds max_age{500};
+  double minimum_quality{0.8};
+  bool allow_synthetic{false};
+};
+inline bool valid_evidence_policy(const EvidencePolicy& p) {
+  return p.max_age.count() > 0 && std::isfinite(p.minimum_quality) &&
+         p.minimum_quality >= 0.0 && p.minimum_quality <= 1.0;
+}
+inline bool acceptable_evidence(const EvidenceMetadata& m, Time stamp, Time now, const EvidencePolicy& p) {
+  return valid_evidence_policy(p) && valid_id(m.source) && std::isfinite(m.quality) &&
+         m.quality >= p.minimum_quality && m.quality <= 1.0 &&
+         (!m.synthetic || p.allow_synthetic) && fresh(stamp, now, p.max_age);
+}
+enum class PoseMeaning { object_pose, motion_target };
+inline const char* name(PoseMeaning meaning) {
+  return meaning == PoseMeaning::object_pose ? "object_pose" :
+         meaning == PoseMeaning::motion_target ? "motion_target" : "unknown";
+}
 struct Observation {
   std::string object_id;
   std::string frame_id;
   Pose pose;
   Time stamp;
   bool valid{false};
+  EvidenceMetadata evidence;
+  PoseMeaning meaning{PoseMeaning::object_pose};
+};
+struct OutcomeEvidence {
+  std::string object_id, target_id;
+  Time stamp{};
+  bool valid{false}, condition_met{false};
+  EvidenceMetadata evidence;
+  uint64_t sample_id{0};
+};
+struct OutcomeVerification {
+  OutcomeEvidence evidence;
+  unsigned samples{0};
+  std::chrono::milliseconds stable_for{0};
 };
 struct WorldState {
   std::map<std::string, Observation> observations;
@@ -120,6 +160,9 @@ struct WorldState {
   std::map<std::string, std::string> known_locations;
   // An inferred release location is not a new perception measurement.
   std::map<std::string, std::string> placement_candidates;
+  Time attachment_stamp{};
+  std::map<std::string, Time> release_stamps;
+  std::map<std::string, OutcomeVerification> grasp_verifications, placement_verifications;
 };
 struct Requirement {
   std::string role;

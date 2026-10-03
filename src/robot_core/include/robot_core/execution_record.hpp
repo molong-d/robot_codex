@@ -20,6 +20,7 @@ struct SkillExecutionRecord {
   uint64_t started_ms{0}, updated_ms{0};
   Result result;
   std::vector<StateTransition> transitions;
+  std::optional<OutcomeVerification> verification;
 };
 struct ExecutionRecord {
   std::string id, entrypoint, task_name;
@@ -48,13 +49,14 @@ class ExecutionJournal {
     active_->task_name = std::move(task_name); active_->total_steps = total_steps;
     active_->timeout_ms = timeout_ms; active_->started_unix_ms = unix_ms;
   }
-  void observe(const Request& request, const Result& result, Time now) {
+  void observe(const Request& request, const Result& result, Time now,
+               std::optional<OutcomeVerification> verification = std::nullopt) {
     auto& record = current();
     auto it = std::find_if(record.steps.begin(), record.steps.end(),
                           [&](const auto& step) { return step.request.id == request.id; });
     if (it == record.steps.end()) {
       if (record.steps.size() >= record.total_steps) throw std::logic_error("execution exceeds planned step count");
-      record.steps.push_back({request, elapsed(now), elapsed(now), {}, {}});
+      record.steps.push_back({request, elapsed(now), elapsed(now), {}, {}, std::nullopt});
       it = record.steps.end()-1;
     }
     if (terminal(it->result.status)) return;  // immutable terminal evidence
@@ -64,6 +66,7 @@ class ExecutionJournal {
     }
     it->updated_ms = elapsed(now);
     it->result = result;
+    if (result.status == Status::succeeded) it->verification = std::move(verification);
   }
   void update(Result result, ExecutionSnapshot snapshot, Time now) {
     if (terminal(result.status)) throw std::logic_error("use finish for terminal execution");

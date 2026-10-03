@@ -7,3 +7,5 @@ string status
 string error_code
 string message
 StateTransition[<=8] transitions
+bool has_verification
+VerificationSnapshot verification

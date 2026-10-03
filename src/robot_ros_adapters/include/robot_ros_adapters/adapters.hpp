@@ -148,6 +148,8 @@ class MoveItArm final : public rc::ArmMotion {
       measured_.pose = {t.transform.translation.x, t.transform.translation.y, t.transform.translation.z,
                         t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w};
       measured_.stamp = std::min(js_stamp, tf_stamp);
+      measured_.sample_id = static_cast<uint64_t>(std::min(rclcpp::Time(joints_.header.stamp).nanoseconds(),
+                                                        rclcpp::Time(t.header.stamp).nanoseconds()));
       measured_.valid = js_stamp != rc::Time{} && tf_stamp != rc::Time{} && rc::valid_pose(measured_.pose);
       measured_.stopped = measured_.valid && stationary(joints_, config_.arm_joints);
     } catch (const tf2::TransformException&) { /* missing TF is unavailable feedback */ }
@@ -191,6 +193,7 @@ class ParallelGripper final : public rc::Gripper {
       if (i < joints_.position.size()) {
         measured_.width_m = 2.0*joints_.position[i];
         measured_.stamp = monotonic_stamp(node_, joints_.header.stamp, now);
+        measured_.sample_id = static_cast<uint64_t>(rclcpp::Time(joints_.header.stamp).nanoseconds());
         measured_.valid = measured_.stamp != rc::Time{} && std::isfinite(measured_.width_m) && measured_.width_m >= 0.0;
         measured_.stopped = measured_.valid && stationary(joints_, {config_.finger_joint});
       }

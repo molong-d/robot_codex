@@ -36,15 +36,17 @@ struct Engine {
   bool fault_latched{false};
 
   Engine(std::string motion, int ticks, int stop_ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
-         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity)
+         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity,
+         bool outcome_enabled, const std::string& verification_failure, int verification_window_ms)
       : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
-                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}}),
+                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}, {"outcome", "demo_outcome"}}),
         context{bindings, world}, journal(history_capacity) {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
     components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(scene));
     rc::ManipulationPolicy policy;
     policy.frame_id = scene.frame();
+    policy.allow_synthetic = true;  // this runtime only has demonstration backends
     if (ros_backend) {
       components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
       components.add("mock_gripper", std::make_shared<robot_ros_adapters::ParallelGripper>(node, config));
@@ -53,10 +55,16 @@ struct Engine {
       components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2, false, stop_ticks));
       components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp, stop_ticks));
     }
-    bindings.get<rc::ArmMotion>("motion");
-    bindings.get<rc::Gripper>("gripper");
+    const auto arm = bindings.get<rc::ArmMotion>("motion");
+    const auto gripper = bindings.get<rc::Gripper>("gripper");
+    if (outcome_enabled)
+      components.add("demo_outcome", std::make_shared<rc::DemoOutcomeObserver>(arm, gripper, scene,
+          ros_backend ? "none" : verification_failure));
     bindings.get<rc::ExecutionGate>("safety");
-    rc::register_demo_skills(skills, policy);
+    rc::VerificationPolicy verification;
+    verification.evidence.allow_synthetic = true;
+    verification.stable_duration = std::chrono::milliseconds(verification_window_ms);
+    rc::register_demo_skills(skills, policy, verification);
   }
   std::shared_ptr<rc::Session> start(std::string skill, std::string implementation, rc::Arguments args) {
     rc::Request request{std::to_string(++sequence), skill, std::move(implementation), std::move(args), skill_timeout};
@@ -64,20 +72,20 @@ struct Engine {
     sessions.push_back({std::move(skill), session});
     session->start(rc::Clock::now());
     if (session->result().status == rc::Status::faulted) fault_latched = true;
-    journal.observe(session->request(), session->result(), rc::Clock::now());
+    record_session(session, rc::Clock::now());
     return session;
   }
   void pump(rc::Time now) {
     for (auto& entry : sessions) {
       auto result = entry.session->tick(now);
       if (result.status == rc::Status::faulted) fault_latched = true;
-      if (!journal.active_id().empty()) journal.observe(entry.session->request(), result, now);
+      if (!journal.active_id().empty()) record_session(entry.session, now);
     }
   }
   void cancel() {
     for (auto& entry : sessions) {
       entry.session->cancel();
-      if (!journal.active_id().empty()) journal.observe(entry.session->request(), entry.session->result(), rc::Clock::now());
+      if (!journal.active_id().empty()) record_session(entry.session, rc::Clock::now());
     }
   }
   bool stopped() const {
@@ -86,6 +94,16 @@ struct Engine {
   }
   rc::ExecutionSnapshot snapshot(rc::Time now) const {
     return {now, world, resources.owners(), resources.empty(), fault_latched, stopped()};
+  }
+  void record_session(const std::shared_ptr<rc::Session>& session, rc::Time now) {
+    std::optional<rc::OutcomeVerification> proof;
+    const auto& skill = session->request().skill;
+    if (skill == "verify_grasp" || skill == "verify_placement") {
+      const auto& values = skill == "verify_grasp" ? world.grasp_verifications : world.placement_verifications;
+      const auto it = values.find(session->request().arguments.at("object"));
+      if (it != values.end()) proof = it->second;
+    }
+    journal.observe(session->request(), session->result(), now, std::move(proof));
   }
 };
 
@@ -144,6 +162,13 @@ class RuntimeNode final : public rclcpp::Node {
     config.arm_resource = declare_parameter<std::string>("arm_resource", config.arm_resource);
     config.gripper_resource = declare_parameter<std::string>("gripper_resource", config.gripper_resource);
     config.simulation_grasp_detection = declare_parameter<bool>("simulation_grasp_detection", false);
+    const auto outcome_enabled = catalog_support::startup_parameter<bool>(this, "simulation_outcome_evidence", backend == "mock");
+    const auto verification_failure = catalog_support::startup_parameter<std::string>(this, "mock_verification_failure", "none");
+    const auto verification_window_ms = catalog_support::startup_parameter<int>(this, "verification_window_ms", 100);
+    if (verification_failure != "none" && verification_failure != "grasp" && verification_failure != "placement")
+      throw std::invalid_argument("mock verification failure must be none, grasp or placement");
+    if (verification_window_ms < 1 || verification_window_ms > 30000)
+      throw std::invalid_argument("verification window must be 1..30000 ms");
     const auto motion = declare_parameter<std::string>("motion_component", "mock_arm");
     const auto ticks = declare_parameter<int>("mock_action_ticks", 3);
     const auto stop_ticks = catalog_support::startup_parameter<int>(this, "mock_stop_ticks", 2);
@@ -160,7 +185,7 @@ class RuntimeNode final : public rclcpp::Node {
     tasks_ = std::make_unique<rc::TaskCatalog>(catalog_support::load_tasks(this));
     if (history_capacity < 1 || history_capacity > 128) throw std::invalid_argument("execution history capacity requires 1..128");
     engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_,
-                                     static_cast<size_t>(history_capacity));
+                                     static_cast<size_t>(history_capacity), outcome_enabled, verification_failure, verification_window_ms);
     tasks_->validate_configuration(*scene_, engine_->skills, engine_->bindings);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
@@ -170,6 +195,7 @@ class RuntimeNode final : public rclcpp::Node {
     // Load reviewed templates at startup, before accepting any task.
     factory_.registerBehaviorTreeFromFile(tree_dir + "pick_place.xml");
     factory_.registerBehaviorTreeFromFile(tree_dir + "locate_object.xml");
+    factory_.registerBehaviorTreeFromFile(tree_dir + "verified_pick_place.xml");
     catalog_server_ = create_service<catalog_support::GetCatalog>("get_catalog",
         [this](const std::shared_ptr<catalog_support::GetCatalog::Request>,
                const std::shared_ptr<catalog_support::GetCatalog::Response> response) {
@@ -178,7 +204,7 @@ class RuntimeNode final : public rclcpp::Node {
     state_server_ = create_service<record_support::GetRuntimeState>("get_runtime_state",
         [this](const std::shared_ptr<record_support::GetRuntimeState::Request>,
                const std::shared_ptr<record_support::GetRuntimeState::Response> response) {
-          response->schema_version = 1; response->runtime_id = runtime_id_; response->backend = backend_;
+          response->schema_version = 2; response->runtime_id = runtime_id_; response->backend = backend_;
           response->simulation_only = true; response->busy = reserved_;
           response->active_execution_id = engine_->journal.active_id();
           response->history_capacity = static_cast<uint32_t>(engine_->journal.capacity());
@@ -190,7 +216,7 @@ class RuntimeNode final : public rclcpp::Node {
     record_server_ = create_service<record_support::GetExecution>("get_execution",
         [this](const std::shared_ptr<record_support::GetExecution::Request> request,
                const std::shared_ptr<record_support::GetExecution::Response> response) {
-          response->schema_version = 1; response->runtime_id = runtime_id_;
+          response->schema_version = 2; response->runtime_id = runtime_id_;
           const auto record = engine_->journal.get(request->execution_id, rc::Clock::now());
           response->found = record.has_value();
           if (record) {
@@ -292,7 +318,7 @@ class RuntimeNode final : public rclcpp::Node {
   }
   void accept_task(const std::shared_ptr<GoalHandle>& handle) {
     const auto& definition = tasks_->definitions().at(handle->get_goal()->task_name);
-    begin<ExecuteTask>(handle, definition.name, definition.template_id == "pick_place" ? 4 : 1);
+    begin<ExecuteTask>(handle, definition.name, rc::TaskCatalog::step_count(definition));
     try {
       auto blackboard = BT::Blackboard::create();
       blackboard->set("object", handle->get_goal()->object_id);
@@ -301,9 +327,12 @@ class RuntimeNode final : public rclcpp::Node {
                                       handle->get_goal()->target_id, *scene_, engine_->skills, engine_->bindings);
       blackboard->set("implementation", task.implementation);
       tree_ = std::make_unique<BT::Tree>(factory_.createTree(
-          task.template_id == "pick_place" ? "PickPlace" : "LocateObject", blackboard));
-      success_message_ = task.template_id == "pick_place" ?
-          "release verified; object placement needs perception confirmation" : "fresh configured demo pose obtained";
+          task.template_id == "pick_place" ? "PickPlace" :
+          task.template_id == "verified_pick_place" ? "VerifiedPickPlace" : "LocateObject", blackboard));
+      success_message_ = task.template_id == "verified_pick_place" ?
+          "synthetic grasp and placement evidence verified; no physical object/contact sensing" :
+          task.template_id == "pick_place" ? "release verified; object placement needs perception confirmation" :
+          "fresh configured demo motion target obtained";
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
   }
   void accept_plan(const std::shared_ptr<PlanGoalHandle>& handle) {
@@ -312,7 +341,7 @@ class RuntimeNode final : public rclcpp::Node {
       const auto xml = plan_support::tree_xml(plan_support::decode(*handle->get_goal()),
           *scene_, engine_->skills, engine_->bindings, engine_->world);
       tree_ = std::make_unique<BT::Tree>(factory_.createTreeFromText(xml));
-      success_message_ = "all skill steps verified; inferred placement still needs perception confirmation";
+      success_message_ = "all skill steps succeeded; consult verification provenance and remaining placement candidates";
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_PLAN", e.what()); }
   }
   void tick() {

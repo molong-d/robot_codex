@@ -4,11 +4,13 @@ import signal
 import subprocess
 import tempfile
 import time
+import math
 import unittest
 
 import rclpy
 from action_msgs.msg import GoalStatus
-from control_msgs.action import ParallelGripperCommand
+from control_msgs.action import FollowJointTrajectory, ParallelGripperCommand
+from controller_manager_msgs.srv import ListControllers
 from moveit_msgs.action import MoveGroup
 from rclpy.action import ActionClient
 from sensor_msgs.msg import JointState
@@ -28,13 +30,14 @@ class PandaTests(unittest.TestCase):
         cls.client = ActionClient(cls.node, ExecuteTask, "execute_task")
         cls.plan_client = ActionClient(cls.node, ExecutePlan, "execute_plan")
         cls.arm = ActionClient(cls.node, MoveGroup, "move_action")
+        cls.trajectory = ActionClient(cls.node, FollowJointTrajectory, "panda_arm_controller/follow_joint_trajectory")
         cls.hand = ActionClient(cls.node, ParallelGripperCommand, "panda_hand_controller/gripper_cmd")
         cls.states = []
         cls.subscription = cls.node.create_subscription(JointState, "joint_states", lambda s: cls.states.append(s), 10)
 
     @classmethod
     def tearDownClass(cls):
-        cls.client.destroy(); cls.plan_client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
+        cls.client.destroy(); cls.plan_client.destroy(); cls.arm.destroy(); cls.trajectory.destroy(); cls.hand.destroy(); cls.node.destroy_node()
         forced_kill = False
         if cls.process.poll() is None:
             cls.process.send_signal(signal.SIGINT)  # launch propagates once to its children
@@ -55,12 +58,54 @@ class PandaTests(unittest.TestCase):
 
     def ready(self):
         self.assertTrue(self.arm.wait_for_server(timeout_sec=60), "MoveIt server unavailable")
+        self.assertTrue(self.trajectory.wait_for_server(timeout_sec=60), "arm trajectory controller unavailable")
         self.assertTrue(self.hand.wait_for_server(timeout_sec=60), "gripper controller unavailable")
         self.assertTrue(self.client.wait_for_server(timeout_sec=30), "runtime unavailable")
-        # Give TF, state broadcaster and initial feedback time to reach runtime.
-        end = time.monotonic()+3
+        controllers = self.node.create_client(ListControllers, "/controller_manager/list_controllers")
+        try:
+            self.assertTrue(controllers.wait_for_service(timeout_sec=30), "controller manager unavailable")
+            end = time.monotonic()+30
+            while time.monotonic() < end:
+                response = self.wait(controllers.call_async(ListControllers.Request()), timeout=5)
+                active = {controller.name for controller in response.controller if controller.state == "active"}
+                if {"joint_state_broadcaster", "panda_arm_controller", "panda_hand_controller"} <= active:
+                    break
+                rclpy.spin_once(self.node, timeout_sec=0.05)
+            else:
+                self.fail("Panda controllers did not become active")
+        finally:
+            self.node.destroy_client(controllers)
+        # Action servers may exist before the state broadcaster is activated.
+        # Wait for actual fresh stationary samples, never dispatch/retry a probe goal.
+        required = [f"panda_joint{i}" for i in range(1, 8)]+["panda_finger_joint1"]
+        end = time.monotonic()+30
+        first_stamp = last_stamp = None
+        samples = 0
         while time.monotonic() < end:
-            rclpy.spin_once(self.node, timeout_sec=0.1)
+            rclpy.spin_once(self.node, timeout_sec=0.02)
+            if not self.states:
+                continue
+            state = self.states[-1]
+            stamp = state.header.stamp.sec*1_000_000_000+state.header.stamp.nanosec
+            age = (self.node.get_clock().now().nanoseconds-stamp)/1_000_000_000
+            valid = stamp > 0 and 0 <= age <= 0.5
+            for name in required:
+                if name not in state.name:
+                    valid = False; break
+                i = state.name.index(name)
+                if i >= len(state.position) or i >= len(state.velocity) or not math.isfinite(state.position[i]) or \
+                        not math.isfinite(state.velocity[i]) or abs(state.velocity[i]) > 0.001:
+                    valid = False; break
+            if not valid:
+                first_stamp = last_stamp = None; samples = 0
+                continue
+            if last_stamp is None or stamp > last_stamp:
+                if first_stamp is None:
+                    first_stamp = stamp
+                last_stamp = stamp; samples += 1
+            if samples >= 3 and stamp-first_stamp >= 200_000_000:
+                return
+        self.fail("fresh stationary arm/gripper state broadcaster samples unavailable")
 
     def test_01_repeatable_pick_place_with_actual_ros_stack(self):
         self.ready()
@@ -124,6 +169,36 @@ class PandaTests(unittest.TestCase):
             self.assertEqual(state.runtime_id, record.runtime_id)
         finally:
             self.node.destroy_client(client); self.node.destroy_client(state_client)
+
+    def test_05_verified_template_marks_synthetic_outcome_proofs(self):
+        self.ready()
+        handle = self.wait(self.client.send_goal_async(ExecuteTask.Goal(
+            task_name="verified_pick_place", object_id="workpiece", target_id="tray", timeout_ms=90000)))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertTrue(result.result.success, result.result.error_code+": "+result.result.message)
+        client = self.node.create_client(GetExecution, "get_execution")
+        try:
+            self.assertTrue(client.wait_for_service(timeout_sec=5))
+            record = self.wait(client.call_async(GetExecution.Request(execution_id=bytes(handle.goal_id.uuid).hex())))
+            self.assertEqual(record.schema_version, 2)
+            self.assertEqual(record.record.completed_steps, 6)
+            for index in (2, 5):
+                self.assertTrue(record.record.steps[index].has_verification)
+                proof = record.record.steps[index].verification
+                self.assertTrue(proof.synthetic)
+                self.assertGreaterEqual(proof.samples, 3)
+                self.assertGreaterEqual(proof.stable_ms, 100)
+                self.assertEqual(proof.source, "demo_outcome")
+                self.assertEqual(proof.entity_id, "workpiece")
+                self.assertEqual(proof.target_id, "" if index == 2 else "tray")
+            candidates = {entry.entity_id: entry.location_id for entry in record.record.snapshot.placement_candidates}
+            locations = {entry.entity_id: entry.location_id for entry in record.record.snapshot.known_locations}
+            self.assertNotIn("workpiece", candidates)
+            self.assertEqual(locations.get("workpiece"), "tray")
+            self.assertTrue(record.record.snapshot.stop_confirmed)
+        finally:
+            self.node.destroy_client(client)
 
 
 if __name__ == "__main__":
