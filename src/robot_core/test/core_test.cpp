@@ -210,6 +210,18 @@ int main() {
       check(verify.tick(f.now+160ms).status == Status::succeeded, "three distinct post-effect samples");
       check(f.world.grasp_verifications.at("workpiece").samples == 3, "cache polling excluded");
     });
+    test("demo outcome identity advances only when oldest contributing sample advances", [] {
+      Fixture f; auto arm = std::make_shared<ProbeMotion>();
+      arm->measured = {"base_link", {0.6, -0.2, 0.15, 0.0, 0.0, 0.0, 1.0}, f.now, true, true, 7};
+      const DemoScene scene("base_link", {{"workpiece", EntityRole::object, {}},
+          {"tray", EntityRole::target, arm->measured.pose}});
+      DemoOutcomeObserver observer(arm, f.bindings.get<Gripper>("gripper"), scene);
+      const auto first = observer.placement("workpiece", "tray", f.now);
+      const auto duplicate = observer.placement("workpiece", "tray", f.now+20ms);
+      check(first && duplicate && first->sample_id == 7 && duplicate->sample_id == 7, "new gripper frame cannot refresh cached arm frame");
+      arm->measured.sample_id = 8; arm->measured.stamp = f.now+20ms;
+      check(observer.placement("workpiece", "tray", f.now+20ms)->sample_id == 8, "combined sample identity advances");
+    });
     test("verification rejects malformed negative and misidentified evidence", [] {
       for (int mode = 0; mode < 6; ++mode) {
         Fixture f; f.locate(); f.run(f.request("pick", "pick_object"));

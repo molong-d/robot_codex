@@ -74,7 +74,7 @@ class DemoOutcomeObserver final : public ManipulationObserver {
               !gripper.grasp_detected && std::abs(gripper.width_m-0.08) <= 0.002) &&
           failure_ != (target.empty() ? "grasp" : "placement");
       return OutcomeEvidence{object, target, std::min(arm.stamp, gripper.stamp),
-          arm.valid && gripper.valid, condition, {"demo_outcome", true, 1.0}, gripper.sample_id};
+          arm.valid && gripper.valid, condition, {"demo_outcome", true, 1.0}, std::min(arm.sample_id, gripper.sample_id)};
     } catch (const std::out_of_range&) { return std::nullopt; }
   }
   std::shared_ptr<ArmMotion> arm_;

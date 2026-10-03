@@ -28,6 +28,7 @@ struct MotionFeedback {
   Time stamp{};
   bool valid{false};
   bool stopped{false};
+  uint64_t sample_id{0};  // oldest contributing source stamp in the demo adapters
 };
 class ArmMotion : public Component {
  public:

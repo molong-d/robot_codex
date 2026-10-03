@@ -53,6 +53,7 @@ class MockArmMotion final : public ArmMotion {
   }
   Status poll(Time now) override {
     feedback_.stamp = now;
+    feedback_.sample_id = static_cast<uint64_t>(now.time_since_epoch().count());
     feedback_.valid = true;
     feedback_.stopped = !busy_;
     if (!busy_) return last_;

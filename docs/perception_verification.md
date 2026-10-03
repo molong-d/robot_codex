@@ -79,7 +79,7 @@ Panda 示例使用相同任务/计划，timeout_ms 改为 90000。配置显式�
 ## ROS 与已有组件迁移
 
 - ObjectLocator 升为接口版本 2。旧 v1 适配器在绑定校验时拒绝；增加来源、质量、合成标记和位姿语义后再声明 v2。
-- ArmMotion/Gripper 保持版本 2。GripperFeedback 新增 sample_id；Panda 使用原始 JointState 时间戳纳秒作为样本身份，重复轮询同一 ROS 消息不会产生新样本。独立真实 ManipulationObserver 可使用其自己的传感器序列，不依赖这个演示字段。
+- ArmMotion/Gripper 保持版本 2。反馈新增 sample_id；Panda 夹爪使用原始 JointState 时间戳纳秒，手臂使用 JointState/TF 中较旧的源时间戳纳秒。演示观察组件以这些同一 ROS 时钟来源中最旧的身份作为组合样本身份，任何仍缓存的旧输入都不能被另一输入刷新。重复轮询同一 ROS 消息不会产生新样本。独立真实 ManipulationObserver 可使用其自己的传感器序列，不依赖这些演示字段。
 - GetRuntimeState/GetExecution 诊断 schema 升为 2；ObservationSnapshot 增加证据/语义字段，WorldSnapshot 增加验证数组，SkillExecutionRecord 增加 has_verification 与证据。ROS 消息发生变化，须重新构建所有包并使用一致 overlay，不能混用旧生成接口。
 - GetCatalog、ExecuteTask、ExecutePlan 的协议版本/请求字段保持原样。inspect_runtime.py 当前接受诊断 schema 2；旧备份使用对应版本客户端。
 
