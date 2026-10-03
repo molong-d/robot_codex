@@ -127,6 +127,9 @@ int main() {
       s.cancel(); check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "stale feedback retains lease");
       arm->measured.stamp = f.now; arm->measured.stopped = false;
       check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "moving feedback retains lease");
+      arm->measured.stopped = true; arm->measured.stamp = f.now-1ms;
+      check(s.tick(f.now).status == Status::canceling && !f.resources.empty(), "pre-result stop sample retains lease");
+      arm->measured.stamp = f.now;
       arm->measured.stopped = true;
       check(s.tick(f.now).status == Status::canceled && f.resources.empty(), "measured stop releases lease");
     });
