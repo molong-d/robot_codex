@@ -267,6 +267,94 @@ class RuntimeTests(unittest.TestCase):
                                argument_names=["object", "target"], argument_values=["workpiece", "tray"]))
         return steps
 
+    def native_config(self):
+        return Path(__file__).resolve().parents[1]/"src/robot_bringup/config/demo_native_poses.yaml"
+
+    def test_native_pose_template_keeps_perception_and_calibration_semantics(self):
+        self.start(config=self.native_config())
+        inspection = self.send(task="inspect_object", target_id="")
+        inspection_result = self.wait(inspection.get_result_async()).result
+        self.assertTrue(inspection_result.success)
+        self.assertIn("demo object pose", inspection_result.message)
+        observation = self.state().snapshot.observations[0]
+        self.assertEqual((observation.frame_id, observation.pose_meaning, observation.source),
+                         ("demo_camera", "object_pose", "configured_native_demo"))
+        self.assertAlmostEqual(observation.pose[0], 0.15)
+        handle = self.send(task="verified_pick_place")
+        result = self.wait(handle.get_result_async()).result
+        self.assertTrue(result.success, result.message)
+        record = self.record(handle).record
+        self.assertEqual(record.completed_steps, 6)
+        self.assertTrue(all(s.step.implementation_id == "pose_resolved" for s in record.steps))
+        for index in (1, 4):
+            self.assertIn("calibration=demo_camera_v1", record.steps[index].transitions[0].message)
+            self.assertIn("source_frame=demo_camera", record.steps[index].transitions[0].message)
+        self.assertTrue(record.steps[2].has_verification and record.steps[5].has_verification)
+        self.assertEqual([(p.entity_id, p.location_id) for p in record.snapshot.known_locations], [("workpiece", "tray")])
+
+    def test_native_pose_plan_and_client_select_second_implementation(self):
+        self.start(config=self.native_config())
+        steps = self.verified_steps()
+        for step in steps:
+            step.implementation_id = "pose_resolved"
+        handle = self.send_plan(steps)
+        result = self.wait(handle.get_result_async()).result
+        self.assertEqual((result.success, result.completed_steps), (True, 6), result.message)
+        planner = Path(__file__).resolve().parent/"plan_pick_place.py"
+        result = subprocess.run(["python3", str(planner), "--implementation", "pose_resolved", "--verify-outcomes",
+                                 "--object", "workpiece_two", "--target", "tray_two", "--timeout-ms", "5000"],
+                                capture_output=True, text=True, timeout=20, env=self.runtime_env)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        self.assertIn('"completed_steps": 6', result.stdout)
+
+    def test_missing_resolver_rejects_entire_plan_before_execution(self):
+        self.start()
+        pick = next(s for s in self.catalog().skills if s.skill_id == "pick_object")
+        resolved = next(i for i in pick.implementations if i.implementation_id == "pose_resolved")
+        self.assertFalse(resolved.dependencies_satisfied)
+        self.assertIn("target_resolver", {c.role for c in resolved.components})
+        steps = self.plan_steps()
+        for step in steps:
+            step.implementation_id = "pose_resolved"
+        self.assertFalse(self.send_plan(steps).accepted)
+        self.assertFalse(self.record().found)
+        self.assertFalse(self.state().snapshot.resource_leases)
+
+    def test_native_pose_wrong_source_frame_fails_before_moving(self):
+        self.start("target_resolution.source_frame:=other_camera", config=self.native_config())
+        handle = self.send()
+        result = self.wait(handle.get_result_async()).result
+        self.assertEqual((result.success, result.error_code), (False, "TARGET_RESOLUTION_FAILED"))
+        record = self.record(handle).record
+        self.assertEqual(record.completed_steps, 1)
+        self.assertFalse(record.snapshot.attached_object)
+        self.assertFalse(record.snapshot.placement_candidates)
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertFalse(record.snapshot.resource_leases)
+
+    def test_native_pose_cancellation_uses_measured_stop_path(self):
+        self.start("mock_action_ticks:=50", "mock_stop_ticks:=50", config=self.native_config())
+        feedback = []
+        handle = self.send(feedback=lambda msg: feedback.append(msg.feedback))
+        self.wait_for_pick(feedback)
+        self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
+        self.assertTrue(self.state().snapshot.resource_leases)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_CANCELED)
+        record = self.record(handle).record
+        self.assertEqual(record.steps[1].step.implementation_id, "pose_resolved")
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertFalse(record.snapshot.resource_leases)
+        self.assertFalse(record.snapshot.attached_object)
+
+    def test_native_pose_invalid_tool_calibration_rejected_at_startup(self):
+        self.process = subprocess.Popen(["ros2", "run", "robot_bt_runtime", "robot_runtime", "--ros-args", "--params-file",
+                                         str(self.native_config()), "-p", "target_resolution.tool_frame:=other_tool"],
+                                        stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True, env=self.runtime_env)
+        self.assertNotEqual(self.process.wait(timeout=10), 0)
+        self.log.seek(0)
+        self.assertIn("calibration tool frame must match", self.log.read())
+
     def test_verified_template_retains_both_step_proofs_and_provenance(self):
         self.start(config=Path(__file__).resolve().parents[1]/"src/robot_bringup/config/demo.yaml")
         handle = self.send(task="verified_pick_place", object_id="workpiece_two", target_id="tray_two")
@@ -436,7 +524,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(set(skills), {"locate_object", "pick_object", "place_object", "verify_grasp", "verify_placement"})
         self.assertEqual([(p.name, p.type, p.required) for p in skills["place_object"].inputs],
                          [("object", "entity_id", True), ("target", "entity_id", True)])
-        pick = skills["pick_object"].implementations[0]
+        pick = next(i for i in skills["pick_object"].implementations if i.implementation_id == "standard")
         self.assertTrue(pick.dependencies_satisfied)  # does not claim the closed gate is armed
         self.assertEqual(pick.execution_gate_role, "safety")
         self.assertEqual({r.role: r.interface_version for r in pick.components},

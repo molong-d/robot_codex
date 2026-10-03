@@ -68,7 +68,7 @@ flowchart TD
 
 环境状态需保留观测来源、坐标系、时间和质量；执行期不能把计划的预期效果直接写成观测事实。MoveIt PlanningScene 应作为运动规划视图，与世界状态同步，而不是任意多个模块互相覆盖的数据库。
 
-6B 已实现位姿证据来源、合成标记、质量与 object_pose/motion_target 语义。`ManipulationObserver` 提供技术证据，`VerifyOutcome` 技能检查动作后样本身份、时间窗口和条件，再更新带来源的验证状态。配置示例使用合成观察组件；真实感知、工具/抓取目标变换和物理抓稳条件仍需按设备实现，见 [感知证据与结果验证](perception_verification.md)。
+6B 已实现位姿证据来源、合成标记、质量与 object_pose/motion_target 语义。`ManipulationObserver` 提供技术证据，`VerifyOutcome` 技能检查动作后样本身份、时间窗口和条件，再更新带来源的验证状态。7A 的 `MotionTargetResolver` 提供明确的几何解析，`pose_resolved` 操作技能检查输出后才派发运动；静态示例不求解真实标定，也不选择抓取点。真实感知、标定及物理抓稳条件仍需按设备实现，见 [感知证据与结果验证](perception_verification.md) 与 [显式位姿解析](target_resolution.md)。
 
 ## 复用边界
 

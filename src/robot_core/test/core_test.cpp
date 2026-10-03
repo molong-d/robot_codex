@@ -2,6 +2,7 @@
 #include "robot_core/task_catalog.hpp"
 #include "robot_core/plan.hpp"
 #include "robot_core/execution_record.hpp"
+#include "robot_core/target_resolution.hpp"
 #include <iostream>
 #include <limits>
 
@@ -15,6 +16,8 @@ void rejects(const std::function<void()>& run, const char* message) {
   try { run(); } catch (const std::exception&) { return; }
   throw std::runtime_error(message);
 }
+StaticCalibration demo_calibration();
+DemoScene native_scene();
 
 struct Fixture {
   Components components;
@@ -26,11 +29,15 @@ struct Fixture {
   std::shared_ptr<MockRobotState> robot{std::make_shared<MockRobotState>()};
   Time now{Clock::now()};
   explicit Fixture(int arm_ticks = 3, bool fail_motion = false, bool permitted = true,
-                   bool fail_grasp = false, std::optional<DemoScene> scene = std::nullopt)
+                   bool fail_grasp = false, std::optional<DemoScene> scene = std::nullopt,
+                   bool native_input = false, std::shared_ptr<MotionTargetResolver> resolver = {})
       : bindings(components, {{"perception", "camera"}, {"motion", "arm"},
-                              {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}}),
+                              {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}}),
         context{bindings, world} {
-    if (scene) components.add("camera", std::make_shared<ConfiguredDemoLocator>(*scene));
+    if (native_input) {
+      components.add("camera", std::make_shared<ConfiguredDemoLocator>(native_scene(), PoseMeaning::object_pose, "configured_native_demo"));
+      components.add("resolver", resolver ? std::move(resolver) : std::make_shared<StaticMotionTargetResolver>(demo_calibration()));
+    } else if (scene) components.add("camera", std::make_shared<ConfiguredDemoLocator>(*scene));
     else components.add("camera", std::make_shared<MockLocator>());
     components.add("arm", std::make_shared<MockArmMotion>(robot, arm_ticks, fail_motion));
     components.add("gripper", std::make_shared<MockGripper>(robot, 2, fail_grasp));
@@ -107,6 +114,30 @@ class ProbeObserver final : public ManipulationObserver {
   std::optional<OutcomeEvidence> placement(const std::string&, const std::string&, Time) override { return value; }
 };
 
+StaticCalibration demo_calibration() {
+  const double s = std::sqrt(0.5);
+  return {"demo_camera_v1", "demo_camera", "base_link", "tool0",
+          {0.1, -0.05, 0.1, 0, 0, s, s}, {0, 0, 0.02, 0, 0, 0, 1}, {0, 0, 0.01, 0, 0, 0, 1}, true};
+}
+DemoScene native_scene() {
+  const double s = std::sqrt(0.5);
+  return DemoScene("demo_camera", {{"workpiece", EntityRole::object, {0.15, -0.30, 0.08, 0, 0, -s, s}},
+                                   {"tray", EntityRole::target, {-0.15, -0.50, 0.04, 0, 0, -s, s}}});
+}
+class ProbeResolver final : public MotionTargetResolver {
+ public:
+  bool called{false}, throws{false};
+  std::function<void(ResolvedMotionTarget&)> alter;
+  std::string resource_id() const override { return "probe_calibration"; }
+  std::optional<ResolvedMotionTarget> resolve(const Observation& o, TargetPurpose p) override {
+    called = true;
+    if (throws) throw std::runtime_error("calibration unavailable");
+    auto result = StaticMotionTargetResolver(demo_calibration()).resolve(o, p);
+    if (result && alter) alter(*result);
+    return result;
+  }
+};
+
 Plan transfer_plan(const std::string& object = "workpiece", const std::string& target = "tray") {
   return {1, {{"locate_object", "standard", {{"object", object}}},
               {"pick_object", "standard", {{"object", object}}},
@@ -130,6 +161,110 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("native poses resolve through rotation and separate tool offsets", [] {
+      StaticMotionTargetResolver resolver(demo_calibration());
+      ConfiguredDemoLocator locator(native_scene(), PoseMeaning::object_pose, "depth_camera");
+      const auto now = Clock::now();
+      const auto grasp = resolver.resolve(*locator.locate("workpiece", now), TargetPurpose::grasp);
+      const auto place = resolver.resolve(*locator.locate("tray", now), TargetPurpose::placement);
+      check(grasp && place && pose_near(grasp->observation.pose, {0.4, 0.1, 0.2, 0, 0, 0, 1}, {1e-9, 1e-6}) &&
+            pose_near(place->observation.pose, {0.6, -0.2, 0.15, 0, 0, 0, 1}, {1e-9, 1e-6}), "independent expected base/tool goals");
+      check(grasp->observation.stamp == now && grasp->observation.evidence.source == "depth_camera" &&
+            grasp->observation.meaning == PoseMeaning::motion_target && grasp->tool_frame == "tool0", "capture provenance retained");
+      const double s = std::sqrt(0.5);
+      const auto rotated = compose_pose({1, 2, 3, 0, 0, s, s}, {0.2, 0, 0, 1, 0, 0, 0});
+      check(pose_near(rotated, {1, 2.2, 3, s, s, 0, 0}, {1e-9, 1e-6}), "translation follows parent rotation, not vector addition");
+    });
+    test("static calibration rejects malformed profiles and wrong input semantics", [] {
+      auto c = demo_calibration(); c.tool_frame.clear();
+      rejects([&] { StaticMotionTargetResolver resolver(c); }, "tool must be named");
+      c = demo_calibration(); c.source_in_base.qw = 0;
+      rejects([&] { StaticMotionTargetResolver resolver(c); }, "invalid quaternion");
+      c = demo_calibration(); c.id = "bad/id";
+      rejects([&] { StaticMotionTargetResolver resolver(c); }, "invalid calibration ID");
+      c = demo_calibration(); c.grasp_tool_in_object.x = std::numeric_limits<double>::infinity();
+      rejects([&] { StaticMotionTargetResolver resolver(c); }, "nonfinite offset");
+      StaticMotionTargetResolver resolver(demo_calibration());
+      auto o = *ConfiguredDemoLocator(native_scene(), PoseMeaning::object_pose).locate("workpiece", Clock::now());
+      o.frame_id = "other_camera"; check(!resolver.resolve(o, TargetPurpose::grasp), "no implicit frame fallback");
+      o.frame_id = "demo_camera"; o.meaning = PoseMeaning::motion_target;
+      check(!resolver.resolve(o, TargetPurpose::grasp), "no repeated tool offsets");
+    });
+    test("calibration preserves real source age and marks synthetic geometry", [] {
+      auto c = demo_calibration(); c.synthetic = false;
+      auto o = *ConfiguredDemoLocator(native_scene(), PoseMeaning::object_pose).locate("workpiece", Clock::now());
+      o.evidence = {"real_depth", false, 0.87}; o.stamp -= 123ms;
+      const auto real = StaticMotionTargetResolver(c).resolve(o, TargetPurpose::grasp);
+      check(real && !real->observation.evidence.synthetic && real->observation.stamp == o.stamp &&
+            real->observation.evidence.quality == 0.87, "no refreshed timestamp or upgraded confidence");
+      c.synthetic = true;
+      check(StaticMotionTargetResolver(c).resolve(o, TargetPurpose::grasp)->observation.evidence.synthetic, "synthetic calibration taints result");
+      Fixture f(3, false, true, false, std::nullopt, true); f.locate();
+      f.world.observations["workpiece"].evidence = {"real_depth", false, 0.87};
+      Manipulate strict(f.context, true, {}, true);
+      check(strict.start({{"object", "workpiece"}}, f.now).code == "TARGET_RESOLUTION_FAILED" && f.robot->arm_target.empty(),
+            "real source cannot launder synthetic calibration through a strict skill");
+    });
+    test("resolved six-step task preserves goals and calibration trace", [] {
+      Fixture f(3, false, true, false, std::nullopt, true); auto plan = verified_transfer_plan();
+      for (auto& step : plan.steps) step.implementation = "pose_resolved";
+      validate_plan(plan, plan_scene(), f.skills, f.bindings, f.world);
+      ExecutionJournal journal; journal.begin("resolved", "execute_plan", "", 6, 5000, f.now, 1);
+      for (size_t i = 0; i < plan.steps.size(); ++i) {
+        const auto& step = plan.steps[i]; auto request = f.request(std::to_string(i), step.skill, step.arguments);
+        request.implementation = step.implementation;
+        Session session(f.skills, f.resources, f.context, request); auto result = session.start(f.now);
+        journal.observe(request, result, f.now);
+        for (int n = 0; n < 100 && !terminal(result.status); ++n) { f.now += 10ms; result = session.tick(f.now); }
+        check(result.status == Status::succeeded, "resolved task step succeeded");
+        journal.observe(request, result, f.now);
+      }
+      journal.finish({Status::succeeded, "", ""}, {f.now, f.world, {}, true, false, true}, f.now);
+      check(f.world.known_locations.at("workpiece") == "tray" && f.world.placement_candidates.empty(), "verified placement unchanged");
+      check(pose_near(f.robot->arm_pose, {0.6, -0.2, 0.15, 0, 0, 0, 1}, {1e-9, 1e-6}), "correct release tool pose");
+      check(journal.get("resolved", f.now)->steps[1].transitions.front().result.message.find("calibration=demo_camera_v1") != std::string::npos,
+            "calibration ID retained in recorded start transition");
+    });
+    test("resolved implementation needs its own dependency before plan admission", [] {
+      Fixture f; auto plan = transfer_plan(); for (auto& step : plan.steps) step.implementation = "pose_resolved";
+      rejects([&] { validate_plan(plan, plan_scene(), f.skills, f.bindings, f.world); }, "missing resolver blocks complete plan");
+      check(f.world.observations.empty() && f.robot->arm_target.empty() && f.resources.empty(), "admission is read-only");
+      Fixture g(3, false, true, false, std::nullopt, true); g.locate(); g.world.observations["workpiece"].meaning = PoseMeaning::motion_target;
+      auto r = g.request("twice", "pick_object"); r.implementation = "pose_resolved";
+      check(g.run(r).code == "INVALID_SOURCE_POSE" && g.robot->arm_target.empty(), "double resolution rejected before dispatch");
+    });
+    test("skills reject altered resolution provenance frames and tool identities", [] {
+      const std::vector<std::function<void(ResolvedMotionTarget&)>> changes{
+        [](auto& r) { r.observation.stamp += 1ms; }, [](auto& r) { r.observation.evidence.quality = 0.99; },
+        [](auto& r) { r.observation.evidence.synthetic = false; }, [](auto& r) { r.observation.evidence.source = "other"; },
+        [](auto& r) { r.observation.frame_id = "other_base"; }, [](auto& r) { r.tool_frame = "wrong_tool"; },
+        [](auto& r) { r.observation.object_id = "another_part"; }, [](auto& r) { r.observation.pose.qw = 0; }};
+      for (const auto& change : changes) {
+        auto resolver = std::make_shared<ProbeResolver>(); resolver->alter = change;
+        Fixture f(3, false, true, false, std::nullopt, true, resolver); f.locate();
+        auto r = f.request("bad-resolution", "pick_object"); r.implementation = "pose_resolved";
+        check(f.run(r).code == "TARGET_RESOLUTION_FAILED" && f.robot->arm_target.empty() && f.resources.empty(), "malformed resolution never dispatches");
+      }
+    });
+    test("resolution failures and stale sources terminate without actuator commands", [] {
+      auto resolver = std::make_shared<ProbeResolver>(); Fixture f(3, false, true, false, std::nullopt, true, resolver); f.locate();
+      auto r = f.request("stale-native", "pick_object"); r.implementation = "pose_resolved";
+      f.world.observations["workpiece"].stamp -= 3s;
+      check(f.run(r).code == "STALE_OBSERVATION" && !resolver->called, "stale input rejected before geometry");
+      f.locate(); resolver->throws = true;
+      check(f.run(r).code == "TARGET_RESOLUTION_FAILED" && f.resources.empty() && f.robot->arm_target.empty(), "resolver exception before dispatch is a clean failure");
+    });
+    test("resolved motion uses the same gate and confirmed cancellation leases", [] {
+      Fixture denied(50, false, false, false, std::nullopt, true); denied.locate();
+      auto r = denied.request("blocked-native", "pick_object"); r.implementation = "pose_resolved";
+      check(denied.run(r).code == "SAFETY_INTERLOCK" && denied.resources.empty(), "same execution admission");
+      Fixture f(50, false, true, false, std::nullopt, true); f.locate();
+      r = f.request("cancel-native", "pick_object"); r.implementation = "pose_resolved";
+      Session session(f.skills, f.resources, f.context, r); check(session.start(f.now).status == Status::running, "native motion started");
+      session.cancel(); check(!f.resources.empty(), "leases held before measured stop");
+      for (int n = 0; n < 5 && !terminal(session.result().status); ++n) { f.now += 10ms; session.tick(f.now); }
+      check(session.result().status == Status::canceled && f.resources.empty() && !f.robot->grasped && f.world.attached_object.empty(), "confirmed stop without dispatching grasp");
+    });
     test("evidence policy rejects missing source quality and synthetic data by default", [] {
       const auto now = Clock::now(); EvidenceMetadata value{"camera", false, 0.9}; EvidencePolicy policy;
       check(acceptable_evidence(value, now, now, policy), "accepted real evidence");
@@ -445,10 +580,12 @@ int main() {
       check(catalog.size() == 5, "all definitions visible");
       const auto& pick = catalog.at(1);
       check(pick.definition.id == "pick_object" && pick.definition.inputs.at(0).type == "entity_id", "typed inputs");
-      check(pick.implementations.size() == 2, "alternative implementations visible");
-      check(pick.implementations.at(0).dependencies_satisfied, "bound dependencies despite closed gate");
-      check(pick.implementations.at(0).dependencies.components.at(0).version == 2, "component version");
-      check(!pick.implementations.at(1).dependencies_satisfied && !pick.implementations.at(1).unavailable_reason.empty(), "unbound implementation explained");
+      check(pick.implementations.size() == 3, "alternative implementations visible");
+      const auto& standard = *std::find_if(pick.implementations.begin(), pick.implementations.end(), [](const auto& i) { return i.id == "standard"; });
+      const auto& unbound = *std::find_if(pick.implementations.begin(), pick.implementations.end(), [](const auto& i) { return i.id == "unbound"; });
+      check(standard.dependencies_satisfied, "bound dependencies despite closed gate");
+      check(standard.dependencies.components.at(0).version == 2, "component version");
+      check(!unbound.dependencies_satisfied && !unbound.unavailable_reason.empty(), "unbound implementation explained");
       check(!constructed && f.resources.empty() && f.robot->arm_target.empty(), "read-only catalog");
     });
     test("task admission checks every step before any actuator or factory", [] {

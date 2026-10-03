@@ -11,6 +11,7 @@
 | `stable/v0.4.0-catalog-r1-20261003` | `d2ec8e8768c21ccb1c836077c899b50d33ea585c` | 5A 修订快照；功能测试与 Panda 子进程退出检查通过 |
 | `stable/v0.4.0-plans-20261003` | `ba8368dbedc7216e0cdd47f88192cc5be4d08085` | 5B 快照；核心、ROS 结构化计划及 Panda 测试通过 |
 | `stable/v0.4.0-records-20261003` | `3ff7eb44ea953aa45d1dd9889ac9999e587b1fcf` | 6A 快照；核心、ROS 执行记录与 Panda 测试通过 |
+| `stable/v0.4.0-verification-20261003` | `1a7d070f330691ed8b880eee4b936869d595495b` | 6B 快照；51 项核心、31 项 ROS、5 项 Panda 测试通过 |
 
 备份分支固定指向原提交，后续开发不向该分支推送。备份保留的是当时经过测试的软件行为，不代表已经通过实机或功能安全验证。
 
@@ -19,6 +20,8 @@
 6A 分支 `framework/execution-records-v04` 在 5B 基础上开发；6B 分支 `framework/perception-verification-v04` 接在 6A 后。合并顺序为 5A → 5B → 6A → 6B。每次前置 PR 合并后，调整下一 PR 的目标为 main，再检查差异和 CI。6B 验证通过后创建新的 `stable/v0.4.0-verification-20261003` 快照，保留全部旧备份；主线合并前继续以 v0.3 作为已合并稳定基线。
 
 6B 将 ObjectLocator 契约升为 v2，诊断 ROS schema 升为 2；增加来源、质量、合成标记、位姿语义与验证证据。重新构建完整 overlay，不能混用旧消息。Action 请求、目录和计划版本不变；见 [迁移说明](perception_verification.md)。
+
+7A 分支 framework/target-resolution-v04 在 6B 基础上开发，合并顺序追加在 6B 之后。通过完整 CI 后，以 stable/v0.4.0-targets-日期 创建固定快照，日期按北京时间记录。7A 新增组件和实现，不改变 ROS 消息或协议版本；需重建 C++ 包与安装配置。新目录客户端按 implementation_id 选择实现，详见 [显式位姿解析](target_resolution.md)。
 
 ## 升级流程
 

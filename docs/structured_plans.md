@@ -55,6 +55,8 @@ Panda 使用 `--timeout-ms 90000`。`--dry-run` 只查询目录并打印技能�
 
 6B 增加 `--verify-outcomes`，分解为六步并使用 `ManipulationObserver` 证据验证抓稳和放置。默认四步不变；当前证据为合成示例。步骤、来源与样本窗口见 [感知证据与结果验证](perception_verification.md)。
 
+7A 可通过 `--implementation pose_resolved` 使用显式原生位姿解析。客户端沿用实现级依赖检查；缺少解析组件会在全计划准入时拒绝。两套配置与坐标约定见 [显式位姿解析](target_resolution.md)。
+
 ## 后续规划器、VLM 与 VLA 接入
 
 传统规划器或 LLM/VLM 任务规划器可将输出转换成同一个技能计划协议，遵守目录参数和全计划校验；不能绕过运行时直接控制设备。目前没有模型 SDK、API key 或某个模型专用接口。

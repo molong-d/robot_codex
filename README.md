@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.4 感知证据与结果验证开发版（6B）**。包含 ROS 2 Action、技能目录、配置任务、结构化计划、执行记录、感知来源/质量/位姿语义，以及抓稳和放置证据验证技能。位姿、反馈时效、样本窗口和停止确认均参与验收。当前证据为显式合成示例，尚未连接真实机器人。
+当前版本为 **v0.4 显式位姿解析开发版（7A）**。包含 ROS 2 Action、技能目录、配置任务、结构化计划、执行记录、感知来源/质量/位姿语义、抓稳和放置证据验证，以及物体位姿到末端目标的解析组件。位姿、反馈时效、样本窗口和停止确认均参与验收。当前证据与标定为显式合成示例，尚未连接真实机器人。
 
 ## 技能与组件
 
@@ -129,6 +129,17 @@ python3 scripts/plan_pick_place.py --verify-outcomes --timeout-ms 5000
 
 默认四步流程保持原样。新增 `verify_grasp`、`verify_placement` 接受动作后的多份独立样本；验证通过后保留来源、质量与合成标记。示例组件根据机器人反馈生成合成条件，没有真实视觉、滑移或落点检测。原生 object_pose 必须经过明确的运动目标转换，不能直接下发。契约、六步任务与 ROS 迁移说明见 [感知证据与结果验证](docs/perception_verification.md)。
 
+## 原生位姿与第二种技能实现
+
+使用独立的相机坐标位姿配置，通过显式旋转、平移与抓取/放置工具偏置生成末端目标：
+
+```bash
+ros2 launch robot_bringup demo.launch.py config_file:=$(ros2 pkg prefix robot_bringup)/share/robot_bringup/config/demo_native_poses.yaml
+python3 scripts/plan_pick_place.py --implementation pose_resolved --verify-outcomes --timeout-ms 5000
+```
+
+启动与提交命令分别在两个已 source 环境的终端执行。Panda 也提供 `runtime_native_poses.yaml`，使用相同实现与技能定义。解析组件不刷新观测时间、不提高来源质量、不去除合成标记；错误源坐标、工具或输出证据会在运动前失败。变换约定、配置与扩展见 [显式位姿解析](docs/target_resolution.md)。
+
 ## 完整验证
 
 停止手动启动的 runtime，source 上述环境后运行：
@@ -170,6 +181,6 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 - 停止未确认或异常时保留资源并拒绝后续任务；mock 节点可重启复位。真实设备必须先确认物理状态，不能将进程重启当作停机确认。
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
-阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [感知证据与结果验证](docs/perception_verification.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [感知证据与结果验证](docs/perception_verification.md) · [显式位姿解析](docs/target_resolution.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
 
 稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

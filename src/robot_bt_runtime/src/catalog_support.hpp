@@ -1,5 +1,6 @@
 #pragma once
 #include "robot_core/task_catalog.hpp"
+#include "robot_core/target_resolution.hpp"
 #include "robot_interfaces/srv/get_catalog.hpp"
 #include <rclcpp/rclcpp.hpp>
 
@@ -34,6 +35,37 @@ inline rc::DemoScene load_scene(rclcpp::Node* node, const std::string& frame, bo
     }
   }
   return rc::DemoScene(frame, std::move(entities));
+}
+
+inline rc::Pose required_pose(rclcpp::Node* node, const std::string& name) {
+  const auto p = startup_parameter<std::vector<double>>(node, name, {});
+  if (p.size() != 7) throw std::invalid_argument(name + " requires explicit x,y,z,qx,qy,qz,qw");
+  const rc::Pose result{p[0], p[1], p[2], p[3], p[4], p[5], p[6]};
+  if (!rc::valid_pose(result)) throw std::invalid_argument("invalid pose: " + name);
+  return result;
+}
+inline rc::DemoScene load_native_scene(rclcpp::Node* node, const rc::DemoScene& goals) {
+  const auto frame = startup_parameter<std::string>(node, "perception_frame", "");
+  std::vector<rc::DemoEntity> entities;
+  for (const auto role : {rc::EntityRole::object, rc::EntityRole::target})
+    for (const auto& id : goals.ids(role))
+      entities.push_back({id, role, required_pose(node, "native_entities." + id + ".pose")});
+  return rc::DemoScene(frame, std::move(entities));
+}
+inline std::shared_ptr<rc::MotionTargetResolver> load_target_resolver(rclcpp::Node* node, const std::string& base_frame,
+                                                                   const std::string& tool_frame) {
+  if (!startup_parameter<bool>(node, "target_resolution.enabled", false)) return {};
+  rc::StaticCalibration c;
+  c.id = startup_parameter<std::string>(node, "target_resolution.calibration_id", "");
+  c.source_frame = startup_parameter<std::string>(node, "target_resolution.source_frame", "");
+  c.base_frame = base_frame;
+  c.tool_frame = startup_parameter<std::string>(node, "target_resolution.tool_frame", "");
+  if (c.tool_frame != tool_frame) throw std::invalid_argument("calibration tool frame must match end_effector_link");
+  c.source_in_base = required_pose(node, "target_resolution.source_in_base");
+  c.grasp_tool_in_object = required_pose(node, "target_resolution.grasp_tool_offset");
+  c.placement_tool_in_target = required_pose(node, "target_resolution.place_tool_offset");
+  c.synthetic = startup_parameter<bool>(node, "target_resolution.synthetic", true);
+  return std::make_shared<rc::StaticMotionTargetResolver>(std::move(c));
 }
 
 inline rc::TaskCatalog load_tasks(rclcpp::Node* node) {

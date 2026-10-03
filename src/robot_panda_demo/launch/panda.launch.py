@@ -29,6 +29,7 @@ def generate_launch_description():
         raise RuntimeError(f"MoveIt controller plugin library missing: {controller_library}")
     preload = " ".join(filter(None, [str(controller_library), os.environ.get("LD_PRELOAD", "")]))
     return LaunchDescription([
+        DeclareLaunchArgument("config_file", default_value=str(share / "config" / "runtime.yaml")),
         DeclareLaunchArgument("mock_motion_permitted", default_value="true"),
         Node(package="tf2_ros", executable="static_transform_publisher",
              arguments=["--frame-id", "world", "--child-frame-id", "panda_link0"], output="screen"),
@@ -44,7 +45,7 @@ def generate_launch_description():
                output="screen")
           for name in ["joint_state_broadcaster", "panda_arm_controller", "panda_hand_controller"]],
         Node(package="robot_bt_runtime", executable="robot_runtime", name="robot_runtime",
-             parameters=[str(share / "config" / "runtime.yaml"), {
+             parameters=[LaunchConfiguration("config_file"), {
                  "mock_motion_permitted": ParameterValue(LaunchConfiguration("mock_motion_permitted"), value_type=bool),
              }], output="screen"),
     ])
