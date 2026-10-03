@@ -262,6 +262,8 @@ class Resources {
       if (it->second == owner) it = owners_.erase(it); else ++it;
   }
   bool empty() const { return active_.empty(); }
+  // A copy for diagnostics; reading it cannot acquire or release resources.
+  std::map<std::string, std::string> owners() const { return owners_; }
  private:
   std::set<std::string> active_;
   std::map<std::string, std::string> owners_;
@@ -288,6 +290,7 @@ class Session {
     }
   }
   const Result& result() const { return result_; }
+  const Request& request() const { return request_; }
   Result start(Time now) {
     if (result_.status != Status::idle) return result_; // never dispatch twice
     try {

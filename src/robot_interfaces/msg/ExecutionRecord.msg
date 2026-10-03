@@ -1,0 +1,13 @@
+string execution_id
+string entrypoint
+string task_name
+uint64 started_unix_ms
+uint64 elapsed_ms
+uint32 timeout_ms
+uint32 total_steps
+uint32 completed_steps
+string status
+string error_code
+string message
+SkillExecutionRecord[<=32] steps
+WorldSnapshot snapshot

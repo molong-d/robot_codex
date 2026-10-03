@@ -1,6 +1,7 @@
 #include "robot_core/demo.hpp"
 #include "catalog_support.hpp"
 #include "plan_support.hpp"
+#include "record_support.hpp"
 #include "robot_ros_adapters/adapters.hpp"
 #include "robot_interfaces/action/execute_task.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -27,17 +28,18 @@ struct Engine {
   rc::Context context;
   rc::Skills skills;
   rc::Resources resources;
+  rc::ExecutionJournal journal;
   struct Entry { std::string skill; std::shared_ptr<rc::Session> session; };
   std::vector<Entry> sessions;
   uint64_t sequence{0};
   std::chrono::milliseconds skill_timeout{2000};
   bool fault_latched{false};
 
-  Engine(std::string motion, int ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
-         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene)
+  Engine(std::string motion, int ticks, int stop_ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
+         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity)
       : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
                               {"gripper", "mock_gripper"}, {"safety", "execution_gate"}}),
-        context{bindings, world} {
+        context{bindings, world}, journal(history_capacity) {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
     components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(scene));
@@ -47,9 +49,9 @@ struct Engine {
       components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
       components.add("mock_gripper", std::make_shared<robot_ros_adapters::ParallelGripper>(node, config));
     } else {
-      components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks));
-      components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2));
-      components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp));
+      components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks, false, stop_ticks));
+      components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2, false, stop_ticks));
+      components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp, stop_ticks));
     }
     bindings.get<rc::ArmMotion>("motion");
     bindings.get<rc::Gripper>("gripper");
@@ -61,18 +63,29 @@ struct Engine {
     auto session = std::make_shared<rc::Session>(skills, resources, context, std::move(request));
     sessions.push_back({std::move(skill), session});
     session->start(rc::Clock::now());
+    if (session->result().status == rc::Status::faulted) fault_latched = true;
+    journal.observe(session->request(), session->result(), rc::Clock::now());
     return session;
   }
   void pump(rc::Time now) {
     for (auto& entry : sessions) {
       auto result = entry.session->tick(now);
       if (result.status == rc::Status::faulted) fault_latched = true;
+      if (!journal.active_id().empty()) journal.observe(entry.session->request(), result, now);
     }
   }
-  void cancel() { for (auto& entry : sessions) entry.session->cancel(); }
+  void cancel() {
+    for (auto& entry : sessions) {
+      entry.session->cancel();
+      if (!journal.active_id().empty()) journal.observe(entry.session->request(), entry.session->result(), rc::Clock::now());
+    }
+  }
   bool stopped() const {
     return resources.empty() && std::all_of(sessions.begin(), sessions.end(),
         [](const Entry& e) { return rc::terminal(e.session->result().status); });
+  }
+  rc::ExecutionSnapshot snapshot(rc::Time now) const {
+    return {now, world, resources.owners(), resources.empty(), fault_latched, stopped()};
   }
 };
 
@@ -113,6 +126,7 @@ class RuntimeNode final : public rclcpp::Node {
  public:
   RuntimeNode() : Node("robot_runtime") {
     const auto backend = declare_parameter<std::string>("backend", "mock");
+    backend_ = backend;
     const auto simulation_only = declare_parameter<bool>("simulation_only", true);
     const auto ros_enabled = declare_parameter<bool>("ros_backend_enabled", false);
     if (backend != "mock" && backend != "panda_ros") throw std::invalid_argument("unknown backend");
@@ -132,17 +146,21 @@ class RuntimeNode final : public rclcpp::Node {
     config.simulation_grasp_detection = declare_parameter<bool>("simulation_grasp_detection", false);
     const auto motion = declare_parameter<std::string>("motion_component", "mock_arm");
     const auto ticks = declare_parameter<int>("mock_action_ticks", 3);
+    const auto stop_ticks = catalog_support::startup_parameter<int>(this, "mock_stop_ticks", 2);
     const auto fail = declare_parameter<bool>("mock_fail_pick", false);
     const auto motion_permitted = declare_parameter<bool>("mock_motion_permitted", true);
     const auto period = declare_parameter<int>("tick_period_ms", 20);
     const auto skill_timeout = declare_parameter<int>("skill_timeout_ms", 2000);
     const auto stop_timeout = declare_parameter<int>("stop_timeout_ms", 2000);
-    if (ticks <= 0 || ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
+    const auto history_capacity = catalog_support::startup_parameter<int>(this, "execution_history_capacity", 32);
+    if (ticks <= 0 || ticks > 100000 || stop_ticks <= 0 || stop_ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
     scene_ = std::make_unique<rc::DemoScene>(catalog_support::load_scene(this, config.frame, backend == "panda_ros"));
     tasks_ = std::make_unique<rc::TaskCatalog>(catalog_support::load_tasks(this));
-    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_);
+    if (history_capacity < 1 || history_capacity > 128) throw std::invalid_argument("execution history capacity requires 1..128");
+    engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_,
+                                     static_cast<size_t>(history_capacity));
     tasks_->validate_configuration(*scene_, engine_->skills, engine_->bindings);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
@@ -157,6 +175,29 @@ class RuntimeNode final : public rclcpp::Node {
                const std::shared_ptr<catalog_support::GetCatalog::Response> response) {
           catalog_support::describe(engine_->skills, engine_->bindings, *tasks_, *scene_, *response);
         });
+    state_server_ = create_service<record_support::GetRuntimeState>("get_runtime_state",
+        [this](const std::shared_ptr<record_support::GetRuntimeState::Request>,
+               const std::shared_ptr<record_support::GetRuntimeState::Response> response) {
+          response->schema_version = 1; response->runtime_id = runtime_id_; response->backend = backend_;
+          response->simulation_only = true; response->busy = reserved_;
+          response->active_execution_id = engine_->journal.active_id();
+          response->history_capacity = static_cast<uint32_t>(engine_->journal.capacity());
+          response->evicted_records = engine_->journal.evicted_count();
+          const auto ids = engine_->journal.recent_ids();
+          response->recent_execution_ids.assign(ids.begin(), ids.end());
+          response->snapshot = record_support::describe(engine_->snapshot(rc::Clock::now()));
+        });
+    record_server_ = create_service<record_support::GetExecution>("get_execution",
+        [this](const std::shared_ptr<record_support::GetExecution::Request> request,
+               const std::shared_ptr<record_support::GetExecution::Response> response) {
+          response->schema_version = 1; response->runtime_id = runtime_id_;
+          const auto record = engine_->journal.get(request->execution_id, rc::Clock::now());
+          response->found = record.has_value();
+          if (record) {
+            response->lookup_status = rc::terminal(record->result.status) ? "completed" : "active";
+            response->record = record_support::describe(*record);
+          } else response->lookup_status = request->execution_id.empty() ? "no_records" : "not_found";
+        });
     server_ = serve<ExecuteTask>("execute_task", [this](const ExecuteTask::Goal& goal) {
       tasks_->admit(goal.task_name, goal.object_id, goal.target_id, *scene_, engine_->skills, engine_->bindings);
     }, [this](const std::shared_ptr<GoalHandle>& handle) { accept_task(handle); });
@@ -164,7 +205,7 @@ class RuntimeNode final : public rclcpp::Node {
       rc::validate_plan(plan_support::decode(goal), *scene_, engine_->skills, engine_->bindings, engine_->world);
     }, [this](const std::shared_ptr<PlanGoalHandle>& handle) { accept_plan(handle); });
     timer_ = create_wall_timer(std::chrono::milliseconds(period), [this] { tick(); });
-    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task, /execute_plan, /get_catalog; backend=%s; motion=%s; permitted=%s",
+    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=%s; motion=%s; permitted=%s",
                 backend.c_str(), motion.c_str(), motion_permitted ? "true" : "false");
   }
   void request_shutdown() {
@@ -203,11 +244,13 @@ class RuntimeNode final : public rclcpp::Node {
           if (!active_ || handle.get() != active_->identity) return rclcpp_action::CancelResponse::REJECT;
           cancel_requested_ = true;
           engine_->cancel();
+          record_state();
           return rclcpp_action::CancelResponse::ACCEPT;
         },
         [accept](const std::shared_ptr<Handle> handle) { accept(handle); });
   }
-  template<class Action> void begin(const std::shared_ptr<rclcpp_action::ServerGoalHandle<Action>>& handle) {
+  template<class Action> void begin(const std::shared_ptr<rclcpp_action::ServerGoalHandle<Action>>& handle,
+                                    const std::string& task_name, uint32_t total_steps) {
     active_ = std::make_unique<ActiveGoal>();
     active_->identity = handle.get();
     active_->is_canceling = [handle] { return handle->is_canceling(); };
@@ -240,10 +283,16 @@ class RuntimeNode final : public rclcpp::Node {
     timeout_ = false;
     engine_->sessions.clear();
     engine_->world.observations.clear();
-    deadline_ = rc::Clock::now() + std::chrono::milliseconds(handle->get_goal()->timeout_ms);
+    const auto now = rc::Clock::now();
+    engine_->journal.begin(record_support::hex_id(handle->get_goal_id()),
+        std::is_same_v<Action, ExecutePlan> ? "execute_plan" : "execute_task", task_name,
+        total_steps, handle->get_goal()->timeout_ms, now, record_support::unix_ms());
+    record_state();
+    deadline_ = now + std::chrono::milliseconds(handle->get_goal()->timeout_ms);
   }
   void accept_task(const std::shared_ptr<GoalHandle>& handle) {
-    begin<ExecuteTask>(handle);
+    const auto& definition = tasks_->definitions().at(handle->get_goal()->task_name);
+    begin<ExecuteTask>(handle, definition.name, definition.template_id == "pick_place" ? 4 : 1);
     try {
       auto blackboard = BT::Blackboard::create();
       blackboard->set("object", handle->get_goal()->object_id);
@@ -258,7 +307,7 @@ class RuntimeNode final : public rclcpp::Node {
     } catch (const std::exception& e) { finish(false, "failed", "INVALID_TASK", e.what()); }
   }
   void accept_plan(const std::shared_ptr<PlanGoalHandle>& handle) {
-    begin<ExecutePlan>(handle);
+    begin<ExecutePlan>(handle, "", static_cast<uint32_t>(handle->get_goal()->steps.size()));
     try {
       const auto xml = plan_support::tree_xml(plan_support::decode(*handle->get_goal()),
           *scene_, engine_->skills, engine_->bindings, engine_->world);
@@ -280,6 +329,7 @@ class RuntimeNode final : public rclcpp::Node {
       }
       engine_->pump(now);
       if (!active_) return;
+      record_state();
       if (engine_->fault_latched) {
         finish(false, "faulted", "STATE_UNKNOWN", "component fault; runtime latched"); return;
       }
@@ -305,6 +355,7 @@ class RuntimeNode final : public rclcpp::Node {
           finish(false, rc::name(failure.status), failure.code, failure.message); return;
         }
       }
+      record_state();
       active_->feedback();
     } catch (const std::exception& e) {
       engine_->fault_latched = true;
@@ -315,10 +366,24 @@ class RuntimeNode final : public rclcpp::Node {
     if (tree_) tree_->haltTree();
     engine_->cancel();
     active_->complete(success, status, code, message);
+    rc::Status outcome = rc::Status::failed;
+    for (const auto value : {rc::Status::succeeded, rc::Status::failed, rc::Status::canceled,
+                             rc::Status::timed_out, rc::Status::faulted})
+      if (status == rc::name(value)) outcome = value;
+    const auto now = rc::Clock::now();
+    engine_->journal.finish({outcome, code, message}, engine_->snapshot(now), now);
     RCLCPP_INFO(get_logger(), "Task %s: %s %s", status.c_str(), code.c_str(), message.c_str());
     active_.reset();
     tree_.reset();
     reserved_ = false;
+  }
+  void record_state() {
+    if (!active_) return;
+    const auto now = rc::Clock::now();
+    const bool stopping = stopping_ || cancel_requested_;
+    engine_->journal.update({stopping ? rc::Status::canceling : rc::Status::running,
+        stopping ? (timeout_ ? "DEADLINE" : "CANCEL_REQUESTED") : "",
+        stopping ? "awaiting measured stop confirmation" : ""}, engine_->snapshot(now), now);
   }
   std::unique_ptr<Engine> engine_;
   BT::BehaviorTreeFactory factory_;
@@ -326,7 +391,10 @@ class RuntimeNode final : public rclcpp::Node {
   std::unique_ptr<rc::DemoScene> scene_;
   std::unique_ptr<rc::TaskCatalog> tasks_;
   std::string success_message_;
+  std::string backend_, runtime_id_{record_support::runtime_id()};
   rclcpp::Service<catalog_support::GetCatalog>::SharedPtr catalog_server_;
+  rclcpp::Service<record_support::GetRuntimeState>::SharedPtr state_server_;
+  rclcpp::Service<record_support::GetExecution>::SharedPtr record_server_;
   rclcpp_action::Server<ExecuteTask>::SharedPtr server_;
   rclcpp_action::Server<ExecutePlan>::SharedPtr plan_server_;
   rclcpp::TimerBase::SharedPtr timer_;

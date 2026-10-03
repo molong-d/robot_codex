@@ -1,0 +1,2 @@
+string resource_id
+string owner_request_id

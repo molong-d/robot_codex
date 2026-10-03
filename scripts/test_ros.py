@@ -6,6 +6,7 @@ import tempfile
 import time
 import unittest
 import copy
+import json
 from pathlib import Path
 
 import rclpy
@@ -17,7 +18,7 @@ from rclpy.parameter import Parameter
 from rclpy.parameter_client import AsyncParameterClient
 from robot_interfaces.action import ExecuteTask, ExecutePlan
 from robot_interfaces.msg import SkillStep
-from robot_interfaces.srv import GetCatalog
+from robot_interfaces.srv import GetCatalog, GetExecution, GetRuntimeState
 
 
 class RuntimeTests(unittest.TestCase):
@@ -85,6 +86,28 @@ class RuntimeTests(unittest.TestCase):
         finally:
             self.node.destroy_client(client)
 
+    def query(self, service, endpoint, **values):
+        client = self.node.create_client(service, endpoint)
+        try:
+            self.assertTrue(client.wait_for_service(timeout_sec=5))
+            return self.wait(client.call_async(service.Request(**values)))
+        finally:
+            self.node.destroy_client(client)
+
+    def state(self):
+        return self.query(GetRuntimeState, "get_runtime_state")
+
+    def record(self, handle=None, execution_id=None):
+        if execution_id is None:
+            execution_id = bytes(handle.goal_id.uuid).hex() if handle is not None else ""
+        return self.query(GetExecution, "get_execution", execution_id=execution_id)
+
+    def wait_for_pick(self, feedback):
+        end = time.monotonic()+5
+        while not any(f.active_skill == "pick_object" and f.status == "running" for f in feedback):
+            self.assertLess(time.monotonic(), end, "no running pick feedback")
+            self.executor.spin_once(timeout_sec=0.02)
+
     def plan_steps(self, object_id="workpiece", target_id="tray"):
         return [SkillStep(skill_id=skill, implementation_id="standard", argument_names=list(args), argument_values=list(args.values()))
                 for skill, args in [("locate_object", {"object": object_id}), ("pick_object", {"object": object_id}),
@@ -95,6 +118,144 @@ class RuntimeTests(unittest.TestCase):
         self.assertTrue(self.plan_client.wait_for_server(timeout_sec=5))
         goal = ExecutePlan.Goal(schema_version=version, steps=self.plan_steps() if steps is None else steps, timeout_ms=timeout)
         return self.wait(self.plan_client.send_goal_async(goal, feedback_callback=feedback))
+
+    def test_diagnostics_idle_and_rejected_goals_have_no_record(self):
+        self.start()
+        state = self.state()
+        self.assertEqual(state.schema_version, 1)
+        self.assertEqual(len(state.runtime_id), 32)
+        self.assertFalse(state.busy)
+        self.assertTrue(state.simulation_only)
+        self.assertTrue(state.snapshot.stop_confirmed)
+        self.assertTrue(state.snapshot.resources_empty)
+        self.assertFalse(self.record().found)
+        self.assertEqual(self.record().lookup_status, "no_records")
+        self.assertFalse(self.send(task="unknown").accepted)
+        self.assertFalse(self.record().found)
+        self.assertFalse(self.record(execution_id="0"*32).found)
+        self.assertEqual(self.record(execution_id="0"*32).lookup_status, "not_found")
+
+    def test_task_record_and_world_snapshot_distinguish_inferred_placement(self):
+        self.start()
+        handle = self.send()
+        self.assertTrue(self.wait(handle.get_result_async()).result.success)
+        response = self.record(handle)
+        self.assertTrue(response.found)
+        self.assertEqual(response.lookup_status, "completed")
+        record = response.record
+        self.assertEqual(record.execution_id, bytes(handle.goal_id.uuid).hex())
+        self.assertEqual((record.entrypoint, record.task_name), ("execute_task", "pick_place"))
+        self.assertEqual((record.status, record.total_steps, record.completed_steps), ("succeeded", 4, 4))
+        self.assertEqual([s.step.skill_id for s in record.steps], ["locate_object", "pick_object", "locate_object", "place_object"])
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertFalse(record.snapshot.resource_leases)
+        self.assertFalse(record.snapshot.attached_object)
+        self.assertFalse(record.snapshot.known_locations)
+        self.assertEqual([(p.entity_id, p.location_id) for p in record.snapshot.placement_candidates], [("workpiece", "tray")])
+        self.assertTrue(record.started_unix_ms > 0)
+        # A later task changes current world state without changing the old record.
+        inspect = self.send(task="inspect_object", target_id="")
+        self.assertTrue(self.wait(inspect.get_result_async()).result.success)
+        self.assertEqual(self.record(handle).record, record)
+        observation = self.state().snapshot.observations[0]
+        self.assertEqual(observation.source, "configured_demo")
+        self.assertTrue(observation.valid and observation.stamp_valid)
+        self.assertEqual(observation.frame_id, "base_link")
+        self.assertEqual(len(observation.pose), 7)
+
+    def test_plan_diagnostics_track_ownership_and_confirmed_cancel(self):
+        self.start("mock_action_ticks:=50", "mock_stop_ticks:=50")
+        feedback = []
+        handle = self.send_plan(feedback=lambda msg: feedback.append(msg.feedback))
+        self.wait_for_pick(feedback)
+        state = self.state()
+        self.assertTrue(state.busy)
+        self.assertEqual(state.active_execution_id, bytes(handle.goal_id.uuid).hex())
+        self.assertFalse(state.snapshot.stop_confirmed)
+        record = self.record(handle).record
+        self.assertEqual(record.entrypoint, "execute_plan")
+        self.assertEqual(record.steps[1].status, "running")
+        self.assertEqual({lease.resource_id for lease in state.snapshot.resource_leases}, {"demo_arm", "demo_gripper"})
+        self.assertTrue(all(lease.owner_request_id == record.steps[1].request_id for lease in state.snapshot.resource_leases))
+        self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
+        stopping = self.record(handle).record
+        self.assertEqual(stopping.status, "canceling")
+        self.assertFalse(stopping.snapshot.stop_confirmed)
+        self.assertTrue(stopping.snapshot.resource_leases)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_CANCELED)
+        completed = self.record(handle).record
+        self.assertEqual((completed.status, completed.completed_steps), ("canceled", 1))
+        self.assertTrue(completed.snapshot.stop_confirmed)
+        self.assertFalse(completed.snapshot.resource_leases)
+        self.assertEqual([t.status for t in completed.steps[1].transitions], ["running", "canceling", "canceled"])
+        self.assertTrue(self.wait(self.send_plan().get_result_async()).result.success)
+
+    def test_stop_unconfirmed_record_keeps_fault_and_leases(self):
+        self.start("mock_action_ticks:=50", "mock_stop_ticks:=100000", "stop_timeout_ms:=40")
+        feedback = []
+        handle = self.send(feedback=lambda msg: feedback.append(msg.feedback))
+        self.wait_for_pick(feedback)
+        self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.result.error_code, "STOP_UNCONFIRMED")
+        record = self.record(handle).record
+        self.assertEqual(record.status, "faulted")
+        self.assertFalse(record.snapshot.stop_confirmed)
+        self.assertTrue(record.snapshot.fault_latched)
+        self.assertFalse(record.snapshot.resources_empty)
+        self.assertEqual(len(record.snapshot.resource_leases), 2)
+        self.assertEqual(record.steps[-1].status, "canceling")  # no fabricated skill completion
+        state = self.state()
+        self.assertFalse(state.busy)
+        self.assertFalse(state.active_execution_id)
+        self.assertTrue(state.snapshot.fault_latched)
+        self.assertFalse(state.snapshot.stop_confirmed)
+        self.assertEqual(len(state.snapshot.resource_leases), 2)
+        self.assertFalse(self.send().accepted)
+        self.assertFalse(self.send_plan().accepted)
+        self.assertEqual(self.record(handle).record, record)  # queries do not unlock the fault
+
+    def test_execution_history_capacity_and_export_example(self):
+        self.start("execution_history_capacity:=2")
+        handles = []
+        for _ in range(3):
+            handle = self.send(task="inspect_object", target_id="")
+            self.assertTrue(self.wait(handle.get_result_async()).result.success)
+            handles.append(handle)
+        state = self.state()
+        self.assertEqual(state.history_capacity, 2)
+        self.assertEqual(state.evicted_records, 1)
+        self.assertEqual(state.recent_execution_ids, [bytes(h.goal_id.uuid).hex() for h in reversed(handles[1:])])
+        self.assertEqual(self.record(handles[0]).lookup_status, "not_found")
+        self.assertEqual(self.record().record.execution_id, bytes(handles[-1].goal_id.uuid).hex())
+        client = AsyncParameterClient(self.node, "robot_runtime")
+        self.assertTrue(client.wait_for_services(timeout_sec=5))
+        update = self.wait(client.set_parameters([Parameter("execution_history_capacity", value=8)]))
+        self.assertFalse(update.results[0].successful)
+        exporter = Path(__file__).resolve().parent / "inspect_runtime.py"
+        with tempfile.TemporaryDirectory() as folder:
+            output = Path(folder)/"record.json"
+            command = ["python3", str(exporter), "--output", str(output)]
+            result = subprocess.run(command, capture_output=True, text=True, timeout=20, env=self.runtime_env)
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            payload = json.loads(output.read_text())
+            self.assertEqual(payload["execution"]["record"]["execution_id"], bytes(handles[-1].goal_id.uuid).hex())
+            self.assertEqual(payload["runtime_state"]["runtime_id"], payload["execution"]["runtime_id"])
+            original = output.read_text()
+            self.assertNotEqual(subprocess.run(command, capture_output=True, timeout=20, env=self.runtime_env).returncode, 0)
+            self.assertEqual(output.read_text(), original)  # no accidental overwrite
+
+    def test_failed_records_match_action_outcomes(self):
+        self.start("mock_motion_permitted:=false")
+        handle = self.send()
+        result = self.wait(handle.get_result_async()).result
+        record = self.record(handle).record
+        self.assertEqual((record.status, record.error_code), (result.status, result.error_code))
+        self.assertEqual(record.completed_steps, 1)
+        self.assertEqual(len(record.steps), 2)
+        self.assertFalse(record.snapshot.resource_leases)
+        self.assertTrue(record.snapshot.stop_confirmed)
 
     def test_plan_second_pair_succeeds_with_four_verified_steps(self):
         self.start(config=Path(__file__).resolve().parents[1] / "src/robot_bringup/config/demo.yaml")
@@ -286,6 +447,10 @@ class RuntimeTests(unittest.TestCase):
         outcome = self.wait(goal.get_result_async())
         self.assertEqual(outcome.status, GoalStatus.STATUS_ABORTED)
         self.assertEqual(outcome.result.status, "timed_out")
+        record = self.record(goal).record
+        self.assertEqual((record.status, record.error_code), (outcome.result.status, outcome.result.error_code))
+        self.assertTrue(record.snapshot.stop_confirmed)
+        self.assertTrue(record.snapshot.resources_empty)
 
     def test_busy_rejection_and_cancel_confirmation(self):
         self.start("mock_action_ticks:=50")

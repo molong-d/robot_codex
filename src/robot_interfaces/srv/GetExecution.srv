@@ -1,0 +1,9 @@
+# 32 lowercase hex characters from the action goal UUID; empty means active or latest.
+string execution_id
+---
+uint32 schema_version
+string runtime_id
+bool found
+# active, completed, not_found or no_records
+string lookup_status
+ExecutionRecord record

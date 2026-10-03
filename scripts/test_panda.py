@@ -14,6 +14,7 @@ from rclpy.action import ActionClient
 from sensor_msgs.msg import JointState
 from robot_interfaces.action import ExecuteTask, ExecutePlan
 from robot_interfaces.msg import SkillStep
+from robot_interfaces.srv import GetExecution, GetRuntimeState
 
 
 class PandaTests(unittest.TestCase):
@@ -106,6 +107,23 @@ class PandaTests(unittest.TestCase):
         self.assertEqual(result.status, GoalStatus.STATUS_SUCCEEDED, result.result.message)
         self.assertTrue(result.result.success, result.result.error_code)
         self.assertEqual(result.result.completed_steps, 4)
+        client = self.node.create_client(GetExecution, "get_execution")
+        state_client = self.node.create_client(GetRuntimeState, "get_runtime_state")
+        try:
+            self.assertTrue(client.wait_for_service(timeout_sec=5))
+            self.assertTrue(state_client.wait_for_service(timeout_sec=5))
+            record = self.wait(client.call_async(GetExecution.Request(execution_id=bytes(handle.goal_id.uuid).hex())))
+            state = self.wait(state_client.call_async(GetRuntimeState.Request()))
+            self.assertTrue(record.found)
+            self.assertEqual(record.record.completed_steps, 4)
+            self.assertEqual(record.record.status, "succeeded")
+            self.assertTrue(record.record.snapshot.stop_confirmed)
+            self.assertFalse(record.record.snapshot.resource_leases)
+            self.assertEqual(state.backend, "panda_ros")
+            self.assertTrue(state.simulation_only)
+            self.assertEqual(state.runtime_id, record.runtime_id)
+        finally:
+            self.node.destroy_client(client); self.node.destroy_client(state_client)
 
 
 if __name__ == "__main__":

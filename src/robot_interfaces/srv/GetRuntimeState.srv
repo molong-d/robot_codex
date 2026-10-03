@@ -1,0 +1,12 @@
+---
+uint32 schema_version
+string runtime_id
+string backend
+bool simulation_only
+bool busy
+string active_execution_id
+uint32 history_capacity
+uint64 evicted_records
+# Most recent completed execution first, does not include the active execution.
+string[<=128] recent_execution_ids
+WorldSnapshot snapshot
