@@ -52,6 +52,7 @@ flowchart TD
 | 任务执行 | BehaviorTree.CPP `SkillNode` + ROS `RuntimeNode` |
 | 技能目录 | `Skills::catalog` 与 ROS `/get_catalog`，定义/实现依赖分别描述 |
 | 示例场景与任务别名 | `DemoScene` / `TaskCatalog`，启动配置与接收前校验，不是完整世界模型或任务规划器 |
+| 结构化计划 | `Plan` / `validate_plan`，检查三种技能的顺序语义；ROS 转换与 XML 生成留在适配层 |
 
 示例 `ObjectLocator`、`ArmMotion`、`Gripper` 和 `ExecutionGate` 是用于证明分层的最小类型化契约。`Manipulate` 技能先驱动手臂到时效有效的笛卡尔位姿，再执行夹持/释放，并分别验收运动和夹爪反馈；技能在整个过程中共同持有手臂与夹爪资源。
 
@@ -76,3 +77,5 @@ flowchart TD
 - [PlanSys2](https://plansys2.github.io/)：未来符号任务规划候选，避免与本运行时产生两个控制权所有者。
 
 当前没有引入这些可选大依赖，也没有宣称已兼容任意机器人或模型。
+
+5B 的 `/execute_plan` 只接收有界顺序技能计划；`scripts/plan_pick_place.py` 提供基于目录的确定性目标分解。它与模板入口共享执行权，避免传统规划和模型规划各自建立控制调度器。协议细节见 [结构化计划](structured_plans.md)。

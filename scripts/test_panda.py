@@ -12,7 +12,8 @@ from control_msgs.action import ParallelGripperCommand
 from moveit_msgs.action import MoveGroup
 from rclpy.action import ActionClient
 from sensor_msgs.msg import JointState
-from robot_interfaces.action import ExecuteTask
+from robot_interfaces.action import ExecuteTask, ExecutePlan
+from robot_interfaces.msg import SkillStep
 
 
 class PandaTests(unittest.TestCase):
@@ -24,6 +25,7 @@ class PandaTests(unittest.TestCase):
                                        stdout=cls.log, stderr=subprocess.STDOUT, start_new_session=True)
         cls.node = rclpy.create_node("panda_adapter_tests")
         cls.client = ActionClient(cls.node, ExecuteTask, "execute_task")
+        cls.plan_client = ActionClient(cls.node, ExecutePlan, "execute_plan")
         cls.arm = ActionClient(cls.node, MoveGroup, "move_action")
         cls.hand = ActionClient(cls.node, ParallelGripperCommand, "panda_hand_controller/gripper_cmd")
         cls.states = []
@@ -31,7 +33,7 @@ class PandaTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
+        cls.client.destroy(); cls.plan_client.destroy(); cls.arm.destroy(); cls.hand.destroy(); cls.node.destroy_node()
         forced_kill = False
         if cls.process.poll() is None:
             cls.process.send_signal(signal.SIGINT)  # launch propagates once to its children
@@ -90,6 +92,20 @@ class PandaTests(unittest.TestCase):
         result = self.wait(handle.get_result_async())
         self.assertEqual(result.status, GoalStatus.STATUS_SUCCEEDED, result.result.message)
         self.assertTrue(result.result.success, result.result.error_code)
+
+    def test_04_structured_plan_uses_actual_moveit_and_controllers(self):
+        self.ready()
+        self.assertTrue(self.plan_client.wait_for_server(timeout_sec=10))
+        steps = [SkillStep(skill_id=skill, implementation_id="standard", argument_names=list(args), argument_values=list(args.values()))
+                 for skill, args in [("locate_object", {"object": "workpiece"}), ("pick_object", {"object": "workpiece"}),
+                                     ("locate_object", {"object": "tray"}),
+                                     ("place_object", {"object": "workpiece", "target": "tray"})]]
+        handle = self.wait(self.plan_client.send_goal_async(ExecutePlan.Goal(schema_version=1, steps=steps, timeout_ms=90000)))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_SUCCEEDED, result.result.message)
+        self.assertTrue(result.result.success, result.result.error_code)
+        self.assertEqual(result.result.completed_steps, 4)
 
 
 if __name__ == "__main__":

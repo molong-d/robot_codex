@@ -1,5 +1,6 @@
 #include "robot_core/demo.hpp"
 #include "robot_core/task_catalog.hpp"
+#include "robot_core/plan.hpp"
 #include <iostream>
 #include <limits>
 
@@ -91,12 +92,89 @@ class ProbeMotion final : public ArmMotion {
   MotionFeedback feedback() const override { return measured; }
 };
 
+Plan transfer_plan(const std::string& object = "workpiece", const std::string& target = "tray") {
+  return {1, {{"locate_object", "standard", {{"object", object}}},
+              {"pick_object", "standard", {{"object", object}}},
+              {"locate_object", "standard", {{"object", target}}},
+              {"place_object", "standard", {{"object", object}, {"target", target}}}}};
+}
+DemoScene plan_scene() {
+  return DemoScene("base_link", {{"workpiece", EntityRole::object, {}},
+                                  {"other", EntityRole::object, {}}, {"tray", EntityRole::target, {}}});
+}
+
 int main() {
   int passed = 0;
   auto test = [&passed](const char* name, const std::function<void()>& run) {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("plan validation never writes predicted effects or dispatches", [] {
+      Fixture f; auto scene = plan_scene();
+      validate_plan(transfer_plan(), scene, f.skills, f.bindings, f.world);
+      check(f.world.attached_object.empty() && f.world.observations.empty() &&
+            f.world.placement_candidates.empty() && f.resources.empty() && f.robot->arm_target.empty(), "validation is read-only");
+    });
+    test("late invalid plan step blocks the entire plan before execution", [] {
+      Fixture f; auto scene = plan_scene(); auto plan = transfer_plan();
+      plan.steps.back().arguments["target"] = "unknown";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "unknown final target");
+      plan = transfer_plan(); plan.steps.back().implementation = "missing";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "unknown final implementation");
+      plan = transfer_plan(); plan.steps.back().arguments["extra"] = "injected";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "unexpected final input");
+      check(!f.robot->grasped && f.robot->arm_target.empty() && f.resources.empty(), "no partial dispatch");
+    });
+    test("plan checks locate grasp release ordering and matching identities", [] {
+      Fixture f; auto scene = plan_scene(); auto plan = transfer_plan();
+      std::swap(plan.steps[0], plan.steps[1]);
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "pick before locate");
+      plan = transfer_plan(); plan.steps.erase(plan.steps.begin()+2);
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "place without target locate");
+      plan = transfer_plan(); plan.steps.back().arguments["object"] = "other";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "wrong held object");
+      plan = transfer_plan(); plan.steps[1].arguments["object"] = "tray";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "cannot grasp target entity");
+    });
+    test("plan bounds versions and XML-like inputs are rejected", [] {
+      Fixture f; auto scene = plan_scene(); auto plan = transfer_plan();
+      plan.schema_version = 2;
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "version");
+      plan = {1, {}}; rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "empty");
+      plan.steps.assign(33, transfer_plan().steps.front());
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "too many steps");
+      plan.steps.resize(32); validate_plan(plan, scene, f.skills, f.bindings, f.world);
+      plan = transfer_plan(); plan.steps[0].arguments["object"] = "{world}";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "blackboard injection");
+      plan = transfer_plan(); plan.steps[0].implementation = "standard\"/>";
+      rejects([&] { validate_plan(plan, scene, f.skills, f.bindings, f.world); }, "XML injection");
+    });
+    test("plan uses actual held state and requires new within-plan observations", [] {
+      Fixture f; auto scene = plan_scene(); f.world.attached_object = "workpiece";
+      rejects([&] { validate_plan(transfer_plan(), scene, f.skills, f.bindings, f.world); }, "occupied gripper");
+      auto place = transfer_plan(); place.steps.erase(place.steps.begin(), place.steps.begin()+2);
+      validate_plan(place, scene, f.skills, f.bindings, f.world);
+      check(f.world.attached_object == "workpiece", "symbolic release not written");
+      f.world.attached_object.clear(); f.locate();
+      auto pick = transfer_plan(); pick.steps = {pick.steps[1]};
+      rejects([&] { validate_plan(pick, scene, f.skills, f.bindings, f.world); }, "previous observation does not replace planned locate");
+    });
+    test("plan permits implementation-specific dependencies without constructing skills", [] {
+      Fixture f; auto scene = plan_scene(); bool constructed = false;
+      f.skills.implement("locate_object", "read_only", [&](Context&) { constructed = true; return std::make_unique<ProbeSkill>(); }, {});
+      Plan plan{1, {{"locate_object", "read_only", {{"object", "tray"}}}}};
+      validate_plan(plan, scene, f.skills, f.bindings, f.world);
+      check(!constructed, "validator does not construct implementation");
+    });
+    test("validated plan steps still execute through verified skill sessions", [] {
+      Fixture f; auto scene = plan_scene(); const auto plan = transfer_plan();
+      validate_plan(plan, scene, f.skills, f.bindings, f.world);
+      for (size_t i = 0; i < plan.steps.size(); ++i) {
+        const auto& step = plan.steps[i];
+        check(f.run({"plan_"+std::to_string(i), step.skill, step.implementation, step.arguments, 5000ms}).status == Status::succeeded, "step verified");
+      }
+      check(f.world.attached_object.empty() && f.world.placement_candidates.at("workpiece") == "tray" && f.resources.empty(), "verified sessions update state");
+    });
     test("entity input schema rejects malformed identifiers before dispatch", [] {
       Fixture f;
       for (const auto& id : {"", "object.with.dot", "../../workpiece", "<Skill/>", "1workpiece"}) {

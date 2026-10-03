@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.4 技能目录与任务配置开发版（5A）**。包含 ROS 2 Action 服务、技能目录查询、可配置对象/目标/任务别名、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
+当前版本为 **v0.4 技能目录与结构化计划开发版（5A/5B）**。包含 ROS 2 Action 服务、技能目录查询、可配置对象/目标/任务别名、结构化技能计划、BehaviorTree.CPP 行为树，以及可独立测试的 C++ 核心。位姿合法性、位置/姿态容差、反馈时效与停止确认均参与技能验收。尚未连接真实机器人。
 
 ## 技能与组件
 
@@ -20,7 +20,7 @@
 | 路径 | 内容 |
 |---|---|
 | `src/robot_core` | 无 ROS 依赖的 C++17 契约、注册、绑定、资源管理、技能会话；mock 示例 |
-| `src/robot_interfaces` | `ExecuteTask.action`、`GetCatalog.srv` 与技能目录消息 |
+| `src/robot_interfaces` | `ExecuteTask.action`、`ExecutePlan.action`、`GetCatalog.srv` 与技能/计划消息 |
 | `src/robot_bt_runtime` | BehaviorTree.CPP 4 执行引擎与 ROS 2 Action 服务 |
 | `src/robot_bringup` | 启动文件及组件选择配置 |
 | `src/robot_ros_adapters` | 非阻塞 MoveIt/并联夹爪 Action 客户端、JointState/TF 反馈 |
@@ -76,6 +76,17 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 ```
 
 `transfer_two` 是 `pick_place` 模板的配置别名，不绑定特定对象。只读定位任务 `inspect_object` 使用 `locate_object` 模板，`target_id` 必须为空。启动配置、校验规则及目录字段含义见 [技能目录与任务配置](docs/task_catalog.md)。
+
+## 结构化计划与规划示例
+
+运行时还提供 `/execute_plan`。示例规划客户端先查询目录，将目标分解为技能步骤，然后通过同一个执行引擎运行：
+
+```bash
+python3 scripts/plan_pick_place.py --object workpiece_two --target tray_two --timeout-ms 5000 --dry-run
+python3 scripts/plan_pick_place.py --object workpiece_two --target tray_two --timeout-ms 5000
+```
+
+Panda 示例使用 `--timeout-ms 90000`。这是一种确定性任务分解，不是通用符号规划器或模型调用。计划必须通过全步骤参数、实现依赖、实体角色及操作顺序校验；两种 Action 入口共用忙碌互斥、取消、超时和停止确认。协议与后续模型接入方式见 [结构化计划](docs/structured_plans.md)。
 
 替换组件（先停止原有 mock 节点）：
 
@@ -134,10 +145,10 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 - 条件描述用于契约说明；当前条件由技能 C++ 实现检查，没有通用谓词解释器或自动规划器。
 - 技能/组件通过显式工厂注册，不支持运行时下载插件；扩展实际第三方适配器时可再接 pluginlib 或 ROS Action 客户端。
 - 任务模板是手写行为树；LLM/VLM 任务规划和 VLA 动作策略只预留架构位置，没有模型调用或 API key 要求。
-- 5A 的输入类型仅为必填 `entity_id`；对象/目标角色由任务模板校验。没有通用位姿、力、轨迹参数或外部结构化计划执行器，后者属于 5B。
+- 输入类型仅为必填 `entity_id`；对象/目标角色由任务模板或计划校验器检查。结构化计划 v1 支持三种现有技能、1～32 个顺序步骤；没有通用位姿、力、轨迹参数、分支或自动重试。
 - 停止未确认或异常时保留资源并拒绝后续任务；mock 节点可重启复位。真实设备必须先确认物理状态，不能将进程重启当作停机确认。
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
-阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
 
 稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

@@ -69,7 +69,7 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 
 接收成功不保证物理执行成功。技能执行时仍检查许可、资源、观测时效、物体持有状态及测量反馈。抓取后故障可能保留物体持有状态；系统不会自动清空或盲目重试。
 
-新模板需要添加受审的安装 XML、核心 `TaskCatalog` 的输入/步骤映射和对应测试。此阶段不接受客户端 XML、脚本或模型输出计划。下一阶段 5B 才接入结构化技能计划、计划校验和确定性规划示例。
+新模板需要添加受审的安装 XML、核心 `TaskCatalog` 的输入/步骤映射和对应测试。模板入口不接受客户端 XML 或脚本；5B 的结构化计划使用独立 `/execute_plan` 入口，见 [结构化技能计划](structured_plans.md)。
 
 ## C++ 迁移
 
