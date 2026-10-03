@@ -78,6 +78,15 @@ class PandaTests(unittest.TestCase):
         self.assertTrue(next_handle.accepted, "resource ownership not released after measured stop")
         self.assertTrue(self.wait(next_handle.get_result_async()).result.success)
 
+    def test_03_second_configured_object_target_and_alias(self):
+        self.ready()
+        goal = ExecuteTask.Goal(task_name="transfer_two", object_id="workpiece_two", target_id="tray_two", timeout_ms=90000)
+        handle = self.wait(self.client.send_goal_async(goal))
+        self.assertTrue(handle.accepted)
+        result = self.wait(handle.get_result_async())
+        self.assertEqual(result.status, GoalStatus.STATUS_SUCCEEDED, result.result.message)
+        self.assertTrue(result.result.success, result.result.error_code)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

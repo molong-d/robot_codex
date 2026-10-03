@@ -1,5 +1,19 @@
 robot_runtime:
   ros__parameters:
+    base_frame: base_link
+    object_ids: [workpiece, workpiece_two]
+    target_ids: [tray, tray_two]
+    entities.workpiece.pose: [0.40, 0.10, 0.20, 0.0, 0.0, 0.0, 1.0]
+    entities.tray.pose: [0.60, -0.20, 0.15, 0.0, 0.0, 0.0, 1.0]
+    entities.workpiece_two.pose: [0.30, -0.10, 0.20, 0.0, 0.0, 0.0, 1.0]
+    entities.tray_two.pose: [0.50, 0.20, 0.30, 0.0, 0.0, 0.0, 1.0]
+    task_names: [pick_place, inspect_object, transfer_two]
+    tasks.pick_place.template_id: pick_place
+    tasks.pick_place.implementation_id: standard
+    tasks.inspect_object.template_id: locate_object
+    tasks.inspect_object.implementation_id: standard
+    tasks.transfer_two.template_id: pick_place
+    tasks.transfer_two.implementation_id: standard
     motion_component: mock_arm  # or slow_mock_arm; skills and tree stay unchanged
     mock_action_ticks: 3
     mock_fail_pick: false

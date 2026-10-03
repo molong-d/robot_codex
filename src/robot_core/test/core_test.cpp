@@ -1,4 +1,5 @@
 #include "robot_core/demo.hpp"
+#include "robot_core/task_catalog.hpp"
 #include <iostream>
 #include <limits>
 
@@ -7,6 +8,10 @@ using namespace std::chrono_literals;
 
 void check(bool value, const char* message) {
   if (!value) throw std::runtime_error(message);
+}
+void rejects(const std::function<void()>& run, const char* message) {
+  try { run(); } catch (const std::exception&) { return; }
+  throw std::runtime_error(message);
 }
 
 struct Fixture {
@@ -19,11 +24,12 @@ struct Fixture {
   std::shared_ptr<MockRobotState> robot{std::make_shared<MockRobotState>()};
   Time now{Clock::now()};
   explicit Fixture(int arm_ticks = 3, bool fail_motion = false, bool permitted = true,
-                   bool fail_grasp = false)
+                   bool fail_grasp = false, std::optional<DemoScene> scene = std::nullopt)
       : bindings(components, {{"perception", "camera"}, {"motion", "arm"},
                               {"gripper", "gripper"}, {"safety", "gate"}}),
         context{bindings, world} {
-    components.add("camera", std::make_shared<MockLocator>());
+    if (scene) components.add("camera", std::make_shared<ConfiguredDemoLocator>(*scene));
+    else components.add("camera", std::make_shared<MockLocator>());
     components.add("arm", std::make_shared<MockArmMotion>(robot, arm_ticks, fail_motion));
     components.add("gripper", std::make_shared<MockGripper>(robot, 2, fail_grasp));
     components.add("gate", std::make_shared<MockExecutionGate>(permitted));
@@ -91,6 +97,85 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("entity input schema rejects malformed identifiers before dispatch", [] {
+      Fixture f;
+      for (const auto& id : {"", "object.with.dot", "../../workpiece", "<Skill/>", "1workpiece"}) {
+        check(f.run(f.request("invalid", "pick_object", {{"object", id}})).code == "INVALID_REQUEST", "invalid entity ID");
+        check(f.resources.empty() && f.robot->arm_target.empty(), "invalid input never dispatches");
+      }
+      Skills schemas;
+      rejects([&] { schemas.define({"bad", "", {{"object", "float", ""}}, "", "", ""}); }, "unsupported input type");
+      rejects([&] { schemas.define({"bad", "", {{"object", "entity_id", ""}, {"object", "entity_id", ""}}, "", "", ""}); }, "duplicate input");
+    });
+    test("demo scene rejects duplicate IDs and invalid poses", [] {
+      rejects([] { DemoScene scene("base_link", {{"part", EntityRole::object, {}}, {"part", EntityRole::target, {}}}); }, "duplicate entity");
+      rejects([] { DemoScene scene("", {{"part", EntityRole::object, {}}}); }, "empty frame");
+      rejects([] { DemoScene scene("base_link", {}); }, "empty scene");
+      Pose invalid; invalid.qw = 0.0;
+      rejects([&] { DemoScene scene("base_link", {{"part", EntityRole::object, invalid}}); }, "invalid quaternion");
+      invalid = {}; invalid.x = std::numeric_limits<double>::infinity();
+      rejects([&] { DemoScene scene("base_link", {{"part", EntityRole::object, invalid}}); }, "infinite coordinate");
+    });
+    test("catalog reports implementation bindings without executing factories or gates", [] {
+      Fixture f(3, false, false);
+      bool constructed = false;
+      f.skills.implement("pick_object", "unbound", [&](Context&) {
+        constructed = true; return std::make_unique<ProbeSkill>();
+      }, {{{"depth", "object_locator", 1}}, {}, ""});
+      const auto catalog = f.skills.catalog(f.bindings);
+      check(catalog.size() == 3, "all definitions visible");
+      const auto& pick = catalog.at(1);
+      check(pick.definition.id == "pick_object" && pick.definition.inputs.at(0).type == "entity_id", "typed inputs");
+      check(pick.implementations.size() == 2, "alternative implementations visible");
+      check(pick.implementations.at(0).dependencies_satisfied, "bound dependencies despite closed gate");
+      check(pick.implementations.at(0).dependencies.components.at(0).version == 2, "component version");
+      check(!pick.implementations.at(1).dependencies_satisfied && !pick.implementations.at(1).unavailable_reason.empty(), "unbound implementation explained");
+      check(!constructed && f.resources.empty() && f.robot->arm_target.empty(), "read-only catalog");
+    });
+    test("task admission checks every step before any actuator or factory", [] {
+      Fixture f;
+      DemoScene scene("base_link", {{"part", EntityRole::object, {}}, {"bin", EntityRole::target, {}}});
+      bool constructed = false;
+      for (const auto& id : {"locate_object", "pick_object", "place_object"})
+        f.skills.implement(id, "alternate", [&](Context&) { constructed = true; return std::make_unique<ProbeSkill>(); },
+            id == std::string("place_object") ? Dependencies{{{"missing_gripper", "gripper", 2}}, {}, ""} : Dependencies{});
+      TaskCatalog tasks({{"transfer", "pick_place", "alternate"}});
+      rejects([&] { tasks.admit("transfer", "part", "bin", scene, f.skills, f.bindings); }, "late step missing dependency");
+      rejects([&] { tasks.validate_configuration(scene, f.skills, f.bindings); }, "invalid startup binding");
+      check(!constructed && f.resources.empty() && f.robot->arm_target.empty(), "no partial execution");
+    });
+    test("task aliases validate roles and only select reviewed templates", [] {
+      Fixture f;
+      DemoScene scene("base_link", {{"part", EntityRole::object, {}}, {"bin", EntityRole::target, {}}});
+      TaskCatalog tasks({{"transfer", "pick_place", "standard"}, {"inspect", "locate_object", "standard"}});
+      tasks.validate_configuration(scene, f.skills, f.bindings);
+      check(tasks.admit("transfer", "part", "bin", scene, f.skills, f.bindings).template_id == "pick_place", "alias");
+      check(tasks.admit("inspect", "bin", "", scene, f.skills, f.bindings).template_id == "locate_object", "locate target entity");
+      rejects([&] { tasks.admit("transfer", "bin", "part", scene, f.skills, f.bindings); }, "wrong roles");
+      rejects([&] { tasks.admit("transfer", "part", "unknown", scene, f.skills, f.bindings); }, "unknown target");
+      rejects([&] { tasks.admit("transfer", "unknown", "bin", scene, f.skills, f.bindings); }, "unknown object");
+      rejects([&] { tasks.admit("inspect", "part", "bin", scene, f.skills, f.bindings); }, "unexpected target");
+      rejects([&] { tasks.admit("unknown", "part", "bin", scene, f.skills, f.bindings); }, "unknown task");
+      rejects([] { TaskCatalog invalid({{"task", "../external.xml", "standard"}}); }, "external template");
+      rejects([] { TaskCatalog invalid({{"task", "pick_place", "standard"}, {"task", "locate_object", "standard"}}); }, "duplicate task");
+      TaskCatalog unknown_impl({{"task", "pick_place", "missing"}});
+      rejects([&] { unknown_impl.validate_configuration(scene, f.skills, f.bindings); }, "unknown implementation");
+    });
+    test("second configured object and target reuse complete manipulation flow", [] {
+      const Pose part{0.3, -0.1, 0.2, 0.0, 0.0, 0.0, 1.0};
+      const Pose bin{0.5, 0.2, 0.3, 0.0, 0.0, 0.0, 1.0};
+      DemoScene scene("base_link", {{"part_two", EntityRole::object, part}, {"bin_two", EntityRole::target, bin}});
+      Fixture f(3, false, true, false, scene);
+      TaskCatalog tasks({{"transfer_two", "pick_place", "standard"}});
+      tasks.admit("transfer_two", "part_two", "bin_two", scene, f.skills, f.bindings);
+      f.locate("part_two");
+      check(f.run(f.request("pick_two", "pick_object", {{"object", "part_two"}})).status == Status::succeeded, "pick second object");
+      check(pose_near(f.robot->arm_pose, part, {}), "configured object pose used");
+      f.locate("bin_two");
+      check(f.run(f.request("place_two", "place_object", {{"object", "part_two"}, {"target", "bin_two"}})).status == Status::succeeded, "place second object");
+      check(pose_near(f.robot->arm_pose, bin, {}) && f.world.placement_candidates.at("part_two") == "bin_two", "configured target used");
+      check(f.resources.empty() && f.world.attached_object.empty(), "leases and held state cleared");
+    });
     test("pose validation rejects NaN and invalid quaternion", [] {
       Pose p;
       check(valid_pose(p), "identity quaternion");

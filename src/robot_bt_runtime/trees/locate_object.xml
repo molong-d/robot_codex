@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<root BTCPP_format="4" main_tree_to_execute="LocateObject">
+  <BehaviorTree ID="LocateObject">
+    <Skill skill="locate_object" implementation="{implementation}" object="{object}"/>
+  </BehaviorTree>
+</root>

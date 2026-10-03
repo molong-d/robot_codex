@@ -7,6 +7,16 @@ robot_runtime:
     motion_component: ros_arm
     mock_motion_permitted: true       # demo admission only
     base_frame: panda_link0
+    object_ids: [workpiece, workpiece_two]
+    target_ids: [tray, tray_two]
+    entities.workpiece.pose: [0.40, 0.10, 0.40, 1.0, 0.0, 0.0, 0.0]
+    entities.tray.pose: [0.45, -0.15, 0.40, 1.0, 0.0, 0.0, 0.0]
+    entities.workpiece_two.pose: [0.35, 0.05, 0.40, 1.0, 0.0, 0.0, 0.0]
+    entities.tray_two.pose: [0.40, -0.10, 0.40, 1.0, 0.0, 0.0, 0.0]
+    task_names: [pick_place, inspect_object, transfer_two]
+    tasks.pick_place.template_id: pick_place
+    tasks.inspect_object.template_id: locate_object
+    tasks.transfer_two.template_id: pick_place
     end_effector_link: panda_hand
     planning_group: panda_arm
     move_action: /move_action

@@ -1,0 +1,6 @@
+---
+uint32 schema_version
+SkillInfo[] skills
+TaskInfo[] tasks
+string[] object_ids
+string[] target_ids

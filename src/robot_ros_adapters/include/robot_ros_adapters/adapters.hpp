@@ -230,17 +230,4 @@ class ParallelGripper final : public rc::Gripper {
   rc::GripperFeedback measured_;
 };
 
-// Known demo coordinates are target configuration, not visual detections.
-class DemoTargets final : public rc::ObjectLocator {
- public:
-  explicit DemoTargets(std::string frame) : frame_(std::move(frame)) {}
-  std::string resource_id() const override { return "panda_demo_target_catalog"; }
-  std::optional<rc::Observation> locate(const std::string& id, rc::Time now) override {
-    if (id == "workpiece") return rc::Observation{id, frame_, {0.4, 0.1, 0.4, 1.0, 0.0, 0.0, 0.0}, now, true};
-    if (id == "tray") return rc::Observation{id, frame_, {0.45, -0.15, 0.4, 1.0, 0.0, 0.0, 0.0}, now, true};
-    return std::nullopt;
-  }
- private:
-  std::string frame_;
-};
 }  // namespace robot_ros_adapters

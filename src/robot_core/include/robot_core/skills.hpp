@@ -137,11 +137,12 @@ class Manipulate final : public Skill {
 };
 
 inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {}) {
-  skills.define({"locate_object", "Obtain a fresh object pose", {"object"},
+  skills.define({"locate_object", "Obtain a fresh object pose", {{"object", "entity_id", "Entity to locate"}},
       "camera ready", "observation valid", "fresh object pose in a known frame"});
-  skills.define({"pick_object", "Move to and grasp a previously located object", {"object"},
+  skills.define({"pick_object", "Move to and grasp a previously located object", {{"object", "entity_id", "Object to grasp"}},
       "empty gripper and fresh object pose", "exclusive arm and gripper control", "grasp detected"});
-  skills.define({"place_object", "Move to a located target and release the held object", {"object", "target"},
+  skills.define({"place_object", "Move to a located target and release the held object",
+      {{"object", "entity_id", "Held object"}, {"target", "entity_id", "Release target"}},
       "requested object held and fresh target pose", "exclusive arm and gripper control", "release detected"});
   skills.implement("locate_object", "standard", [](Context& c) { return std::make_unique<Locate>(c); },
       {{{"perception", "object_locator", 1}}, {}, ""});

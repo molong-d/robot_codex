@@ -50,6 +50,8 @@ flowchart TD
 | 资源所有权 | `Resources`，按物理资源 ID 独占 |
 | 世界状态 | `WorldState`，仅保存示例观测；不能当作完整世界模型 |
 | 任务执行 | BehaviorTree.CPP `SkillNode` + ROS `RuntimeNode` |
+| 技能目录 | `Skills::catalog` 与 ROS `/get_catalog`，定义/实现依赖分别描述 |
+| 示例场景与任务别名 | `DemoScene` / `TaskCatalog`，启动配置与接收前校验，不是完整世界模型或任务规划器 |
 
 示例 `ObjectLocator`、`ArmMotion`、`Gripper` 和 `ExecutionGate` 是用于证明分层的最小类型化契约。`Manipulate` 技能先驱动手臂到时效有效的笛卡尔位姿，再执行夹持/释放，并分别验收运动和夹爪反馈；技能在整个过程中共同持有手臂与夹爪资源。
 

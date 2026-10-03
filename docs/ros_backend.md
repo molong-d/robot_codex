@@ -33,6 +33,8 @@ flowchart TD
 
 运行时默认 `backend=mock`；Panda 示例显式设置 `backend=panda_ros`、`ros_backend_enabled=true`、`simulation_only=true`。示例 launch 固定 `mock_components`，不提供真实驱动选择参数。机器人身份/控制端点属于适配器配置；修改末端型号或控制器时，必须同时检查语义、关节顺序与接口版本。
 
+5A 将对象/目标位姿移至 `runtime.yaml` 的 `entities.<id>.pose`，用 `object_ids/target_ids` 声明允许的实体，用 `task_names/tasks.<name>.*` 选择任务别名。Panda 和纯 mock 复用同一个配置定位组件，示例包含第二组对象/目标和 `transfer_two` 别名。目录入口与配置规则见 [技能目录与任务配置](task_catalog.md)。这些位姿仍为合成动作目标，没有视觉检测或接触几何。
+
 ## 反馈与取消
 
 Action 客户端全部异步，由单线程 executor 串行推进。停止可以发生在 goal 被服务器接受之前；客户端记住该请求，在接受回调中立即请求取消。收到取消接受响应后仍等待终态结果及有效反馈。
