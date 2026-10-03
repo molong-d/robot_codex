@@ -11,6 +11,8 @@ from pathlib import Path
 import rclpy
 from action_msgs.msg import GoalStatus
 from rclpy.action import ActionClient
+from rclpy.context import Context
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.parameter import Parameter
 from rclpy.parameter_client import AsyncParameterClient
 from robot_interfaces.action import ExecuteTask, ExecutePlan
@@ -19,25 +21,31 @@ from robot_interfaces.srv import GetCatalog
 
 
 class RuntimeTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        rclpy.init()
-
-    @classmethod
-    def tearDownClass(cls):
-        rclpy.shutdown()
+    domain_sequence = 0
 
     def setUp(self):
+        # Repeated action servers must not share stale DDS discovery/response
+        # endpoints. Give each test a fresh context, executor and ROS domain.
+        RuntimeTests.domain_sequence += 1
+        self.domain_id = (int(os.environ.get("ROS_DOMAIN_ID", "42")) + RuntimeTests.domain_sequence) % 101
+        self.runtime_env = dict(os.environ, ROS_DOMAIN_ID=str(self.domain_id))
+        self.context = Context()
+        rclpy.init(context=self.context, domain_id=self.domain_id)
+        self.executor = SingleThreadedExecutor(context=self.context)
         self.process = None
         self.log = tempfile.TemporaryFile(mode="w+")
-        self.node = rclpy.create_node("robot_runtime_test")
+        self.node = rclpy.create_node(f"robot_runtime_test_{self.domain_id}", context=self.context)
+        self.executor.add_node(self.node)
         self.client = ActionClient(self.node, ExecuteTask, "execute_task")
         self.plan_client = ActionClient(self.node, ExecutePlan, "execute_plan")
 
     def tearDown(self):
         self.client.destroy()
         self.plan_client.destroy()
+        self.executor.remove_node(self.node)
         self.node.destroy_node()
+        self.executor.shutdown()
+        rclpy.shutdown(context=self.context)
         if self.process is not None:
             if self.process.poll() is None:
                 os.killpg(self.process.pid, signal.SIGINT)
@@ -57,11 +65,11 @@ class RuntimeTests(unittest.TestCase):
         for parameter in parameters:
             command += ["-p", parameter]
         self.process = subprocess.Popen(command, stdout=self.log, stderr=subprocess.STDOUT,
-                                        start_new_session=True)
+                                        start_new_session=True, env=self.runtime_env)
         self.assertTrue(self.client.wait_for_server(timeout_sec=15), "runtime did not start")
 
     def wait(self, future, timeout=10):
-        rclpy.spin_until_future_complete(self.node, future, timeout_sec=timeout)
+        self.executor.spin_until_future_complete(future, timeout_sec=timeout)
         self.assertTrue(future.done(), "future timed out")
         return future.result()
 
@@ -129,7 +137,7 @@ class RuntimeTests(unittest.TestCase):
         end = time.monotonic()+5
         while not any(f.step_index == 1 and f.active_skill == "pick_object" and f.status == "running" for f in feedback):
             self.assertLess(time.monotonic(), end)
-            rclpy.spin_once(self.node, timeout_sec=0.02)
+            self.executor.spin_once(timeout_sec=0.02)
         self.assertFalse(self.send().accepted)
         self.assertFalse(self.send_plan().accepted)
         self.assertTrue(self.wait(handle.cancel_goal_async()).goals_canceling)
@@ -167,7 +175,7 @@ class RuntimeTests(unittest.TestCase):
         self.start(config=Path(__file__).resolve().parents[1] / "src/robot_bringup/config/demo.yaml")
         planner = Path(__file__).resolve().parent / "plan_pick_place.py"
         result = subprocess.run(["python3", str(planner), "--object", "workpiece_two", "--target", "tray_two", "--timeout-ms", "5000"],
-                                capture_output=True, text=True, timeout=20)
+                                capture_output=True, text=True, timeout=20, env=self.runtime_env)
         self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
         self.assertIn('"completed_steps": 4', result.stdout)
 
@@ -235,7 +243,7 @@ class RuntimeTests(unittest.TestCase):
                           "tasks.pick_place.template_id:=../external.xml",
                           "tasks.pick_place.implementation_id:=missing"]:
             self.process = subprocess.Popen(["ros2", "run", "robot_bt_runtime", "robot_runtime", "--ros-args", "-p", parameter],
-                                            stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True)
+                                            stdout=self.log, stderr=subprocess.STDOUT, start_new_session=True, env=self.runtime_env)
             self.assertNotEqual(self.process.wait(timeout=15), 0, parameter)
 
     def test_success(self):
@@ -287,7 +295,7 @@ class RuntimeTests(unittest.TestCase):
         end = time.monotonic() + 5
         while not any(f.active_skill == "pick_object" and f.status == "running" for f in feedback):
             self.assertLess(time.monotonic(), end, "no running pick feedback")
-            rclpy.spin_once(self.node, timeout_sec=0.02)
+            self.executor.spin_once(timeout_sec=0.02)
         self.assertFalse(self.send().accepted)
         response = self.wait(goal.cancel_goal_async())
         self.assertTrue(response.goals_canceling)
