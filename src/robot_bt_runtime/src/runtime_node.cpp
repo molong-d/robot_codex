@@ -1,4 +1,5 @@
 #include "robot_core/demo.hpp"
+#include "robot_ros_adapters/adapters.hpp"
 #include "robot_interfaces/action/execute_task.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <behaviortree_cpp/bt_factory.h>
@@ -27,20 +28,29 @@ struct Engine {
   std::chrono::milliseconds skill_timeout{2000};
   bool fault_latched{false};
 
-  Engine(std::string motion, int ticks, bool fail_grasp, bool permitted)
-      : bindings(components, {{"perception", "mock_camera"}, {"motion", std::move(motion)},
+  Engine(std::string motion, int ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
+         bool ros_backend, robot_ros_adapters::Config config)
+      : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
                               {"gripper", "mock_gripper"}, {"safety", "execution_gate"}}),
         context{bindings, world} {
     const auto robot = std::make_shared<rc::MockRobotState>();
-    components.add("mock_camera", std::make_shared<rc::MockLocator>());
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
-    components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks));
-    components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2));
-    components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp));
+    rc::ManipulationPolicy policy;
+    if (ros_backend) {
+      policy.frame_id = config.frame;
+      components.add("mock_camera", std::make_shared<robot_ros_adapters::DemoTargets>(config.frame));
+      components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
+      components.add("mock_gripper", std::make_shared<robot_ros_adapters::ParallelGripper>(node, config));
+    } else {
+      components.add("mock_camera", std::make_shared<rc::MockLocator>());
+      components.add("mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks));
+      components.add("slow_mock_arm", std::make_shared<rc::MockArmMotion>(robot, ticks * 2));
+      components.add("mock_gripper", std::make_shared<rc::MockGripper>(robot, 2, fail_grasp));
+    }
     bindings.get<rc::ArmMotion>("motion");
     bindings.get<rc::Gripper>("gripper");
     bindings.get<rc::ExecutionGate>("safety");
-    rc::register_demo_skills(skills);
+    rc::register_demo_skills(skills, policy);
   }
   std::shared_ptr<rc::Session> start(std::string skill, std::string implementation, rc::Arguments args) {
     rc::Request request{std::to_string(++sequence), skill, std::move(implementation), std::move(args), skill_timeout};
@@ -98,6 +108,23 @@ class SkillNode final : public BT::StatefulActionNode {
 class RuntimeNode final : public rclcpp::Node {
  public:
   RuntimeNode() : Node("robot_runtime") {
+    const auto backend = declare_parameter<std::string>("backend", "mock");
+    const auto simulation_only = declare_parameter<bool>("simulation_only", true);
+    const auto ros_enabled = declare_parameter<bool>("ros_backend_enabled", false);
+    if (backend != "mock" && backend != "panda_ros") throw std::invalid_argument("unknown backend");
+    if (backend == "panda_ros" && (!simulation_only || !ros_enabled))
+      throw std::invalid_argument("Panda ROS backend requires explicit simulation-only enablement");
+    robot_ros_adapters::Config config;
+    config.move_action = declare_parameter<std::string>("move_action", config.move_action);
+    config.gripper_action = declare_parameter<std::string>("gripper_action", config.gripper_action);
+    config.frame = declare_parameter<std::string>("base_frame", config.frame);
+    config.tip = declare_parameter<std::string>("end_effector_link", config.tip);
+    config.group = declare_parameter<std::string>("planning_group", config.group);
+    config.arm_joints = declare_parameter<std::vector<std::string>>("arm_joints", config.arm_joints);
+    config.finger_joint = declare_parameter<std::string>("finger_joint", config.finger_joint);
+    config.arm_resource = declare_parameter<std::string>("arm_resource", config.arm_resource);
+    config.gripper_resource = declare_parameter<std::string>("gripper_resource", config.gripper_resource);
+    config.simulation_grasp_detection = declare_parameter<bool>("simulation_grasp_detection", false);
     const auto motion = declare_parameter<std::string>("motion_component", "mock_arm");
     const auto ticks = declare_parameter<int>("mock_action_ticks", 3);
     const auto fail = declare_parameter<bool>("mock_fail_pick", false);
@@ -108,7 +135,7 @@ class RuntimeNode final : public rclcpp::Node {
     if (ticks <= 0 || ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
-    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted);
+    engine_ = std::make_unique<Engine>(motion, ticks, fail, motion_permitted, this, backend == "panda_ros", config);
     engine_->skill_timeout = std::chrono::milliseconds(skill_timeout);
     factory_.registerBuilder<SkillNode>("Skill", [this](const std::string& name, const BT::NodeConfig& config) {
       return std::make_unique<SkillNode>(name, config, *engine_);
@@ -131,8 +158,8 @@ class RuntimeNode final : public rclcpp::Node {
         },
         [this](const std::shared_ptr<GoalHandle> handle) { accept(handle); });
     timer_ = create_wall_timer(std::chrono::milliseconds(period), [this] { tick(); });
-    RCLCPP_INFO(get_logger(), "Mock-only runtime ready: /execute_task; motion=%s; permitted=%s",
-                motion.c_str(), motion_permitted ? "true" : "false");
+    RCLCPP_INFO(get_logger(), "Demo runtime ready: /execute_task; backend=%s; motion=%s; permitted=%s",
+                backend.c_str(), motion.c_str(), motion_permitted ? "true" : "false");
   }
   void request_shutdown() {
     if (tree_) tree_->haltTree();
@@ -176,7 +203,7 @@ class RuntimeNode final : public rclcpp::Node {
       if (stopping_) {
         if (engine_->stopped()) {
           finish(false, timeout_ ? "timed_out" : "canceled", timeout_ ? "TIMEOUT" : "CANCELED",
-                 "all active mock actions confirmed stopped"); return;
+                 "all active actions confirmed stopped by measured feedback"); return;
         }
         if (now >= stop_deadline_) {
           engine_->fault_latched = true;
@@ -185,7 +212,7 @@ class RuntimeNode final : public rclcpp::Node {
       } else {
         const auto status = tree_->tickOnce();
         if (status == BT::NodeStatus::SUCCESS) {
-          finish(true, "succeeded", "", "mock object placed and outcome verified"); return;
+          finish(true, "succeeded", "", "release verified; object placement needs perception confirmation"); return;
         }
         if (status == BT::NodeStatus::FAILURE) {
           rc::Result failure{rc::Status::failed, "TASK_FAILED", "behavior tree failed"};

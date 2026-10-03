@@ -40,3 +40,4 @@ jobs:
           colcon test --event-handlers console_direct+ --return-code-on-test-failure
           colcon test-result --verbose
           python3 scripts/test_ros.py
+          python3 scripts/test_panda.py

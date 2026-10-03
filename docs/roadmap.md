@@ -10,10 +10,12 @@
 - [x] ROS 2 ExecuteTask Action、反馈、取消、超时和故障锁定
 - [x] ROS launch/config、中文架构及扩展文档
 - [x] 核心契约测试及 ROS 2 集成测试脚本、GitHub Actions 配置
+- [x] 4A：取消竞态锁定、位姿/容差/反馈时效、独立组件与技能文件
+- [x] 4B：MoveGroup/ParallelGripperCommand 异步适配器及 Panda GenericSystem 示例
 
 ## 尚未实现
 
-- [ ] 真实 ROS 2 驱动、MoveIt 2、ros2_control 适配器
+- [ ] 特定实机驱动、独立执行许可与实际停止验证
 - [ ] 真实 6D 感知、力控、抓稳/放置验证
 - [ ] 模型任务规划器和 VLA 动作策略
 - [ ] 组件 pluginlib 动态加载
@@ -25,12 +27,12 @@
 
 初次开发环境只有 g++，无 ROS 2、colcon 和 BehaviorTree.CPP。核心测试可在该环境直接运行；ROS 构建与真实行为树/Action 集成验证由 GitHub Actions 的 Jazzy 环境执行。以本次提交的 CI 结果为准，不能把核心测试通过等同于 ROS 测试通过。
 
-没有进行实机验证。mock 只模拟状态和延迟，不包含运动学、碰撞、接触或动力学。
+没有进行实机验证。纯 mock 只模拟状态和延迟；Panda ROS 示例执行实际运动学/规划和控制器链路，但 GenericSystem 不包含接触动力学，夹持检测是显式合成信号。
 
 ## 后续顺序
 
 1. 在目标开发机确认 ROS 2/硬件驱动版本，复现 CI 与 mock 任务。
-2. 为一个具体设备实现首个 `ArmMotion`（优先 MoveIt 2）与 `Gripper` 适配器，并让 ros2_control 留在控制层。
+2. 根据具体设备配置已提供的 MoveIt 适配器；为该夹爪验证宽度/关节映射及检测来源。
 3. 增加 TF/标定、真实到位与夹持反馈验证，只跑一条受限 pick/place 任务。
 4. 增加第二种技能实现，验证实现级依赖、配置和成功条件的一致性。
 5. 依据实际模型需求实现任务规划或动作策略适配；不提前绑定某一个模型。
