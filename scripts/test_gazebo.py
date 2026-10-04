@@ -31,6 +31,7 @@ from tf2_msgs.msg import TFMessage
 from tf2_ros import Buffer, TransformListener
 
 from gazebo_evidence import audit_physics
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src/robot_panda_gz_sim/scripts"))
 from source_time import SourceTimeGuard
 
 
