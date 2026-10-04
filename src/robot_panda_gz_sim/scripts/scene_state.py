@@ -54,8 +54,16 @@ class SceneReconciler:
         self.cleanup_pending = True
 
     def submit(self, now, scene_ready):
-        if self.in_flight is not None or not self.dirty or not scene_ready:
+        if not scene_ready:
+            if not self.dirty:
+                self.version += 1
+            self.dirty = True
             self.ready = False
+            return None
+        # An idle polling tick must preserve the most recently confirmed
+        # planning-scene state. Desired-state changes and request submission
+        # already clear readiness at their transition points.
+        if self.in_flight is not None or not self.dirty:
             return None
         request = SceneRequest(self._next_request_id, self.version, self.epoch,
                                self.desired_attached, self.cleanup_pending, now)
