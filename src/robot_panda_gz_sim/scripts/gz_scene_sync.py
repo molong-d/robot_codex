@@ -274,7 +274,10 @@ class GazeboSceneSync(Node):
         table_pose = self._fixed_pose(0.58, 0.0, 0.325)
         scene.world.collision_objects.append(self._world_collision("sim_table", [((0.90, 0.80, 0.05), table_pose)]))
 
-        tray_center, _, _ = self.poses["tray"]
+        # Pose cache records also carry source time, receipt time, epoch, and
+        # frame metadata. Read only the pose so added evidence fields cannot
+        # break scene construction.
+        tray_center = self.poses["tray"][0]
         tray_shapes = []
         tray_shapes.append(((0.10, 0.10, 0.001), self._fixed_pose(
             tray_center.position.x, tray_center.position.y, tray_center.position.z - 0.0195)))
@@ -287,7 +290,7 @@ class GazeboSceneSync(Node):
         ])
         scene.world.collision_objects.append(self._world_collision("sim_tray", tray_shapes))
 
-        object_pose, _, _ = self.poses[self.object_id]
+        object_pose = self.poses[self.object_id][0]
         box = ((0.04, 0.04, 0.04), object_pose)
         if request.attached:
             try:
