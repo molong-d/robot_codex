@@ -21,8 +21,10 @@ scripts/with_jazzy.sh scripts/run_panda_gz.sh
 仿真不依赖手动启动 runtime；launch 会启动 Gazebo、桥接、MoveIt、控制器、场景同步器和任务 runtime。用自动创建唯一输出和身份的正常场景复现任务：
 
 ```bash
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario normal
+python3 scripts/test_gazebo_scenarios.py --scenario normal
 ```
+
+场景和批测脚本由宿主机运行；它们会为每个 trial 调用 `scripts/with_jazzy.sh` 启动隔离容器。不要把编排器再包在 Jazzy 容器里运行，否则会形成嵌套 Docker 调用。单次底层仿真可用 `scripts/with_jazzy.sh scripts/test_gazebo.sh ...` 运行。
 
 单次测试须使用新的 `--result-json` 和 `--launch-log` 路径；已有结果文件会被拒绝。故障场景脚本会自动创建批次目录、唯一 run_id 和独立 JSON/日志。
 
@@ -39,11 +41,11 @@ Gazebo 的 `PosePublisher` 提供明确标记为 `synthetic: true` 的仿真真�
 `scripts/test_gazebo_scenarios.py` 使用固定场景配置运行故障验收：
 
 ```bash
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario placement_verification_reject
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario post_grasp_drop
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario post_release_contact_feedback_loss
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario cancel --scenario timeout
-scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario pause_resume --scenario time_reset
+python3 scripts/test_gazebo_scenarios.py --scenario placement_verification_reject
+python3 scripts/test_gazebo_scenarios.py --scenario post_grasp_drop
+python3 scripts/test_gazebo_scenarios.py --scenario post_release_contact_feedback_loss
+python3 scripts/test_gazebo_scenarios.py --scenario cancel --scenario timeout
+python3 scripts/test_gazebo_scenarios.py --scenario pause_resume --scenario time_reset
 ```
 
 验收期望状态、错误码、必须到达的技能阶段、停止确认及资源保留条件预先写在 `scenario_expectations.json`。放错场景要求 `place_object` 成功且 `verify_placement` 明确拒绝；seed 48 的旧 MOTION_FAILED 记录不作为此项证据。掉落场景通过动作打开真实模拟夹爪触发，不移动物体坐标。接触反馈中断在 release 已确认之后通过参数停止发布。非零退出码本身不构成故障测试通过。结果与检查报告分别保存于新的 `.review-runs/scenarios-<batch-id>/` 子目录。测试会为每次仿真重新启动完整 stack；不要并行运行多个场景，它们共享 ROS domain 和 Gazebo 服务名。
@@ -51,12 +53,28 @@ scripts/with_jazzy.sh python3 scripts/test_gazebo_scenarios.py --scenario pause_
 固定种子重复运行（默认 20 次，默认 seed 从 200 开始），逐次使用新 run_id 和独立目录，设置 240 s 子进程墙钟超时并保留诊断：
 
 ```bash
-scripts/with_jazzy.sh python3 scripts/test_gazebo_trials.py --count 20 --seed-start 200
+python3 scripts/test_gazebo_trials.py --count 20 --seed-start 200
 ```
 
 每批会拒绝已存在的 batch-id，JSON 和日志写入唯一 `.review-runs/<batch-id>/`。可用 `--output-dir` 和 `--batch-id` 指定新位置/名称；脚本拒绝复用旧目录。批测不重试失败场景；汇总中的通过数、终端显示和进程退出码使用相同的验收布尔值。
 
 取消时间分别记录取消请求、动作结果收讫和独立关节停止确认。`cancel_to_result_s` 在结果回调时冻结，不含其后的 0.5 s 观测窗口；如果关节样本重复、过期或停止未能确认，停止时间记为未测量。
+
+要将某批次的原始物理观测压缩成 ROS/Gazebo 无关的 JSONL gzip 证据包，可在宿主机执行：
+
+```bash
+BATCH_ID=pr11-round2-f92d532-seeds-200-219
+REPORT_DIR="docs/reports/${BATCH_ID}/evidence"
+mkdir -p "$REPORT_DIR"
+python3 scripts/export_gazebo_evidence.py \
+  --batch ".review-runs/${BATCH_ID}" \
+  --output "${REPORT_DIR}/${BATCH_ID}-audit-evidence.tar"
+python3 scripts/recompute_gazebo_evidence.py \
+  "${REPORT_DIR}/${BATCH_ID}-audit-evidence.tar"
+(cd "$REPORT_DIR" && sha256sum -c "${BATCH_ID}-audit-evidence.tar.sha256")
+```
+
+导出器会保留审计所需的全部位姿、接触和任务事件样本（含无效及被拒绝样本），并在打包时比较原始结果与压缩包离线重算结果。清单记录代码提交、审计版本、验收配置哈希、run 身份及进程退出状态。
 
 `--seed` 传递给 Gazebo Sim，用于固定世界随机种子；当前 MoveIt/OMPL 规划随机数流未配置固定 seed。因此固定 Gazebo seed 不保证生成相同机械臂轨迹。一次 seed 101 运行失败、同 seed 独立重放成功的实测和原始证据见[阶段二报告](reports/phase2-gazebo.md)。
 

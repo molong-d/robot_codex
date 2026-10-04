@@ -1,0 +1,80 @@
+{
+  "acceptance_config": {
+    "path": "src/robot_panda_gz_sim/config/acceptance.json",
+    "sha256": "552ee08315fc77f0ec9474e305a917e80895e50e26fd4e2c32ca8c57b54fad08"
+  },
+  "evidence_files": [
+    {
+      "bytes": 1419,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/ENVIRONMENT.txt",
+      "sha256": "fd918b63780009757f66bfe67501f02411ee49d6cbe5746dcc9c2bc45c06682b"
+    },
+    {
+      "bytes": 49274,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/OFFLINE_RECOMPUTE.json",
+      "sha256": "83e7a30e389e6a2067731ff2b5e64e298e9f38a61efd237e221ac432c9c22a7b"
+    },
+    {
+      "bytes": 12079,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/PHYSICAL_RUN_INDEX.json",
+      "sha256": "097abd7eed30254873479508fd69d324cf39140f760af91dde652f9efaba675e"
+    },
+    {
+      "bytes": 20764,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/SCENARIO_OUTCOMES.json",
+      "sha256": "27a81c61ebdc779cd371b502eb9332a129ec0c2c7b4fb7616a125a2e2b8168c3"
+    },
+    {
+      "bytes": 6827,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/SEED_DIAGNOSTICS.json",
+      "sha256": "0a716f0185c079f3fda5953f53a707e9b4966f45f214b09715f80dfc5a6f8b55"
+    },
+    {
+      "bytes": 231,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/logs/formal-batch-metadata.txt",
+      "sha256": "51cd68ad916c7b8622e6ab201226ff6fc59925c1db4ac89a097c76f72541f2db"
+    },
+    {
+      "bytes": 158,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/logs/full-regression-metadata.txt",
+      "sha256": "50ea20287ba138d931d7e29c4e3a797cf0dbe77cb70905ab363619044cec263f"
+    },
+    {
+      "bytes": 336999,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/logs/full-regression.log",
+      "sha256": "2026b025f310887fb4a41feae52078db0f909bdc157c7b0edd83c484ad07feb0"
+    },
+    {
+      "bytes": 196,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/logs/scenarios-metadata.txt",
+      "sha256": "3dbb7584487a0977a517f3e4d25a91c0cc9494bd142061be298ec12a5ec434b2"
+    },
+    {
+      "bytes": 11898880,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/pr11-round2-f92d532-audit-evidence.tar",
+      "sha256": "4ceb2a84dde56f55cc1540ae86d0b3783c28f11e3d197530052091fc891302aa"
+    },
+    {
+      "bytes": 105,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/pr11-round2-f92d532-audit-evidence.tar.sha256",
+      "sha256": "9f24297231204d99d6262a49313e5a3effece1c25eb3ab5416f912569fc27f11"
+    },
+    {
+      "bytes": 304,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/red-reproductions/contact-semantics-initial.log",
+      "sha256": "c3b0c7ea9ec9da88143fab74953985b38b87cdca52a753bd488ddf408b363db4"
+    },
+    {
+      "bytes": 1211,
+      "path": "docs/reports/pr11-review-round2-20261004/evidence/red-reproductions/release-window-old-audit.log",
+      "sha256": "f5fa7e38c3b6fc291b9a00038b6589662350558d2a71c5111bd1962b7ad60ef8"
+    }
+  ],
+  "manifest_version": 1,
+  "offline_recompute_all_match": true,
+  "scenario_expectations": {
+    "path": "src/robot_panda_gz_sim/config/scenario_expectations.json",
+    "sha256": "10f43deec7323cdb21b506ab392e2f4e73419c92b8212e86d7d0ef318bb719d9"
+  },
+  "tested_code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560"
+}

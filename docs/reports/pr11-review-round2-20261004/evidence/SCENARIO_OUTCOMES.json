@@ -1,0 +1,657 @@
+{
+  "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+  "passed_count": 9,
+  "scenario_count": 9,
+  "scenario_harness_exit_code": 0,
+  "scenarios": [
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "no_fault_latched": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-001-seed-700-0a6a7238739a",
+      "scenario": "normal",
+      "scenario_harness_check_passed": true,
+      "seed": 700,
+      "task": {
+        "error_code": "",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.004316798745249125,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": true,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "succeeded",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_grasp",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "place_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_placement",
+            "status": "succeeded"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": true,
+        "trial_process_exit_code": 0
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "initial_pose_perturbation_applied": true,
+        "no_fault_latched": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-002-seed-708-b6646339a296",
+      "scenario": "initial_pose_perturbation",
+      "scenario_harness_check_passed": true,
+      "seed": 708,
+      "task": {
+        "error_code": "",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.005315202257880273,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": true,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "succeeded",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_grasp",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "place_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_placement",
+            "status": "succeeded"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": true,
+        "trial_process_exit_code": 0
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_injected_after_place_motion": true,
+        "fault_injected_after_release_before_verification": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "off_target_fault_injection_succeeded": true,
+        "place_motion_completed": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_rejected_after_motion": true,
+        "verification_step_was_terminal_step": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-003-seed-701-8e52d37eb1b4",
+      "scenario": "placement_verification_reject",
+      "scenario_harness_check_passed": true,
+      "seed": 701,
+      "task": {
+        "error_code": "PLACEMENT_NOT_VERIFIED",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.19999999996849482,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": false,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "failed",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_grasp",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "place_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "PLACEMENT_NOT_VERIFIED",
+            "skill_id": "verify_placement",
+            "status": "failed"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "drop_injection_event_recorded": true,
+        "execution_resources_empty": true,
+        "forbidden_status_not_seen": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "physical_gripper_open_command_succeeded": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": {
+          "returncode": 0,
+          "stderr": "[WARN] [1791126700.878021706] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791126700.878029180] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.",
+          "stdout": "Waiting for an action server to become available...\nSending goal:\n     command:\n  header:\n    stamp:\n      sec: 0\n      nanosec: 0\n    frame_id: ''\n  name:\n  - panda_finger_joint1\n  position:\n  - 0.04\n  velocity: []\n  effort:\n  - 20.0\n\nGoal accepted with ID: 50772829ebc748e8a6c5998d14f71f7a\n\nResult:\n    state:\n  header:\n    stamp:\n      sec: 0\n      nanosec: 0\n    frame_id: ''\n  name: []\n  position:\n  - 0.039015924995681926\n  velocity: []\n  effort:\n  - 1.1428192361805654e+243\nstalled: false\nreached_goal: true\n\nGoal finished with status: SUCCEEDED"
+        },
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-004-seed-702-6239b3c53d47",
+      "scenario": "post_grasp_drop",
+      "scenario_harness_check_passed": true,
+      "seed": 702,
+      "task": {
+        "error_code": "GRASP_NOT_VERIFIED",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.24754832742940913,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": false,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "failed",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "GRASP_NOT_VERIFIED",
+            "skill_id": "verify_grasp",
+            "status": "failed"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "feedback_interruption_event_recorded": true,
+        "feedback_was_interrupted_after_release": true,
+        "no_fault_latched": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_step_was_terminal_step": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": true,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-005-seed-703-e24b8691d908",
+      "scenario": "post_release_contact_feedback_loss",
+      "scenario_harness_check_passed": true,
+      "seed": 703,
+      "task": {
+        "error_code": "INVALID_VERIFICATION_EVIDENCE",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.004810756769478769,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": true,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "failed",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_grasp",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "place_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "INVALID_VERIFICATION_EVIDENCE",
+            "skill_id": "verify_placement",
+            "status": "failed"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "cancel_accepted": true,
+        "cancel_result_time_measured": true,
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "stop_confirmed_within_timeout": true,
+        "task_failure_returned_nonzero": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-006-seed-704-be26e895eab1",
+      "scenario": "cancel",
+      "scenario_harness_check_passed": true,
+      "seed": 704,
+      "task": {
+        "error_code": "CANCELED",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": false,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "canceled",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "CANCELED",
+            "skill_id": "pick_object",
+            "status": "canceled"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {
+        "cancel_to_result_s": 0.277805295,
+        "cancel_to_stop_confirmed_s": 0.26571874300000003
+      }
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "timeout_stop_confirmed_within_timeout": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "run_id": "trial-007-seed-705-4778408e05b6",
+      "scenario": "timeout",
+      "scenario_harness_check_passed": true,
+      "seed": 705,
+      "task": {
+        "error_code": "TIMEOUT",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": false,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "timed_out",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "CANCELED",
+            "skill_id": "pick_object",
+            "status": "canceled"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {
+        "timeout_to_stop_confirmed_s": 0.050700544
+      }
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "no_fault_latched": true,
+        "pause_and_resume_services_succeeded": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [
+          {
+            "paused": true,
+            "returncode": 0,
+            "stderr": "",
+            "stdout": "data: true"
+          },
+          {
+            "paused": false,
+            "returncode": 0,
+            "stderr": "",
+            "stdout": "data: true"
+          }
+        ],
+        "reset_control": null
+      },
+      "run_id": "trial-008-seed-706-1f04b3e4f480",
+      "scenario": "pause_resume",
+      "scenario_harness_check_passed": true,
+      "seed": 706,
+      "task": {
+        "error_code": "",
+        "fault_latched": false,
+        "placement_xy_error_m": 0.007762671498337046,
+        "process_timed_out": false,
+        "resources_empty": true,
+        "runtime_audit_valid": true,
+        "runtime_busy": false,
+        "runtime_resource_leases": [],
+        "status": "succeeded",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "pick_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_grasp",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "place_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "",
+            "skill_id": "verify_placement",
+            "status": "succeeded"
+          }
+        ],
+        "stop_confirmed": true,
+        "success": true,
+        "trial_process_exit_code": 0
+      },
+      "timing_s": {}
+    },
+    {
+      "checks": {
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_latched": true,
+        "resource_lease_present": true,
+        "resources_retained": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "stop_not_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "world_reset_service_succeeded": true
+      },
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "injection": {
+        "contact_feedback_dropped_after_release": false,
+        "injected_grasp_miss_x_m": null,
+        "injected_placement_offset_y_m": null,
+        "object_drop_command": null,
+        "pause_control": [],
+        "reset_control": {
+          "returncode": 0,
+          "stderr": "",
+          "stdout": "data: true"
+        }
+      },
+      "run_id": "trial-009-seed-707-89a292d8940d",
+      "scenario": "time_reset",
+      "scenario_harness_check_passed": true,
+      "seed": 707,
+      "task": {
+        "error_code": "STOP_UNCONFIRMED",
+        "fault_latched": true,
+        "placement_xy_error_m": 0.28017851452243797,
+        "process_timed_out": false,
+        "resources_empty": false,
+        "runtime_audit_valid": false,
+        "runtime_busy": false,
+        "runtime_resource_leases": [
+          {
+            "owner_request_id": "2",
+            "resource_id": "panda_arm"
+          },
+          {
+            "owner_request_id": "2",
+            "resource_id": "panda_gripper"
+          }
+        ],
+        "status": "faulted",
+        "steps": [
+          {
+            "error_code": "",
+            "skill_id": "locate_object",
+            "status": "succeeded"
+          },
+          {
+            "error_code": "CANCEL_REQUESTED",
+            "skill_id": "pick_object",
+            "status": "canceling"
+          }
+        ],
+        "stop_confirmed": false,
+        "success": false,
+        "trial_process_exit_code": 1
+      },
+      "timing_s": {}
+    }
+  ]
+}
