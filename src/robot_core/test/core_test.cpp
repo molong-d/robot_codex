@@ -106,6 +106,38 @@ class ProbeMotion final : public ArmMotion {
   MotionFeedback feedback() const override { return measured; }
 };
 
+class RecordingArm final : public ArmMotion {
+ public:
+  explicit RecordingArm(std::shared_ptr<ArmMotion> inner) : inner_(std::move(inner)) {}
+  std::string resource_id() const override { return inner_->resource_id(); }
+  void begin_move(const CartesianTarget& target) override { targets.push_back(target); inner_->begin_move(target); }
+  Status poll(Time now) override { return inner_->poll(now); }
+  void request_stop() override { inner_->request_stop(); }
+  MotionFeedback feedback() const override { return inner_->feedback(); }
+  std::vector<CartesianTarget> targets;
+ private:
+  std::shared_ptr<ArmMotion> inner_;
+};
+
+class ProbeGripper final : public Gripper {
+ public:
+  bool stationary{false}, holding{false};
+  double width{0.08};
+  Status status{Status::succeeded};
+  std::string resource_id() const override { return "probe_gripper"; }
+  void begin_grasp(const GraspCommand& command) override { width = command.width_m; holding = true; status = Status::succeeded; }
+  void begin_release(double value) override { width = value; holding = false; status = Status::succeeded; }
+  Status poll(Time now) override {
+    measured_ = {width, now, true, stationary, holding,
+                 static_cast<uint64_t>(now.time_since_epoch().count())};
+    return status;
+  }
+  void request_stop() override { stationary = true; status = Status::canceled; }
+  GripperFeedback feedback() const override { return measured_; }
+ private:
+  GripperFeedback measured_;
+};
+
 class ProbeObserver final : public ManipulationObserver {
  public:
   OutcomeEvidence value{"workpiece", "", {}, true, true, {"sensor", false, 0.95}, 1};
@@ -707,6 +739,85 @@ int main() {
       check(f.world.placement_candidates.at("workpiece") == "tray", "inferred placement");
       check(f.world.known_locations.count("workpiece") == 0, "release is not a perception observation");
       check(f.resources.empty(), "leases released");
+    });
+    test("closed empty gripper opens and verifies before arm approach", [] {
+      Fixture f; f.robot->width_m = 0.0; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      f.components.add("recording_arm", arm);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      Session session(f.skills, f.resources, context, f.request("open-first", "pick_object"));
+      check(session.start(f.now).status == Status::running, "empty gripper opening started");
+      check(arm->targets.empty(), "arm does not approach with closed fingers");
+      for (int i = 0; i < 3 && arm->targets.empty(); ++i)
+        session.tick(f.now += 10ms);
+      check(std::abs(f.robot->width_m-0.08) < 1e-9, "empty gripper opened to the configured width");
+      check(arm->targets.size() == 1 && arm->targets[0].id == "workpiece",
+            "arm command follows verified gripper opening");
+      for (int i = 0; i < 100 && !terminal(session.result().status); ++i)
+        session.tick(f.now += 10ms);
+      check(session.result().status == Status::succeeded, "pick succeeds after opening first");
+    });
+    test("moving gripper is allowed to stop before manipulation starts", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      auto gripper = std::make_shared<ProbeGripper>();
+      f.components.add("recording_arm", arm);
+      f.components.add("probe_gripper", gripper);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "probe_gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      Session session(f.skills, f.resources, context, f.request("wait-stop", "pick_object"));
+      check(session.start(f.now).status == Status::running && arm->targets.empty(),
+            "arm waits while the measured gripper is moving");
+      gripper->stationary = true;
+      session.tick(f.now += 10ms);
+      check(arm->targets.size() == 1, "fresh stationary feedback unlocks arm motion");
+      session.cancel();
+      for (int i = 0; i < 5 && !terminal(session.result().status); ++i)
+        session.tick(f.now += 10ms);
+      check(session.result().status == Status::canceled && f.resources.empty(),
+            "cancellation waits for the arm stop and releases both leases");
+    });
+    test("configured manipulation approaches, descends, then lifts or retreats", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      f.components.add("recording_arm", arm);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      ManipulationPolicy policy; policy.allow_synthetic = true;
+      policy.approach_clearance_m = 0.08; policy.post_action_clearance_m = 0.12;
+      Skills skills; VerificationPolicy verification; verification.evidence.allow_synthetic = true;
+      register_demo_skills(skills, policy, verification);
+      const auto run = [&](const std::string& id, const std::string& skill, Arguments args) {
+        Session session(skills, f.resources, context, f.request(id, skill, std::move(args)));
+        auto result = session.start(f.now);
+        for (int i = 0; i < 100 && !terminal(result.status); ++i) {
+          f.now += 10ms; result = session.tick(f.now);
+        }
+        return result;
+      };
+      check(run("pick-phases", "pick_object", {{"object", "workpiece"}}).status == Status::succeeded,
+            "pick phases complete");
+      check(arm->targets.size() == 3 &&
+            std::abs(arm->targets[0].pose.z-0.28) < 1e-9 &&
+            std::abs(arm->targets[1].pose.z-0.20) < 1e-9 &&
+            std::abs(arm->targets[2].pose.z-0.32) < 1e-9,
+            "pick moves above, descends, and lifts from the located pose");
+      f.locate("tray"); const auto prior = arm->targets.size();
+      check(run("place-phases", "place_object", {{"object", "workpiece"}, {"target", "tray"}}).status == Status::succeeded,
+            "place phases complete");
+      check(arm->targets.size() == prior+3 &&
+            std::abs(arm->targets[prior].pose.z-0.23) < 1e-9 &&
+            std::abs(arm->targets[prior+1].pose.z-0.15) < 1e-9 &&
+            std::abs(arm->targets[prior+2].pose.z-0.27) < 1e-9,
+            "place approaches, releases, and retreats from the target");
+      check(f.world.placement_candidates.at("workpiece") == "tray" && f.resources.empty(),
+            "phase sequence preserves inferred release and releases resource leases");
+      rejects([&] { policy.approach_clearance_m = std::numeric_limits<double>::quiet_NaN();
+        Manipulate invalid(context, true, policy); }, "non-finite clearance rejected");
     });
     test("motion implementation can change without skill changes", [] {
       Fixture f(7); f.locate();

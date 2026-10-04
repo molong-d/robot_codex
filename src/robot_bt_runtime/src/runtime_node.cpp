@@ -36,23 +36,32 @@ struct Engine {
   bool fault_latched{false};
 
   Engine(std::string motion, int ticks, int stop_ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
-         bool ros_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity,
+         bool ros_backend, bool gazebo_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity,
          bool outcome_enabled, const std::string& verification_failure, int verification_window_ms,
          const rc::DemoScene& perception_scene, rc::PoseMeaning perception_meaning,
          std::shared_ptr<rc::MotionTargetResolver> target_resolver)
-      : bindings(components, {{"perception", "mock_camera"}, {"motion", motion},
-                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"}, {"outcome", "demo_outcome"},
+      : bindings(components, {{"perception", gazebo_backend ? "gazebo_world" : "mock_camera"}, {"motion", motion},
+                              {"gripper", "mock_gripper"}, {"safety", "execution_gate"},
+                              {"outcome", gazebo_backend ? "gazebo_outcome" : "demo_outcome"},
                               {"target_resolver", "static_target_resolver"}}),
         context{bindings, world}, journal(history_capacity) {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
-    components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(perception_scene, perception_meaning,
-        perception_meaning == rc::PoseMeaning::object_pose ? "configured_native_demo" : "configured_demo"));
+    if (gazebo_backend) {
+      auto gazebo_world = std::make_shared<robot_ros_adapters::GazeboWorldAdapter>(node, config, scene);
+      components.add("gazebo_world", gazebo_world);
+      components.add("gazebo_outcome", std::make_shared<robot_ros_adapters::GazeboOutcomeAdapter>(gazebo_world));
+    } else
+      components.add("mock_camera", std::make_shared<rc::ConfiguredDemoLocator>(perception_scene, perception_meaning,
+          perception_meaning == rc::PoseMeaning::object_pose ? "configured_native_demo" : "configured_demo"));
     if (target_resolver) components.add("static_target_resolver", std::move(target_resolver));
     rc::ManipulationPolicy policy;
     policy.frame_id = scene.frame();
     policy.tool_frame = config.tip;
     policy.allow_synthetic = true;  // this runtime only has demonstration backends
+    policy.release_width_m = config.gripper_release_width_m;
+    policy.approach_clearance_m = config.approach_clearance_m;
+    policy.post_action_clearance_m = config.post_action_clearance_m;
     if (ros_backend) {
       components.add(motion, std::make_shared<robot_ros_adapters::MoveItArm>(node, config));
       components.add("mock_gripper", std::make_shared<robot_ros_adapters::ParallelGripper>(node, config));
@@ -63,7 +72,7 @@ struct Engine {
     }
     const auto arm = bindings.get<rc::ArmMotion>("motion");
     const auto gripper = bindings.get<rc::Gripper>("gripper");
-    if (outcome_enabled)
+    if (outcome_enabled && !gazebo_backend)
       components.add("demo_outcome", std::make_shared<rc::DemoOutcomeObserver>(arm, gripper, scene,
           ros_backend ? "none" : verification_failure));
     bindings.get<rc::ExecutionGate>("safety");
@@ -153,24 +162,43 @@ class RuntimeNode final : public rclcpp::Node {
     backend_ = backend;
     const auto simulation_only = declare_parameter<bool>("simulation_only", true);
     const auto ros_enabled = declare_parameter<bool>("ros_backend_enabled", false);
-    if (backend != "mock" && backend != "panda_ros") throw std::invalid_argument("unknown backend");
-    if (backend == "panda_ros" && (!simulation_only || !ros_enabled))
-      throw std::invalid_argument("Panda ROS backend requires explicit simulation-only enablement");
+    if (backend != "mock" && backend != "panda_ros" && backend != "panda_gz") throw std::invalid_argument("unknown backend");
+    const bool gazebo_backend = backend == "panda_gz";
+    const bool ros_backend = backend != "mock";
+    if (ros_backend && (!simulation_only || !ros_enabled))
+      throw std::invalid_argument("Panda ROS/Gazebo backend requires explicit simulation-only enablement");
     robot_ros_adapters::Config config;
     config.move_action = declare_parameter<std::string>("move_action", config.move_action);
     config.gripper_action = declare_parameter<std::string>("gripper_action", config.gripper_action);
     config.frame = catalog_support::startup_parameter<std::string>(this, "base_frame",
-        backend == "panda_ros" ? config.frame : "base_link");
-    config.tip = catalog_support::startup_parameter<std::string>(this, "end_effector_link", backend == "panda_ros" ? config.tip : "tool0");
+        ros_backend ? config.frame : "base_link");
+    config.tip = catalog_support::startup_parameter<std::string>(this, "end_effector_link", ros_backend ? config.tip : "tool0");
     config.group = declare_parameter<std::string>("planning_group", config.group);
     config.arm_joints = declare_parameter<std::vector<std::string>>("arm_joints", config.arm_joints);
     config.finger_joint = declare_parameter<std::string>("finger_joint", config.finger_joint);
     config.arm_resource = declare_parameter<std::string>("arm_resource", config.arm_resource);
     config.gripper_resource = declare_parameter<std::string>("gripper_resource", config.gripper_resource);
     config.simulation_grasp_detection = declare_parameter<bool>("simulation_grasp_detection", false);
+    config.gripper_release_width_m = catalog_support::startup_parameter<double>(
+        this, "gripper_release_width_m", config.gripper_release_width_m);
+    config.grasp_topic = declare_parameter<std::string>("grasp_topic", config.grasp_topic);
+    config.grasp_stamped_topic = declare_parameter<std::string>("grasp_stamped_topic", config.grasp_stamped_topic);
+    config.world_pose_topics = catalog_support::startup_parameter<std::vector<std::string>>(
+        this, "world_pose_topics", config.world_pose_topics);
+    config.world_frame = catalog_support::startup_parameter<std::string>(this, "perception_frame", config.world_frame);
+    config.gazebo_world_name = catalog_support::startup_parameter<std::string>(
+        this, "gazebo_world_name", config.gazebo_world_name);
+    config.support_surface_z = catalog_support::startup_parameter<double>(this, "support_surface_z", config.support_surface_z);
+    config.object_height_m = catalog_support::startup_parameter<double>(this, "object_height_m", config.object_height_m);
+    config.grasp_lift_m = catalog_support::startup_parameter<double>(this, "grasp_lift_m", config.grasp_lift_m);
+    config.placement_xy_tolerance_m = catalog_support::startup_parameter<double>(this, "placement_xy_tolerance_m", config.placement_xy_tolerance_m);
+    config.placement_z_tolerance_m = catalog_support::startup_parameter<double>(this, "placement_z_tolerance_m", config.placement_z_tolerance_m);
+    config.stable_speed_mps = catalog_support::startup_parameter<double>(this, "stable_speed_mps", config.stable_speed_mps);
+    config.approach_clearance_m = catalog_support::startup_parameter<double>(this, "approach_clearance_m", config.approach_clearance_m);
+    config.post_action_clearance_m = catalog_support::startup_parameter<double>(this, "post_action_clearance_m", config.post_action_clearance_m);
     const auto outcome_enabled = catalog_support::startup_parameter<bool>(this, "simulation_outcome_evidence", backend == "mock");
     const auto verification_failure = catalog_support::startup_parameter<std::string>(this, "mock_verification_failure", "none");
-    const auto verification_window_ms = catalog_support::startup_parameter<int>(this, "verification_window_ms", 100);
+    const auto verification_window_ms = catalog_support::startup_parameter<int>(this, "verification_window_ms", gazebo_backend ? 500 : 100);
     if (verification_failure != "none" && verification_failure != "grasp" && verification_failure != "placement")
       throw std::invalid_argument("mock verification failure must be none, grasp or placement");
     if (verification_window_ms < 1 || verification_window_ms > 30000)
@@ -187,15 +215,16 @@ class RuntimeNode final : public rclcpp::Node {
     if (ticks <= 0 || ticks > 100000 || stop_ticks <= 0 || stop_ticks > 100000 || period <= 0 || skill_timeout <= 0 || stop_timeout <= 0)
       throw std::invalid_argument("runtime parameters must be positive and mock ticks <= 100000");
     stop_timeout_ = std::chrono::milliseconds(stop_timeout);
-    scene_ = std::make_unique<rc::DemoScene>(catalog_support::load_scene(this, config.frame, backend == "panda_ros"));
+    scene_ = std::make_unique<rc::DemoScene>(catalog_support::load_scene(this, config.frame, ros_backend));
     const auto perception_mode = catalog_support::startup_parameter<std::string>(this, "perception_mode", "motion_target");
     if (perception_mode != "motion_target" && perception_mode != "object_pose")
       throw std::invalid_argument("perception_mode must be motion_target or object_pose");
-    const auto perception_scene = perception_mode == "object_pose" ? catalog_support::load_native_scene(this, *scene_) : *scene_;
+    const auto perception_scene = perception_mode == "object_pose" && !gazebo_backend ?
+        catalog_support::load_native_scene(this, *scene_) : *scene_;
     auto target_resolver = catalog_support::load_target_resolver(this, config.frame, config.tip);
     tasks_ = std::make_unique<rc::TaskCatalog>(catalog_support::load_tasks(this));
     if (history_capacity < 1 || history_capacity > 128) throw std::invalid_argument("execution history capacity requires 1..128");
-    engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, backend == "panda_ros", config, *scene_,
+    engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, ros_backend, gazebo_backend, config, *scene_,
                                      static_cast<size_t>(history_capacity), outcome_enabled, verification_failure, verification_window_ms,
                                      perception_scene, perception_mode == "object_pose" ? rc::PoseMeaning::object_pose : rc::PoseMeaning::motion_target,
                                      std::move(target_resolver));
@@ -343,7 +372,8 @@ class RuntimeNode final : public rclcpp::Node {
           task.template_id == "pick_place" ? "PickPlace" :
           task.template_id == "verified_pick_place" ? "VerifiedPickPlace" : "LocateObject", blackboard));
       success_message_ = task.template_id == "verified_pick_place" ?
-          "synthetic grasp and placement evidence verified; no physical object/contact sensing" :
+          (backend_ == "panda_gz" ? "Gazebo object-state and contact evidence verified over the configured window" :
+           "synthetic grasp and placement evidence verified; no physical object/contact sensing") :
           task.template_id == "pick_place" ? "release verified; object placement needs perception confirmation" :
           get_parameter("perception_mode").as_string() == "object_pose" ?
           "fresh configured demo object pose obtained" : "fresh configured demo motion target obtained";

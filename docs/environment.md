@@ -6,6 +6,7 @@
 
 ```bash
 bash scripts/with_jazzy.sh
+bash scripts/with_jazzy.sh bash scripts/check_jazzy_environment.sh
 bash scripts/with_jazzy.sh bash scripts/test_all_jazzy.sh
 ```
 
@@ -33,6 +34,6 @@ bash scripts/with_jazzy.sh
 
 ## 本仓库一次实测的环境
 
-阶段一基线在 Ubuntu 24.04.5 容器中通过上述依赖和脚本复现，容器运行于 Ubuntu 22.04.5 宿主机。测试时 ROS 2 Jazzy、MoveIt 2 2.12.4、BehaviorTree.CPP 4.10.0、ros2_control 4.48.0、Gazebo Harmonic 8.15.0、`gz_ros2_control` 1.2.20。完整包版本清单与测试命令、提交 SHA、退出码见 [`phase1-baseline.md`](reports/phase1-baseline.md)。宿主机无可用 NVIDIA 驱动；后续仿真应以无 GUI/headless 模式验证，不以该机器的渲染能力作假设。
+阶段一基线和阶段二 Gazebo 测试都使用 Ubuntu 24.04.5 容器，运行在 Ubuntu 22.04.5 宿主机上。实测关键版本为 ROS 2 Jazzy、MoveIt 2 2.12.4、BehaviorTree.CPP 4.10.0、ros2_control 4.48.0、Gazebo Harmonic 8.15.0、`gz_ros2_control` 1.2.20。容器中可运行 [`check_jazzy_environment.sh`](../scripts/check_jazzy_environment.sh) 复核发行版与关键依赖；完整包版本清单和分阶段测试证据见 [`ros-jazzy-packages.txt`](reports/ros-jazzy-packages.txt)、[`phase1-baseline.md`](reports/phase1-baseline.md) 与 [`phase2-gazebo.md`](reports/phase2-gazebo.md)。宿主机无可用 NVIDIA 驱动；当前仿真以无 GUI/headless 方式验证，不依赖该机器的 GPU 渲染能力。
 
-此容器脚本用于开发与复现，不会自动启动 Gazebo、连接真实机器人或下载大型模型权重。第一阶段 Panda 示例使用 `GenericSystem`；它验证 ROS/MoveIt 接口路径，不验证接触物理。
+此容器脚本用于开发与复现，不会自动连接真实机器人或下载大型模型权重。第一阶段 Panda 示例使用 `GenericSystem`，只验证 ROS/MoveIt 接口；阶段二使用独立的 Gazebo Harmonic/DART 场景验证仿真接触物理，范围见 [仿真说明](gazebo-simulation.md)。

@@ -1,0 +1,54 @@
+robot_runtime:
+  ros__parameters:
+    use_sim_time: true
+    backend: panda_gz
+    ros_backend_enabled: true
+    simulation_only: true
+    simulation_grasp_detection: false
+    simulation_outcome_evidence: true
+    motion_component: ros_arm
+    mock_motion_permitted: true
+    base_frame: panda_link0
+    end_effector_link: panda_hand
+    planning_group: panda_arm
+    move_action: /move_action
+    gripper_action: /panda_hand_controller/gripper_cmd
+    finger_joint: panda_finger_joint1
+    gripper_release_width_m: 0.052
+    joint_states_topic: /joint_states
+    grasp_topic: /panda/grasp_contact
+    grasp_stamped_topic: /panda/grasp_contact_stamped
+    world_pose_topics: [/panda_gz/workpiece/pose, /panda_gz/tray/pose]
+    gazebo_world_name: panda_pick_place
+    perception_mode: object_pose
+    perception_frame: world
+    object_ids: [workpiece]
+    target_ids: [tray]
+    entities.workpiece.pose: [0.44, 0.05, 0.37, 0.0, 0.0, 0.0, 1.0]
+    entities.tray.pose: [0.60, -0.18, 0.37, 0.0, 0.0, 0.0, 1.0]
+    task_names: [pick_place, inspect_object]
+    tasks.pick_place.template_id: verified_pick_place
+    tasks.pick_place.implementation_id: pose_resolved
+    tasks.inspect_object.template_id: locate_object
+    tasks.inspect_object.implementation_id: pose_resolved
+    target_resolution.enabled: true
+    target_resolution.calibration_id: panda_gz_truth_v1
+    target_resolution.source_frame: world
+    target_resolution.tool_frame: panda_hand
+    target_resolution.synthetic: true
+    target_resolution.source_in_base: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+    target_resolution.grasp_tool_offset: [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0]
+    target_resolution.place_tool_offset: [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0]
+    approach_clearance_m: 0.08
+    post_action_clearance_m: 0.12
+    support_surface_z: 0.35
+    object_height_m: 0.04
+    grasp_lift_m: 0.04
+    placement_xy_tolerance_m: 0.05
+    placement_z_tolerance_m: 0.015
+    stable_speed_mps: 0.04
+    verification_window_ms: 500
+    skill_timeout_ms: 30000
+    stop_timeout_ms: 5000
+    tick_period_ms: 20
+    execution_history_capacity: 32

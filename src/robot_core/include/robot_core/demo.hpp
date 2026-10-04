@@ -102,7 +102,7 @@ class MockGripper final : public Gripper {
     begin();
   }
   void begin_release(double width_m) override {
-    if (busy_ || !state_->grasped || !std::isfinite(width_m) || width_m <= 0.0)
+    if (busy_ || !std::isfinite(width_m) || width_m <= 0.0)
       throw std::runtime_error("invalid mock release");
     commanded_width_ = width_m;
     closing_ = false;

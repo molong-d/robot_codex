@@ -82,6 +82,10 @@ struct ManipulationPolicy {
   double minimum_observation_quality{0.8};
   bool allow_synthetic{false};
   std::string tool_frame{"tool0"};
+  // Optional vertical approach and post-gripper lift/retreat. Zero preserves
+  // the single-pose demonstration path; physical scenes configure both.
+  double approach_clearance_m{0.0};
+  double post_action_clearance_m{0.0};
 };
 struct VerificationPolicy {
   EvidencePolicy evidence;

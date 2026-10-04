@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(robot_interfaces)
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/ExecuteTask.action"
   "action/ExecutePlan.action"
@@ -18,9 +19,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/ResourceLease.msg"
   "msg/WorldSnapshot.msg"
   "msg/VerificationSnapshot.msg"
+  "msg/GraspContact.msg"
   "msg/ExecutionRecord.msg"
   "srv/GetCatalog.srv"
   "srv/GetRuntimeState.srv"
-  "srv/GetExecution.srv")
+  "srv/GetExecution.srv"
+  DEPENDENCIES builtin_interfaces)
 ament_export_dependencies(rosidl_default_runtime)
 ament_package()

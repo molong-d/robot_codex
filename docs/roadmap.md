@@ -17,11 +17,12 @@
 - [x] 6A：有界执行记录、按 Action UUID 查询、只读运行/资源/世界状态与客户端 JSON 导出
 - [x] 6B：来源/质量/合成/位姿语义契约、动作后样本窗口、抓稳/放置验证技能及六步示例，验证证据进入执行记录
 - [x] 7A：显式静态位姿解析组件、独立原生观测与预期目标配置、pose_resolved 第二种技能实现及 mock/Panda 示例
+- [x] 8A：Gazebo Harmonic Panda DART 场景、gz_ros2_control 入口、物理接触/物体状态证据及仿真时钟新样本验证
 
 ## 尚未实现
 
 - [ ] 特定实机驱动、独立执行许可与实际停止验证
-- [ ] 真实 6D 感知、力控与物理抓稳/放置验证（证据/验收框架已完成）
+- [ ] 真实 6D 感知、实机力控与硬件抓稳/放置验证（Gazebo 物理仿真覆盖不代表实机验证）
 - [ ] 模型任务规划器和 VLA 动作策略
 - [ ] 组件 pluginlib 动态加载
 - [ ] 通用位姿/力/轨迹等任务参数类型与条件解释器（技能目录已完成）
@@ -33,7 +34,7 @@
 
 初次开发环境只有 g++，无 ROS 2、colcon 和 BehaviorTree.CPP。核心测试可在该环境直接运行；ROS 构建与真实行为树/Action 集成验证由 GitHub Actions 的 Jazzy 环境执行。以本次提交的 CI 结果为准，不能把核心测试通过等同于 ROS 测试通过。
 
-没有进行实机验证。纯 mock 只模拟状态和延迟；Panda ROS 示例执行实际运动学/规划和控制器链路，但 GenericSystem 不包含接触动力学，夹持检测是显式合成信号。
+没有进行实机验证。纯 mock 只模拟状态和延迟；Panda GenericSystem 示例不包含接触动力学。新增的 Panda Gazebo Harmonic 入口在 DART 中运行带接触的仿真对象，并由仿真真值/接触传感器独立核验任务结果。已执行的场景、种子、失败和重复试验数以 [`phase2-gazebo.md`](reports/phase2-gazebo.md) 为准。Gazebo DART 对 URDF mimic constraint 有不支持告警，该风险及仿真范围限制已记录。
 
 ## 后续顺序
 
