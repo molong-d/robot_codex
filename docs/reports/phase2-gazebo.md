@@ -69,7 +69,7 @@ scripts/test_gazebo_trials.py --count 20 --seed-start 100
 | 成功任务 Z 放置误差 | 1.000 mm（19 次；每次满足 15 mm 门限） |
 | 20 次全部可测 XY 误差 | 0.542–11.068 mm；包含 seed 101 失败终态 |
 
-seed 101 以退出码 1 结束，状态为 `failed/MOTION_FAILED`，因此整个批测脚本也按设计返回 **1**（未达到要求的 20/20 全通过）。它通过过双指接触，但放置动作阶段手臂轨迹未到达停止状态；Gazebo 日志记录 Panda joint 1 位置误差 20.070 mm、joint 5 误差 11.888 mm，均超过 ros2_control 配置的 1 mm 容差。物体仍被夹持，终点高于托盘底 17.173 mm，没有托盘底接触，故不满足释放、托盘接触和 Z 误差条件。可用 seed 101 和汇总中给出的命令复现；该运行记录在 `phase2-trials/trial-101.json` 与 `.log`。这是场景/轨迹跟踪可靠性问题，具体是规划路径、DART 动态或控制器容差/跟踪之间的哪一项尚未分离定位。
+seed 101 以退出码 1 结束，状态为 `failed/MOTION_FAILED`，因此整个批测脚本也按设计返回 **1**（未达到要求的 20/20 全通过）。它通过过双指接触，但放置动作阶段手臂轨迹未到达停止状态；Gazebo 日志记录 Panda 旋转 joint 1 位置误差 `+0.020070 rad`、joint 5 误差 `-0.011888 rad`，均超过 ros2_control 配置的 `0.001000 rad` 容差。物体仍被夹持，终点高于托盘底 17.173 mm，没有托盘底接触，故不满足释放、托盘接触和 Z 误差条件。可用 seed 101 和汇总中给出的命令复现；该运行记录在 `phase2-trials/trial-101.json` 与 `.log`。这是场景/轨迹跟踪可靠性问题，具体是规划路径、DART 动态或控制器容差/跟踪之间的哪一项尚未分离定位。
 
 随后在代码 SHA 不变且工作区干净时，以同一 seed 101 单独诊断重放：
 
@@ -91,7 +91,7 @@ scripts/with_jazzy.sh scripts/test_gazebo.sh --seed 101 --timeout-ms 30000 \
 | Gazebo 暂停 1 s 后恢复，seed 54 | 两个 pause/unpause 服务均返回 `data: true`；恢复后任务成功。另有 C++ 时间源测试确认暂停时重复 stamp 不会生成新 sample ID | `phase2-gazebo-pause-54.{json,log}` |
 | 注入抓空，seed 52 | `failed/GRIPPER_VERIFICATION_FAILED`；方块仍在桌面，无双指抓取证据 | `phase2-gazebo-missed-grasp-52.{json,log}` |
 | 错误放置偏置 `+80 mm`，seed 48 | `failed/MOTION_FAILED`；终态距托盘中心 XY 81.176 mm，仅有桌面接触，无托盘底接触 | `phase2-gazebo-wrong-place-48.{json,log}` |
-| 取消，seed 45 | 取消被接受，停止得到测量确认；请求至结果 0.885 s（小于 5 s） | `phase2-gazebo-cancel-45.{json,log}` |
+| 取消，seed 45 | 取消被接受并得到停止确认；历史 JSON 的 `cancel_to_result_s=0.885339` 混入结果等待前的额外 0.5 s 观察时间，且没有分别记录取消请求、收到结果和确认停止的单调时钟时间戳，故真实取消到结果及取消到停止时长均未测量 | `phase2-gazebo-cancel-45.{json,log}` |
 | 任务超时 3 s，seed 46 | `timed_out/TIMEOUT`；停止得到测量确认，任务墙钟 3.599 s | `phase2-gazebo-timeout-46.{json,log}` |
 | 丢弃抓取反馈，seed 47 | `faulted/STOP_UNCONFIRMED`；停止期限耗尽，资源继续保留，不伪报停止 | `phase2-gazebo-feedback-loss-47.{json,log}` |
 | 执行中重置世界，seed 53 | Gazebo reset 服务成功，但控制栈重启时无法确认停止；`faulted/STOP_UNCONFIRMED` 并保留资源 | `phase2-gazebo-reset-53.{json,log}` |
@@ -108,3 +108,7 @@ C++ 和 Python 时间源/传感器新鲜度契约测试均包含在上述 colcon
 - 证据校验值清单为 [`phase2-artifacts.sha256`](phase2-artifacts.sha256)。批测原始 JSON/日志约 1.8 MiB，阶段二回归及指定场景日志也一并提交；没有录像、rosbag、模型权重、容器镜像、构建缓存或凭据。
 
 独立审查可优先检查 `src/robot_panda_gz_sim/worlds/panda_pick_place.sdf` 与控制器配置、`gz_scene_sync.py` 的真值/接触和 MoveIt 附着、`robot_core` 抓放后置验证及资源停止确认，以及 seed 101、反馈中断和重置场景的原始日志。
+
+### 2026-10-04 审查勘误
+
+本报告最初将 seed 101 两个旋转关节的位置误差写成毫米，并将 `cancel_to_result_s` 当作纯取消耗时。以上段落现已按原始 Gazebo 日志纠正：旋转关节单位为 rad，且 joint 5 保留日志中的负号；历史 JSON 不包含足以拆分取消请求、结果到达和停止确认的单调时钟时间戳。原始 19/20 批测、seed 101 失败与成功重放的结果和证据文件均未更改；这里只更正说明和单位，不重新解释或替换历史结果。

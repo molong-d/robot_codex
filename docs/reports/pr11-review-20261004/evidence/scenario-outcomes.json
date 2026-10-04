@@ -1,0 +1,1064 @@
+{
+  "batch_id": "20261004T113449Z-66ca4f218a",
+  "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+  "scenario_count": 9,
+  "passed_count": 8,
+  "failed_count": 1,
+  "scenarios": [
+    {
+      "scenario": "normal",
+      "seed": 700,
+      "run_id": "trial-001-seed-700-453629a46045",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "timed_out",
+      "error_code": "TIMEOUT",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 700,
+        "args": [],
+        "expected_status": "succeeded",
+        "expected_error_code": "",
+        "requires_physical_audit_success": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": false,
+        "expected_status": false,
+        "independent_physics_audit_passed": false,
+        "no_fault_latched": true,
+        "process_exit_zero": false,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.27779960381093616,
+        "placement_z_error_m": 0.00018130756936629577
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "canceled",
+          "error_code": "CANCELED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65001987821491,
+        "cancel_stop_confirmed_monotonic_ns": 65001913275540,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65001909383050,
+        "timeout_to_stop_confirmed_s": 0.00389249,
+        "task_elapsed_wall_s": 30.582839591996162
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-001-seed-700/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-001-seed-700/gazebo.log"
+      }
+    },
+    {
+      "scenario": "initial_pose_perturbation",
+      "seed": 708,
+      "run_id": "trial-002-seed-708-0f3e1fa85ec9",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "succeeded",
+      "error_code": "",
+      "process_exit_code": 0,
+      "scenario_expectation": {
+        "seed": 708,
+        "args": [
+          "--object-dx",
+          "0.01",
+          "--object-dy",
+          "-0.01"
+        ],
+        "expected_object_offset_xy_m": [
+          0.01,
+          -0.01
+        ],
+        "expected_status": "succeeded",
+        "expected_error_code": "",
+        "requires_physical_audit_success": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "initial_pose_perturbation_applied": true,
+        "no_fault_latched": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.004308015476166409,
+        "placement_z_error_m": 0.0009999784117908361
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_grasp",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        },
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "place_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_placement",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.01,
+          -0.01
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65040637146732,
+        "cancel_stop_confirmed_monotonic_ns": 65040638023691,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65051626220191,
+        "timeout_to_stop_confirmed_s": -10.9881965,
+        "task_elapsed_wall_s": 19.51392822199705
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-002-seed-708/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-002-seed-708/gazebo.log"
+      }
+    },
+    {
+      "scenario": "placement_verification_reject",
+      "seed": 701,
+      "run_id": "trial-003-seed-701-0cf90e05fe1a",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "failed",
+      "error_code": "PLACEMENT_NOT_VERIFIED",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 701,
+        "args": [
+          "--disturb-object-before-verification"
+        ],
+        "expected_status": "failed",
+        "expected_error_code": "PLACEMENT_NOT_VERIFIED",
+        "requires_step": "verify_placement",
+        "requires_step_status": "failed",
+        "requires_completed_place_motion": true,
+        "requires_object_disturbance": true,
+        "requires_physical_audit_rejection": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_injected_after_place_motion": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "off_target_fault_injection_succeeded": true,
+        "place_motion_completed": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_rejected_after_motion": true,
+        "verification_step_was_terminal_step": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.20000000000000007,
+        "placement_z_error_m": 4.1434264685391575e-06
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_grasp",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        },
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "place_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_placement",
+          "status": "failed",
+          "error_code": "PLACEMENT_NOT_VERIFIED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65072530025695,
+        "cancel_stop_confirmed_monotonic_ns": 65072533961636,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65087321120129,
+        "timeout_to_stop_confirmed_s": -14.787158493000002,
+        "task_elapsed_wall_s": 15.714159235998522
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-003-seed-701/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-003-seed-701/gazebo.log"
+      }
+    },
+    {
+      "scenario": "post_grasp_drop",
+      "seed": 702,
+      "run_id": "trial-004-seed-702-8e038fe903c0",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "failed",
+      "error_code": "MOTION_FAILED",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 702,
+        "args": [
+          "--drop-object-after-grasp"
+        ],
+        "forbidden_status": "succeeded",
+        "requires_drop_command_success": true,
+        "requires_physical_audit_rejection": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "drop_injection_event_recorded": true,
+        "execution_resources_empty": true,
+        "forbidden_status_not_seen": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "physical_gripper_open_command_succeeded": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.24094798270095255,
+        "placement_z_error_m": 1.559824063801507e-07
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_grasp",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        },
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "place_object",
+          "status": "failed",
+          "error_code": "MOTION_FAILED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": 0,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65100583703892,
+        "cancel_stop_confirmed_monotonic_ns": 65100643106931,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65121668619386,
+        "timeout_to_stop_confirmed_s": -21.025512455,
+        "task_elapsed_wall_s": 9.418561289996433
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-004-seed-702/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-004-seed-702/gazebo.log"
+      }
+    },
+    {
+      "scenario": "post_release_contact_feedback_loss",
+      "seed": 703,
+      "run_id": "trial-005-seed-703-3fec8a808a9b",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "failed",
+      "error_code": "INVALID_VERIFICATION_EVIDENCE",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 703,
+        "args": [
+          "--drop-contact-after-release"
+        ],
+        "expected_status": "failed",
+        "expected_error_code": "INVALID_VERIFICATION_EVIDENCE",
+        "requires_step": "verify_placement",
+        "requires_feedback_interruption": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "feedback_interruption_event_recorded": true,
+        "feedback_was_interrupted_after_release": true,
+        "no_fault_latched": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_step_was_terminal_step": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.002912945798575175,
+        "placement_z_error_m": 0.0009999330014288654
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_grasp",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        },
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "place_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_placement",
+          "status": "failed",
+          "error_code": "INVALID_VERIFICATION_EVIDENCE",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": true,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65135735224824,
+        "cancel_stop_confirmed_monotonic_ns": 65135736136772,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65149446191253,
+        "timeout_to_stop_confirmed_s": -13.710054481,
+        "task_elapsed_wall_s": 16.792797858004633
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-005-seed-703/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-005-seed-703/gazebo.log"
+      }
+    },
+    {
+      "scenario": "cancel",
+      "seed": 704,
+      "run_id": "trial-006-seed-704-9137b5baebb4",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "canceled",
+      "error_code": "CANCELED",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 704,
+        "args": [
+          "--cancel-after-ms",
+          "1000"
+        ],
+        "expected_status": "canceled",
+        "requires_cancel_accepted": true,
+        "requires_safe_terminal_resources": true,
+        "maximum_stop_confirmation_ms": 5000
+      },
+      "checks": {
+        "cancel_accepted": true,
+        "cancel_result_time_measured": true,
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "stop_confirmed_within_timeout": true,
+        "task_failure_returned_nonzero": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 1.7166740251539636e-10
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "canceled",
+          "error_code": "CANCELED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": 65155989890718,
+        "cancel_result_received_monotonic_ns": 65156258003136,
+        "cancel_stop_confirmed_monotonic_ns": 65156252209708,
+        "cancel_to_result_s": 0.268112418,
+        "cancel_to_stop_confirmed_s": 0.26231899000000003,
+        "timeout_deadline_monotonic_ns": 65184989861332,
+        "timeout_to_stop_confirmed_s": null,
+        "task_elapsed_wall_s": 1.771738463001384
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-006-seed-704/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-006-seed-704/gazebo.log"
+      }
+    },
+    {
+      "scenario": "timeout",
+      "seed": 705,
+      "run_id": "trial-007-seed-705-4e5d2f73e34c",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "timed_out",
+      "error_code": "TIMEOUT",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 705,
+        "task_timeout_ms": 3000,
+        "args": [],
+        "expected_status": "timed_out",
+        "expected_error_code": "TIMEOUT",
+        "requires_safe_terminal_resources": true,
+        "maximum_stop_confirmation_ms": 5000
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "timeout_stop_confirmed_within_timeout": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 1.7166740251539636e-10
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "canceled",
+          "error_code": "CANCELED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65178091909742,
+        "cancel_stop_confirmed_monotonic_ns": 65178088166059,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65178028241969,
+        "timeout_to_stop_confirmed_s": 0.059924090000000006,
+        "task_elapsed_wall_s": 3.567060049994325
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-007-seed-705/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-007-seed-705/gazebo.log"
+      }
+    },
+    {
+      "scenario": "pause_resume",
+      "seed": 706,
+      "run_id": "trial-008-seed-706-34c28cada9f5",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "succeeded",
+      "error_code": "",
+      "process_exit_code": 0,
+      "scenario_expectation": {
+        "seed": 706,
+        "args": [
+          "--pause-after-ms",
+          "1000",
+          "--pause-duration-ms",
+          "1000"
+        ],
+        "expected_status": "succeeded",
+        "requires_pause_and_resume_success": true,
+        "requires_physical_audit_success": true,
+        "requires_safe_terminal_resources": true
+      },
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "no_fault_latched": true,
+        "pause_and_resume_services_succeeded": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.007869445084222739,
+        "placement_z_error_m": 0.0009999673273264342
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": false,
+        "resource_leases": [],
+        "resources_empty": true
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_grasp",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        },
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "place_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "verify_placement",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": true
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [
+          {
+            "paused": true,
+            "returncode": 0,
+            "stdout": "data: true"
+          },
+          {
+            "paused": false,
+            "returncode": 0,
+            "stdout": "data: true"
+          }
+        ],
+        "reset_control": null
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65212616713023,
+        "cancel_stop_confirmed_monotonic_ns": 65212619061256,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65223869782243,
+        "timeout_to_stop_confirmed_s": -11.250720987000001,
+        "task_elapsed_wall_s": 19.249976576000336
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-008-seed-706/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-008-seed-706/gazebo.log"
+      }
+    },
+    {
+      "scenario": "time_reset",
+      "seed": 707,
+      "run_id": "trial-009-seed-707-2f6a5a237694",
+      "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+      "status": "faulted",
+      "error_code": "STOP_UNCONFIRMED",
+      "process_exit_code": 1,
+      "scenario_expectation": {
+        "seed": 707,
+        "args": [
+          "--reset-after-ms",
+          "1000"
+        ],
+        "expected_status": "faulted",
+        "expected_error_code": "STOP_UNCONFIRMED",
+        "requires_reset_success": true,
+        "requires_retained_resources": true
+      },
+      "checks": {
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_latched": true,
+        "resource_lease_present": true,
+        "resources_retained": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "stop_not_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "world_reset_service_succeeded": true
+      },
+      "independent_audit": {
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": false,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_event_observed": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 0.0
+      },
+      "runtime_state": {
+        "active_execution_id": "",
+        "busy": false,
+        "fault_latched": true,
+        "resource_leases": [
+          {
+            "owner_request_id": "2",
+            "resource_id": "panda_arm"
+          },
+          {
+            "owner_request_id": "2",
+            "resource_id": "panda_gripper"
+          }
+        ],
+        "resources_empty": false
+      },
+      "execution_steps": [
+        {
+          "skill_id": "locate_object",
+          "status": "succeeded",
+          "error_code": "",
+          "has_verification": false
+        },
+        {
+          "skill_id": "pick_object",
+          "status": "canceling",
+          "error_code": "CANCEL_REQUESTED",
+          "has_verification": false
+        }
+      ],
+      "injection": {
+        "object_offset_xy_m": [
+          0.0,
+          0.0
+        ],
+        "injected_placement_offset_y_m": null,
+        "drop_command_exit_code": null,
+        "contact_feedback_dropped_after_release": false,
+        "pause_control": [],
+        "reset_control": {
+          "returncode": 0,
+          "stdout": "data: true"
+        }
+      },
+      "timings": {
+        "cancel_requested_monotonic_ns": null,
+        "cancel_result_received_monotonic_ns": 65266781217906,
+        "cancel_stop_confirmed_monotonic_ns": null,
+        "cancel_to_result_s": null,
+        "cancel_to_stop_confirmed_s": null,
+        "timeout_deadline_monotonic_ns": 65261749033195,
+        "timeout_to_stop_confirmed_s": null,
+        "task_elapsed_wall_s": 35.537650289996236
+      },
+      "evidence_paths": {
+        "raw_result_json": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-009-seed-707/result.json",
+        "gazebo_log": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-009-seed-707/gazebo.log"
+      }
+    }
+  ]
+}
