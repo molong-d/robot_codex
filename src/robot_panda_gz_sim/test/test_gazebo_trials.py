@@ -99,6 +99,14 @@ def main():
     require(audit["independently_valid_physical_outcome"],
             f"valid evidence fixture rejected: {audit['checks']}")
 
+    later_dual = successful_physics()
+    both = later_dual["contact_samples"][0]["contacts"]
+    later_dual["contact_samples"].insert(1, contact(2_200_000_000, both, sequence=2))
+    for sequence, sample in enumerate(later_dual["contact_samples"], 1):
+        sample["sequence"] = sequence
+    require(audit_physics(later_dual, ACCEPTANCE)["checks"]["object_lifted_after_grasp"],
+            "later carrying contact displaced the original grasp/lift checkpoint")
+
     stale = successful_physics()
     next(s for s in reversed(stale["pose_history"]) if s["object_id"] == "workpiece")[
         "receipt_monotonic_ns"] = 1

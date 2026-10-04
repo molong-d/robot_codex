@@ -90,7 +90,11 @@ def audit_physics(result, acceptance):
         if (_pair_matches(pairs, "workpiece", "leftfinger") and
                 _pair_matches(pairs, "workpiece", "rightfinger")):
             dual.append(sample)
-    grasp_time_ns = dual[-1].get("source_stamp_ns") if dual else None
+    # The first same-sample dual-finger contact is the physical grasp
+    # candidate. Later finger contact can persist during transport and must
+    # not move the lift checkpoint forward until after the object is already
+    # resting on the tray.
+    grasp_time_ns = dual[0].get("source_stamp_ns") if dual else None
     lift_height = (float(acceptance["support_surface_z_m"]) +
                    float(acceptance["object_height_m"]) / 2.0 +
                    float(acceptance["grasp_lift_m"]))
