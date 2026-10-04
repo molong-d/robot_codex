@@ -75,9 +75,16 @@ class VerifyOutcome final : public Skill {
     if (samples_ != 0 && (value->stamp < last_stamp_ || value->sample_id < last_sample_ ||
         (last_source_time_ns_ != 0 && value->source_time_ns <= last_source_time_ns_)))
       return done(Status::failed, "OUT_OF_ORDER_EVIDENCE", "verification evidence went backwards");
-    if (samples_ != 0 && last_source_time_ns_ != 0 && value->source_time_ns-last_source_time_ns_ >
-        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(policy_.evidence.max_age).count()))
-      return done(Status::failed, "EVIDENCE_GAP", "verification sample gap exceeds evidence age limit");
+    if (samples_ != 0) {
+      const auto max_gap_ns = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+          policy_.evidence.max_age).count());
+      if (last_source_time_ns_ != 0 && value->source_time_ns != 0 &&
+          value->source_time_ns-last_source_time_ns_ > max_gap_ns)
+        return done(Status::failed, "EVIDENCE_GAP", "verification source-time gap exceeds evidence age limit");
+      if (last_source_time_ns_ == 0 && value->source_time_ns == 0 &&
+          value->stamp-last_stamp_ > policy_.evidence.max_age)
+        return done(Status::failed, "EVIDENCE_GAP", "verification receipt-time gap exceeds evidence age limit");
+    }
     if (value->stamp != last_stamp_ && value->sample_id != last_sample_) {
       if (samples_ == 0) {
         first_stamp_ = value->stamp;
