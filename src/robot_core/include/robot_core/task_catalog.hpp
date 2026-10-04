@@ -77,8 +77,8 @@ class DemoOutcomeObserver final : public ManipulationObserver {
       const auto& pose = scene_.at(target.empty() ? object : target).pose;
       const bool condition = arm.stopped && gripper.stopped && arm.frame_id == scene_.frame() &&
           pose_near(arm.pose, pose, {}) &&
-          (target.empty() ? gripper.grasp_detected :
-              !gripper.grasp_detected && std::abs(gripper.width_m-0.08) <= 0.002) &&
+          (target.empty() ? dual_finger_grasp(gripper.contact_state) :
+              no_finger_contact(gripper.contact_state) && std::abs(gripper.width_m-0.08) <= 0.002) &&
           failure_ != (target.empty() ? "grasp" : "placement");
       return OutcomeEvidence{object, target, std::min(arm.stamp, gripper.stamp),
           arm.valid && gripper.valid, condition, {"demo_outcome", true, 1.0}, std::min(arm.sample_id, gripper.sample_id)};

@@ -20,6 +20,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/WorldSnapshot.msg"
   "msg/VerificationSnapshot.msg"
   "msg/GraspContact.msg"
+  "msg/PlanningSceneStatus.msg"
   "msg/ExecutionRecord.msg"
   "srv/GetCatalog.srv"
   "srv/GetRuntimeState.srv"

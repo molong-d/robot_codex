@@ -103,6 +103,7 @@ class Bindings {
     if (!value) throw std::invalid_argument("component type mismatch: " + role);
     return value;
   }
+  bool contains(const std::string& role) const { return roles_.find(role) != roles_.end(); }
  private:
   const Components& components_;
   std::map<std::string, std::string> roles_;
@@ -142,6 +143,11 @@ struct Observation {
   EvidenceMetadata evidence;
   PoseMeaning meaning{PoseMeaning::object_pose};
 };
+// Contact evidence is deliberately four-way: partial finger contact and
+// unknown feedback are neither a secure grasp nor a confirmed release.
+enum class ContactState { unknown, none, left_only, right_only, both };
+inline bool dual_finger_grasp(ContactState state) { return state == ContactState::both; }
+inline bool no_finger_contact(ContactState state) { return state == ContactState::none; }
 struct OutcomeEvidence {
   std::string object_id, target_id;
   Time stamp{};
@@ -151,7 +157,7 @@ struct OutcomeEvidence {
   // Optional source-domain measurement time and epoch. Adapters keep this
   // independent from the steady-time stamp used for communication freshness.
   uint64_t source_time_ns{0}, epoch{0};
-  enum class ContactState { unknown, contact, no_contact } contact_state{ContactState::unknown};
+  ContactState contact_state{ContactState::unknown};
   uint64_t contact_source_time_ns{0};
 };
 struct OutcomeVerification {

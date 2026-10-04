@@ -52,11 +52,11 @@ class VerifyOutcome final : public Skill {
       return done(Status::failed, "INVALID_VERIFICATION_EVIDENCE", "fresh identified evidence with accepted source/quality required");
     if (value->epoch != effect_epoch_)
       return done(Status::failed, "VERIFICATION_EPOCH_CHANGED", "evidence cannot cross a simulator epoch");
-    if (value->source_time_ns != 0 && value->contact_state == OutcomeEvidence::ContactState::unknown)
+    if (value->source_time_ns != 0 && value->contact_state == ContactState::unknown)
       return done(Status::failed, "UNKNOWN_CONTACT_STATE", "physical verification requires explicit fresh contact state");
     if (value->source_time_ns != 0 &&
-        ((grasp_ && value->contact_state != OutcomeEvidence::ContactState::contact) ||
-         (!grasp_ && value->contact_state != OutcomeEvidence::ContactState::no_contact)))
+        ((grasp_ && value->contact_state != ContactState::both) ||
+         (!grasp_ && value->contact_state != ContactState::none)))
       return done(Status::failed, grasp_ ? "GRASP_NOT_VERIFIED" : "PLACEMENT_NOT_VERIFIED",
                   "physical contact state does not match the requested outcome");
     if ((effect_source_time_ns_ != 0 &&

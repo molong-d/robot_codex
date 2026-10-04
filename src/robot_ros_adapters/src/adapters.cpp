@@ -49,14 +49,20 @@ GazeboWorldAdapter::GazeboWorldAdapter(rclcpp::Node* node, Config config, robot_
         const bool accepted = observe_ros_stamp(node_, contact_clock_, message->source_stamp);
         if (contact_clock_.epoch() != old_epoch) {
           activate_epoch(contact_clock_.epoch());
-          finger_contact_ = false;
+          finger_contact_ = rc::ContactState::unknown;
           contact_stamp_ = {};
           contact_source_ns_ = 0;
         }
-        if (!accepted || message->frame_id != config_.world_frame || message->object_id != "workpiece" ||
+        if (!accepted || message->schema_version != 2 || message->frame_id != config_.world_frame || message->object_id != "workpiece" ||
             message->epoch != contact_clock_.epoch() || message->sequence == 0 ||
             message->sequence <= contact_sequence_) return;
-        finger_contact_ = message->detected;
+        switch (message->state) {
+          case robot_interfaces::msg::GraspContact::NO_FINGER_CONTACT: finger_contact_ = rc::ContactState::none; break;
+          case robot_interfaces::msg::GraspContact::LEFT_FINGER_ONLY: finger_contact_ = rc::ContactState::left_only; break;
+          case robot_interfaces::msg::GraspContact::RIGHT_FINGER_ONLY: finger_contact_ = rc::ContactState::right_only; break;
+          case robot_interfaces::msg::GraspContact::BOTH_FINGERS: finger_contact_ = rc::ContactState::both; break;
+          default: finger_contact_ = rc::ContactState::unknown; break;
+        }
         contact_stamp_ = contact_clock_.stamp();
         contact_source_ns_ = contact_clock_.source_ns();
         contact_epoch_ = contact_clock_.epoch();
@@ -64,11 +70,52 @@ GazeboWorldAdapter::GazeboWorldAdapter(rclcpp::Node* node, Config config, robot_
       });
 }
 
+GazeboPlanningSceneGate::GazeboPlanningSceneGate(rclcpp::Node* node, const std::string& topic) {
+  if (!node || topic.empty()) throw std::invalid_argument("planning scene status requires node and topic");
+  sub_ = node->create_subscription<robot_interfaces::msg::PlanningSceneStatus>(topic, 10,
+      [this](robot_interfaces::msg::PlanningSceneStatus::ConstSharedPtr message) {
+        if (!message || message->schema_version != 1 || message->producer_id.empty() ||
+            message->sequence == 0) return;
+        if (state_.valid && message->producer_id != producer_id_) {
+          if (message->ready) return;  // a producer restart must first publish unsynchronized state
+          state_ = {};
+          producer_id_ = message->producer_id;
+          last_sim_time_ns_ = 0;
+          rewind_pending_ = false;
+        }
+        if (message->sequence <= state_.sequence) return;
+        if (state_.valid && message->epoch < state_.epoch) return;
+        if (!state_.valid || message->producer_id != producer_id_) {
+          state_ = {};
+          producer_id_ = message->producer_id;
+        }
+        const uint64_t sim_ns = static_cast<uint64_t>(message->source_clock_stamp.sec) * 1000000000ULL +
+                                message->source_clock_stamp.nanosec;
+        if (last_sim_time_ns_ != 0 && sim_ns != 0 && sim_ns < last_sim_time_ns_) {
+          rewind_pending_ = true;
+          previous_epoch_ = state_.epoch;
+        }
+        last_sim_time_ns_ = sim_ns;
+        state_.valid = true;
+        if (rewind_pending_ && message->epoch > previous_epoch_) rewind_pending_ = false;
+        state_.ready = message->ready && !rewind_pending_;
+        state_.request_in_flight = message->request_in_flight;
+        state_.cleanup_pending = message->cleanup_pending;
+        state_.epoch = message->epoch;
+        state_.sequence = message->sequence;
+        state_.desired_version = message->desired_version;
+        state_.confirmed_version = message->confirmed_version;
+        state_.desired_attached_object = message->desired_attached_object;
+        state_.confirmed_attached_object = message->confirmed_attached_object;
+        state_.received_at = rc::Clock::now();
+      });
+}
+
 void GazeboWorldAdapter::activate_epoch(uint64_t epoch) {
   if (epoch <= epoch_) return;
   epoch_ = epoch;
   for (auto& entry : poses_) entry.second = PoseSample{};
-  finger_contact_ = false;
+  finger_contact_ = rc::ContactState::unknown;
   contact_stamp_ = {};
   contact_source_ns_ = 0;
   contact_epoch_ = epoch;
@@ -175,12 +222,11 @@ std::optional<robot_core::OutcomeEvidence> GazeboWorldAdapter::grasp(const std::
   const bool contact_fresh = contact_sequence_ != 0 && contact_epoch_ == epoch_ &&
       contact_clock_.epoch() == epoch_ && robot_core::fresh(contact_stamp_, now, config_.evidence_max_age);
   if (!sample || !contact_fresh) return std::nullopt;
-  const bool contact = finger_contact_;
+  const bool contact = rc::dual_finger_grasp(finger_contact_);
   const bool lifted = sample->pose.z >= config_.support_surface_z+config_.object_height_m/2.0+config_.grasp_lift_m;
   robot_core::OutcomeEvidence evidence{object, "", sample->stamp, true, contact && lifted,
       {evidence_source(), true, 1.0}, sample->sample_id, sample->source_ns, sample->epoch};
-  evidence.contact_state = contact ? robot_core::OutcomeEvidence::ContactState::contact :
-                                     robot_core::OutcomeEvidence::ContactState::no_contact;
+  evidence.contact_state = finger_contact_;
   evidence.contact_source_time_ns = contact_source_ns_;
   return evidence;
 }
@@ -200,7 +246,20 @@ std::optional<robot_core::OutcomeEvidence> GazeboWorldAdapter::placement(const s
   };
   if (absolute_delta(sample->source_ns, goal->source_ns) > pairing_limit_ns ||
       absolute_delta(sample->source_ns, contact_source_ns_) > pairing_limit_ns) return std::nullopt;
-  const bool confirmed_no_contact = !finger_contact_;
+  bool has_release = false;
+  uint64_t release_source_ns = 0;
+  if (world_state_) {
+    const auto release_time = world_state_->release_source_times_ns.find(object);
+    const auto release_epoch = world_state_->release_epochs.find(object);
+    const auto release_receipt = world_state_->release_stamps.find(object);
+    has_release = release_time != world_state_->release_source_times_ns.end() &&
+        release_epoch != world_state_->release_epochs.end() && release_receipt != world_state_->release_stamps.end() &&
+        release_time->second != 0 && release_receipt->second != rc::Time{} &&
+        release_epoch->second == epoch_ && contact_epoch_ == epoch_ &&
+        contact_source_ns_ > release_time->second && sample->source_ns > release_time->second;
+    if (has_release) release_source_ns = release_time->second;
+  }
+  const bool confirmed_no_contact = has_release && rc::no_finger_contact(finger_contact_);
   const double speed = sample->previous_source_ns != 0 && sample->source_ns > sample->previous_source_ns &&
       sample->epoch == epoch_ ?
       distance(sample->pose, sample->previous_pose)/
@@ -210,11 +269,12 @@ std::optional<robot_core::OutcomeEvidence> GazeboWorldAdapter::placement(const s
   const bool in_region = xy_error <= config_.placement_xy_tolerance_m &&
                          std::abs(sample->pose.z-(config_.support_surface_z+config_.object_height_m/2.0)) <=
                              config_.placement_z_tolerance_m;
-  const bool condition = confirmed_no_contact && in_region && speed <= config_.stable_speed_mps;
+  const bool condition = confirmed_no_contact && sample->source_ns > release_source_ns &&
+                         contact_source_ns_ > release_source_ns && in_region && speed <= config_.stable_speed_mps;
   robot_core::OutcomeEvidence evidence{object, target, sample->stamp, true, condition,
       {evidence_source(), true, 1.0}, sample->sample_id, sample->source_ns, sample->epoch};
-  evidence.contact_state = confirmed_no_contact ? robot_core::OutcomeEvidence::ContactState::no_contact :
-                                                  robot_core::OutcomeEvidence::ContactState::contact;
+  evidence.contact_state = (rc::no_finger_contact(finger_contact_) && !has_release) ?
+      rc::ContactState::unknown : finger_contact_;
   evidence.contact_source_time_ns = contact_source_ns_;
   return evidence;
 }

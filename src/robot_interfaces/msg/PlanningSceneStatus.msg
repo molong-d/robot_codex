@@ -1,0 +1,12 @@
+uint8 schema_version
+string producer_id
+builtin_interfaces/Time source_clock_stamp
+uint64 sequence
+uint64 epoch
+uint64 desired_version
+uint64 confirmed_version
+string desired_attached_object
+string confirmed_attached_object
+bool ready
+bool request_in_flight
+bool cleanup_pending

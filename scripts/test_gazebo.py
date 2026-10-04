@@ -173,7 +173,7 @@ def main():
                      "table_messages": 0, "table_collisions": [], "table_seen": [],
                      "grasp_feedback_messages": 0, "grasp_feedback": None,
                      "stamped_grasp_messages": 0, "stamped_grasp_source_ns": 0,
-                     "stamped_grasp_detected": None}
+                     "stamped_grasp_state": None}
     arm_state = {"hand_tf": None, "joint_state": None}
     finger_extrema = {"panda_finger_joint1": [None, None], "panda_finger_joint2": [None, None]}
     gazebo_topics = []
@@ -229,7 +229,7 @@ def main():
                                    (acceptance["world_frame"], acceptance["gazebo_world_name"])
                                    else source_frame)
                 sample = {
-                    "stream": f"pose:{object_id}", "object_id": object_id, "child_frame_id": child,
+                    "stream": f"pose:{object_id}", "run_id": run_id, "object_id": object_id, "child_frame_id": child,
                     "frame_id": canonical_frame, "source_frame_id": source_frame,
                     "source_stamp_ns": source_ns,
                     "sim_time_ns": sim_ns, "receipt_monotonic_ns": receipt_ns,
@@ -291,7 +291,7 @@ def main():
             accepted, epoch, reason = sample_guard.observe("contact", source_ns, sim_ns)
             stream_sequences["contact"] = stream_sequences.get("contact", 0) + 1
             contact_samples.append({
-                "stream": "contact", "object_id": "workpiece", "frame_id": acceptance["world_frame"],
+                "stream": "contact", "run_id": run_id, "object_id": "workpiece", "frame_id": acceptance["world_frame"],
                 "source_frame_id": message.header.frame_id,
                 "source_stamp_ns": source_ns, "sim_time_ns": sim_ns,
                 "receipt_monotonic_ns": receipt_ns, "epoch": epoch,
@@ -318,7 +318,8 @@ def main():
             contact_state["stamped_grasp_messages"] += 1
             contact_state["stamped_grasp_source_ns"] = (
                 message.source_stamp.sec * 1_000_000_000 + message.source_stamp.nanosec)
-            contact_state["stamped_grasp_detected"] = message.detected
+            contact_state["stamped_grasp_state"] = message.state
+            contact_state["stamped_grasp_schema_version"] = message.schema_version
             contact_state["stamped_grasp_epoch"] = message.epoch
             contact_state["stamped_grasp_sequence"] = message.sequence
             contact_state["stamped_grasp_frame"] = message.frame_id
@@ -405,7 +406,9 @@ def main():
             entry = {"active_skill": message.feedback.active_skill, "status": message.feedback.status,
                      "message": message.feedback.message,
                      "receipt_monotonic_ns": time.monotonic_ns(),
-                     "sim_time_ns": node.get_clock().now().nanoseconds}
+                     "sim_time_ns": node.get_clock().now().nanoseconds,
+                     "run_id": run_id, "object_id": "workpiece", "target_id": "tray",
+                     "epoch": sample_guard.epoch}
             if "release confirmed" in entry["message"].lower():
                 entry["phase"] = "release_confirmed"
             elif "grasp confirmed" in entry["message"].lower():
@@ -607,6 +610,7 @@ def main():
             "status": wrapped.result.status,
             "error_code": wrapped.result.error_code,
             "message": wrapped.result.message,
+            "object_id": "workpiece", "target_id": "tray",
             "goal_status": int(wrapped.status),
             "launch_log": str(args.launch_log),
             "pose_samples": pose_samples,

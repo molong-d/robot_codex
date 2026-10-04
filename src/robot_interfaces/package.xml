@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>robot_interfaces</name><version>0.1.0</version>
+  <name>robot_interfaces</name><version>0.2.0</version>
   <description>Typed ROS 2 task action and skill catalog for the robot framework.</description>
   <maintainer email="44089363+molong-d@users.noreply.github.com">molong-d</maintainer>
   <license>LicenseRef-Proprietary</license>

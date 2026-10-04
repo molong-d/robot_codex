@@ -134,7 +134,7 @@ class MockGripper final : public Gripper {
   GripperFeedback feedback() const override {
     auto f = feedback_;
     f.width_m = state_->width_m;
-    f.grasp_detected = state_->grasped;
+    f.contact_state = state_->grasped ? ContactState::both : ContactState::none;
     return f;
   }
  private:

@@ -16,7 +16,7 @@ ACCEPTANCE = {
     "object_id": "workpiece", "target_id": "tray",
     "support_surface_z_m": 0.35, "object_height_m": 0.04, "grasp_lift_m": 0.04,
     "placement_xy_tolerance_m": 0.05, "placement_z_tolerance_m": 0.015,
-    "stable_speed_mps": 0.04, "verification_window_ms": 500,
+    "stable_speed_mps": 0.04, "verification_window_ms": 500, "stability_max_gap_ms": 100,
     "minimum_physical_samples": 3, "evidence_max_age_ms": 500,
     "contact_pose_pairing_tolerance_ms": 100,
 }
@@ -24,7 +24,7 @@ ACCEPTANCE = {
 
 def pose(object_id, stamp, xyz, receipt=9_900_000_000, frame="world", epoch=0, sequence=None):
     return {
-        "stream": f"pose:{object_id}", "object_id": object_id, "frame_id": frame,
+        "stream": f"pose:{object_id}", "run_id": "test-run", "object_id": object_id, "frame_id": frame,
         "source_frame_id": frame,
         "source_stamp_ns": stamp, "sim_time_ns": stamp + 10_000_000,
         "receipt_monotonic_ns": receipt, "epoch": epoch, "sequence": sequence or stamp,
@@ -34,7 +34,7 @@ def pose(object_id, stamp, xyz, receipt=9_900_000_000, frame="world", epoch=0, s
 
 def contact(stamp, pairs, receipt=9_900_000_000, epoch=0, sequence=None, frame="world"):
     return {
-        "stream": "contact", "object_id": "workpiece", "frame_id": frame,
+        "stream": "contact", "run_id": "test-run", "object_id": "workpiece", "frame_id": frame,
         "source_frame_id": frame,
         "source_stamp_ns": stamp, "sim_time_ns": stamp + 10_000_000,
         "receipt_monotonic_ns": receipt, "epoch": epoch, "sequence": sequence or stamp,
@@ -43,28 +43,27 @@ def contact(stamp, pairs, receipt=9_900_000_000, epoch=0, sequence=None, frame="
 
 
 def successful_physics():
-    poses = [
-        pose("workpiece", 1_200_000_000, [0.44, 0.05, 0.43], sequence=1),
-        pose("workpiece", 2_400_000_000, [0.600, -0.180, 0.370], sequence=2),
-        pose("workpiece", 2_600_000_000, [0.601, -0.180, 0.370], sequence=3),
-        pose("workpiece", 2_800_000_000, [0.600, -0.181, 0.370], sequence=4),
-        pose("workpiece", 2_900_000_000, [0.600, -0.180, 0.370], sequence=5),
-    ]
-    poses.extend(pose("tray", stamp, [0.600, -0.180, 0.370], sequence=i)
-                 for i, stamp in enumerate((2_400_000_000, 2_600_000_000,
-                                             2_800_000_000, 2_900_000_000), 1))
+    placement_stamps = [2_400_000_000 + i * 50_000_000 for i in range(11)]
+    poses = [pose("workpiece", 1_200_000_000, [0.44, 0.05, 0.43], receipt=9_300_000_000, sequence=1)]
+    poses.extend(pose("workpiece", stamp, [0.600, -0.180, 0.370],
+                      receipt=9_400_000_000 + i * 50_000_000, sequence=i + 2)
+                 for i, stamp in enumerate(placement_stamps))
+    poses.extend(pose("tray", stamp, [0.600, -0.180, 0.370],
+                      receipt=9_400_000_000 + i * 50_000_000 + 1_000_000, sequence=i + 1)
+                 for i, stamp in enumerate(placement_stamps))
     both = [["panda::workpiece", "panda_leftfinger::collision"],
             ["panda::workpiece", "panda_rightfinger::collision"]]
     floor = [["panda::workpiece", "tray::tray_floor::collision"]]
-    contacts = [contact(1_000_000_000, both, sequence=1),
-                contact(2_400_000_000, [], sequence=2),
-                contact(2_600_000_000, floor, sequence=3),
-                contact(2_800_000_000, floor, sequence=4),
-                contact(2_900_000_000, floor, sequence=5)]
+    contacts = [contact(1_000_000_000, both, receipt=9_300_000_000, sequence=1)]
+    contacts.extend(contact(stamp, floor, receipt=9_400_000_000 + i * 50_000_000 + 2_000_000,
+                            sequence=i + 2)
+                    for i, stamp in enumerate(placement_stamps))
     return {
         "success": True, "status": "succeeded", "seed": 42, "code_commit": "abc",
         "run_id": "test-run", "pose_history": poses, "contact_samples": contacts,
-        "task_events": [{"phase": "release_confirmed", "sim_time_ns": 2_300_000_000}],
+        "task_events": [{"phase": "release_confirmed", "run_id": "test-run",
+                          "object_id": "workpiece", "target_id": "tray", "epoch": 0,
+                          "sim_time_ns": 2_300_000_000, "receipt_monotonic_ns": 9_350_000_000}],
         "final_sim_time_ns": 2_910_000_000, "final_receipt_monotonic_ns": 10_000_000_000,
         "final_epoch": 0,
     }
@@ -154,9 +153,9 @@ def main():
 
     dropped = successful_physics()
     dropped["pose_history"].append(pose("workpiece", 2_950_000_000,
-                                         [0.600, -0.180, 0.310], sequence=6))
+                                         [0.600, -0.180, 0.310], receipt=9_960_000_000, sequence=13))
     dropped["contact_samples"].append(contact(
-        2_950_000_000, [["panda::workpiece", "table::collision"]], sequence=6))
+        2_950_000_000, [["panda::workpiece", "table::collision"]], receipt=9_960_000_000, sequence=13))
     require(not audit_physics(dropped, ACCEPTANCE)["independently_valid_physical_outcome"],
             "post-release drop was accepted as a stable placement")
 

@@ -58,8 +58,10 @@ def generate_launch_description():
         "stable_speed_mps": acceptance["stable_speed_mps"],
         "verification_window_ms": acceptance["verification_window_ms"],
         "verification_minimum_samples": acceptance["minimum_physical_samples"],
+        "stability_max_gap_ms": acceptance["stability_max_gap_ms"],
         "evidence_max_age_ms": acceptance["evidence_max_age_ms"],
         "contact_pose_pairing_tolerance_ms": acceptance["contact_pose_pairing_tolerance_ms"],
+        "scene_sync_timeout_ms": acceptance["scene_sync_timeout_ms"],
         "stop_timeout_ms": acceptance["stop_timeout_ms"],
     }
     moveit = (
@@ -127,6 +129,7 @@ def generate_launch_description():
                                    "gazebo_world_name": acceptance["gazebo_world_name"],
                                    "object_id": acceptance["object_id"],
                                    "evidence_max_age_ms": acceptance["evidence_max_age_ms"],
+                                   "scene_sync_timeout_ms": acceptance["scene_sync_timeout_ms"],
                                    "publish_grasp_feedback": ParameterValue(
                                        LaunchConfiguration("publish_grasp_feedback"), value_type=bool)}],
                       output="screen")

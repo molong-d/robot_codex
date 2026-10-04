@@ -7,6 +7,7 @@
 #include <rclcpp_action/rclcpp_action.hpp>
 #include <moveit_msgs/action/move_group.hpp>
 #include <robot_interfaces/msg/grasp_contact.hpp>
+#include <robot_interfaces/msg/planning_scene_status.hpp>
 #include <control_msgs/action/parallel_gripper_command.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/bool.hpp>
@@ -28,6 +29,7 @@ struct Config {
   std::string joint_states_topic{"/joint_states"}, grasp_topic{"/grasp_detected"};
   std::vector<std::string> world_pose_topics{"/panda_gz/workpiece/pose", "/panda_gz/tray/pose"};
   std::string grasp_stamped_topic{"/panda/grasp_contact_stamped"};
+  std::string planning_scene_status_topic{"/panda_gz/planning_scene_status"};
   std::string world_frame{"world"};
   std::string gazebo_world_name{"panda_pick_place"};
   std::string arm_resource{"panda_arm"}, gripper_resource{"panda_gripper"};
@@ -36,6 +38,7 @@ struct Config {
   double support_surface_z{0.35}, object_height_m{0.04}, grasp_lift_m{0.04};
   double placement_xy_tolerance_m{0.05}, placement_z_tolerance_m{0.015}, stable_speed_mps{0.04};
   std::chrono::milliseconds evidence_max_age{500}, contact_pose_pairing_tolerance{100};
+  std::chrono::milliseconds scene_sync_timeout{5000};
   double approach_clearance_m{0.0}, post_action_clearance_m{0.0};
   double velocity_scaling{0.2}, acceleration_scaling{0.2};
 };
@@ -221,8 +224,9 @@ class ParallelGripper final : public rc::Gripper {
     if (config_.grasp_stamped_topic.empty()) {
       contact_ = node->create_subscription<std_msgs::msg::Bool>(config_.grasp_topic, 10,
           [this](std_msgs::msg::Bool::ConstSharedPtr m) {
-          contact_value_ = m->data;
-          contact_stamp_ = rc::Clock::now();
+          (void)m;  // Legacy Bool cannot distinguish partial contact from release.
+          contact_value_ = rc::ContactState::unknown;
+          contact_stamp_ = {};
           contact_source_ns_ = 0;
           contact_epoch_ = 0;
         });
@@ -232,14 +236,21 @@ class ParallelGripper final : public rc::Gripper {
             const auto old_epoch = contact_clock_.epoch();
             const bool accepted = observe_ros_stamp(node_, contact_clock_, m->source_stamp);
             if (contact_clock_.epoch() != old_epoch) {
-              contact_value_ = false;
+              contact_value_ = rc::ContactState::unknown;
               contact_stamp_ = {};
               contact_source_ns_ = 0;
+              contact_message_sequence_ = 0;
             }
-            if (!accepted || m->frame_id != config_.world_frame || m->object_id != "workpiece" ||
+            if (!accepted || m->schema_version != 2 || m->frame_id != config_.world_frame || m->object_id != "workpiece" ||
                 m->epoch != contact_clock_.epoch() || m->sequence == 0 ||
                 m->sequence <= contact_message_sequence_) return;
-            contact_value_ = m->detected;
+            switch (m->state) {
+              case robot_interfaces::msg::GraspContact::NO_FINGER_CONTACT: contact_value_ = rc::ContactState::none; break;
+              case robot_interfaces::msg::GraspContact::LEFT_FINGER_ONLY: contact_value_ = rc::ContactState::left_only; break;
+              case robot_interfaces::msg::GraspContact::RIGHT_FINGER_ONLY: contact_value_ = rc::ContactState::right_only; break;
+              case robot_interfaces::msg::GraspContact::BOTH_FINGERS: contact_value_ = rc::ContactState::both; break;
+              default: contact_value_ = rc::ContactState::unknown; break;
+            }
             contact_stamp_ = contact_clock_.stamp();
             contact_source_ns_ = contact_clock_.source_ns();
             contact_epoch_ = contact_clock_.epoch();
@@ -280,13 +291,14 @@ class ParallelGripper final : public rc::Gripper {
       // Explicit synthetic contact for GenericSystem demo only. No contact physics.
       if (measured_.valid && measured_.stopped && action_status != rc::Status::idle &&
           std::abs(measured_.width_m-commanded_width_) <= 0.002) sim_holding_ = closing_;
-      measured_.grasp_detected = sim_holding_;
+      measured_.contact_state = sim_holding_ ? rc::ContactState::both : rc::ContactState::none;
     } else {
-      contact_fresh = rc::fresh(contact_stamp_, now, config_.evidence_max_age);
+      contact_fresh = contact_value_ != rc::ContactState::unknown &&
+                      rc::fresh(contact_stamp_, now, config_.evidence_max_age);
       contact_fresh = contact_fresh && contact_epoch_ == contact_clock_.epoch() &&
                       contact_clock_.epoch() == joint_clock_.epoch();
       measured_.valid = measured_.valid && contact_fresh;
-      measured_.grasp_detected = contact_value_;
+      measured_.contact_state = contact_value_;
       measured_.stamp = std::min(measured_.stamp, contact_stamp_);
       measured_.sample_id = std::min(measured_.sample_id, contact_clock_.sample_id());
       measured_.source_time_ns = contact_source_ns_;
@@ -334,7 +346,8 @@ class ParallelGripper final : public rc::Gripper {
   rc::Time contact_stamp_{};
   uint64_t contact_source_ns_{0}, contact_epoch_{0}, contact_message_sequence_{0};
   MonotonicSampleClock joint_clock_, contact_clock_;
-  bool contact_value_{false}, closing_{false}, sim_holding_{false};
+  rc::ContactState contact_value_{rc::ContactState::unknown};
+  bool closing_{false}, sim_holding_{false};
   double commanded_width_{0.08};
   rc::GripperFeedback measured_;
 };
@@ -374,7 +387,7 @@ class GazeboWorldAdapter final : public rc::ObjectLocator {
   uint64_t epoch_{0}, world_sample_sequence_{0};
   rclcpp::Subscription<robot_interfaces::msg::GraspContact>::SharedPtr contact_sub_;
   MonotonicSampleClock contact_clock_;
-  bool finger_contact_{false};
+  rc::ContactState finger_contact_{rc::ContactState::unknown};
   rc::Time contact_stamp_{};
   uint64_t contact_source_ns_{0}, contact_epoch_{0}, contact_sequence_{0};
 };
@@ -396,6 +409,19 @@ class GazeboOutcomeAdapter final : public rc::ManipulationObserver {
   }
  private:
   std::shared_ptr<GazeboWorldAdapter> world_;
+};
+
+class GazeboPlanningSceneGate final : public rc::PlanningSceneGate {
+ public:
+  GazeboPlanningSceneGate(rclcpp::Node* node, const std::string& topic);
+  std::string resource_id() const override { return "gazebo_moveit_planning_scene"; }
+  rc::PlanningSceneSnapshot snapshot() const override { return state_; }
+ private:
+  rclcpp::Subscription<robot_interfaces::msg::PlanningSceneStatus>::SharedPtr sub_;
+  rc::PlanningSceneSnapshot state_;
+  std::string producer_id_;
+  uint64_t last_sim_time_ns_{0}, previous_epoch_{0};
+  bool rewind_pending_{false};
 };
 
 }  // namespace robot_ros_adapters

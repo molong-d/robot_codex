@@ -26,7 +26,7 @@ flowchart TD
 | 夹爪 Action | `/panda_hand_controller/gripper_cmd`，`control_msgs/action/ParallelGripperCommand` |
 | 规划组 / 基座 / 末端 | `panda_arm` / `panda_link0` / `panda_hand` |
 | 控制器反馈 | `/joint_states`，关节位置与速度；缺失速度不能确认停止 |
-| 实际夹持检测扩展入口 | `/grasp_detected`，需要持续发布，500 ms 后过期 |
+| 仿真夹持证据 | `/panda/grasp_contact_stamped` (`robot_interfaces/GraspContact` schema v2)，区分双指、单指、无接触与未知；旧 `/panda/grasp_contact` Bool 仅供诊断，不可用于释放验收 |
 | Panda 单指位置换算 | 开口宽度 = 单指关节位移 × 2 |
 | 速度 / 加速度缩放 | 0.2 / 0.2 |
 | 单技能 / 停止确认超时 | 30 s / 5 s |

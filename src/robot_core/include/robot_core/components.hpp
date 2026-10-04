@@ -13,8 +13,21 @@ class ObjectLocator : public Component {
 class ManipulationObserver : public Component {
  public:
   std::string interface_id() const final { return "manipulation_observer"; }
+  unsigned interface_version() const override { return 2; }
   virtual std::optional<OutcomeEvidence> grasp(const std::string& object, Time now) = 0;
   virtual std::optional<OutcomeEvidence> placement(const std::string& object, const std::string& target, Time now) = 0;
+};
+struct PlanningSceneSnapshot {
+  bool valid{false}, ready{false}, request_in_flight{false}, cleanup_pending{false};
+  uint64_t epoch{0}, sequence{0}, desired_version{0}, confirmed_version{0};
+  std::string desired_attached_object, confirmed_attached_object;
+  Time received_at{};  // monotonic receipt time, not simulator/source time
+};
+// A skill checks the exact current scene state before each dependent motion.
+class PlanningSceneGate : public Component {
+ public:
+  std::string interface_id() const final { return "planning_scene_gate"; }
+  virtual PlanningSceneSnapshot snapshot() const = 0;
 };
 struct CartesianTarget {
   std::string id;
@@ -59,14 +72,14 @@ struct GripperFeedback {
   Time stamp{};
   bool valid{false};
   bool stopped{false};
-  bool grasp_detected{false};
+  ContactState contact_state{ContactState::unknown};
   uint64_t sample_id{0};  // producer sample identity, unchanged for cached ROS messages
   uint64_t source_time_ns{0}, epoch{0};
 };
 class Gripper : public Component {
  public:
   std::string interface_id() const final { return "gripper"; }
-  unsigned interface_version() const final { return 2; }
+  unsigned interface_version() const override { return 3; }
   virtual void begin_grasp(const GraspCommand&) = 0;
   virtual void begin_release(double width_m) = 0;
   virtual Status poll(Time now) = 0;
@@ -78,6 +91,7 @@ struct ManipulationPolicy {
   PoseTolerance tolerance;
   std::chrono::milliseconds observation_max_age{2000};
   std::chrono::milliseconds feedback_max_age{500};
+  std::chrono::milliseconds scene_sync_timeout{5000};
   GraspCommand grasp{0.01, 20.0};
   double release_width_m{0.08};
   double gripper_tolerance_m{0.002};

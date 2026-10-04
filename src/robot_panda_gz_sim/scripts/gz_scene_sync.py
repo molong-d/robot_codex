@@ -2,6 +2,7 @@
 """Publish measured Gazebo contacts and mirror collision state into MoveIt."""
 
 import time
+import uuid
 from pathlib import Path
 import sys
 
@@ -21,7 +22,7 @@ from rclpy.clock import Clock, ClockType
 from rclpy.node import Node
 from rclpy.time import Time
 from rcl_interfaces.msg import SetParametersResult
-from robot_interfaces.msg import GraspContact
+from robot_interfaces.msg import GraspContact, PlanningSceneStatus
 from ros_gz_interfaces.msg import Contacts
 from shape_msgs.msg import SolidPrimitive
 from std_msgs.msg import Bool
@@ -31,6 +32,7 @@ from tf2_ros import Buffer, TransformListener
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scene_state import SceneReconciler
 from source_time import SourceTimeGuard
+from contact_semantics import ContactState, attachment_after_contact, classify_contacts
 
 
 def _stamp_ns(stamp):
@@ -143,6 +145,7 @@ class GazeboSceneSync(Node):
         self.declare_parameter("object_id", "workpiece")
         self.declare_parameter("hand_frame", "panda_hand")
         self.declare_parameter("evidence_max_age_ms", 500)
+        self.declare_parameter("scene_sync_timeout_ms", 5000)
         self.pose_topics = self.get_parameter("pose_topics").value
         self.object_id = self.get_parameter("object_id").value
         self.hand_frame = self.get_parameter("hand_frame").value
@@ -158,7 +161,12 @@ class GazeboSceneSync(Node):
         self.contact_count = 0
         self.contact_confirmed = None
         self.contact_sequence = 0
-        self.scene = SceneReconciler(response_timeout_s=5.0)
+        scene_sync_timeout_ms = self.get_parameter("scene_sync_timeout_ms").value
+        if scene_sync_timeout_ms <= 0:
+            raise ValueError("scene_sync_timeout_ms must be positive")
+        self.scene = SceneReconciler(response_timeout_s=scene_sync_timeout_ms / 1000.0)
+        self.scene_status_sequence = 0
+        self.scene_producer_id = uuid.uuid4().hex
         self.last_scene_request = 0.0
         self.started_monotonic = time.monotonic()
         self.fresh_inputs_reported = False
@@ -172,6 +180,7 @@ class GazeboSceneSync(Node):
             if self.get_parameter("publish_grasp_feedback").value else None)
         self.create_subscription(Contacts, self.get_parameter("contact_topic").value, self._on_contacts, 20)
         self.scene_ready_pub = self.create_publisher(Bool, "/panda_gz/scene_ready", 1)
+        self.scene_status_pub = self.create_publisher(PlanningSceneStatus, "/panda_gz/planning_scene_status", 10)
         self.scene_client = self.create_client(ApplyPlanningScene, "/apply_planning_scene")
         self.scene_query_client = self.create_client(GetPlanningScene, "/get_planning_scene")
         self.base_collision_matrix = None
@@ -198,9 +207,11 @@ class GazeboSceneSync(Node):
         self.contact_run = None
         self.contact_count = 0
         self.contact_confirmed = None
+        self.contact_source_ns = 0
+        self.contact_receipt_monotonic = 0.0
+        self.contact_epoch = epoch
+        self.contact_sequence = 0
         self.scene.reset()
-        if self.contact_pub is not None and self.feedback_enabled:
-            self.contact_pub.publish(Bool(data=False))
         self.get_logger().warning(f"Confirmed ROS simulation clock rewind; invalidated truth to epoch {self.epoch}")
 
     def _on_poses(self, message):
@@ -227,7 +238,7 @@ class GazeboSceneSync(Node):
                 (pose.position.x, pose.position.y, pose.position.z),
                 (previous[0].position.x, previous[0].position.y, previous[0].position.z)))
             self.poses[name] = (pose, source_ns, time.monotonic(), epoch, self.world_frame)
-            if moved and (name == "tray" or self.contact_confirmed is not True):
+            if moved and (name == "tray" or self.contact_confirmed != ContactState.BOTH):
                 self.scene.mark_dirty()
 
     def _on_contacts(self, message):
@@ -240,28 +251,28 @@ class GazeboSceneSync(Node):
                 self.get_logger().debug(f"discarding contact sample: {reason}")
             return
 
-        left = right = False
-        for contact in message.contacts:
-            names = (contact.collision1.name.lower(), contact.collision2.name.lower())
-            if not any(self.object_id in name for name in names):
-                continue
-            if any("leftfinger" in name for name in names):
-                left = True
-            if any("rightfinger" in name for name in names):
-                right = True
-        measured = left and right
+        measured = classify_contacts([
+            (contact.collision1.name, contact.collision2.name) for contact in message.contacts
+        ], self.object_id)
         if measured == self.contact_run:
             self.contact_count += 1
         else:
             self.contact_run = measured
             self.contact_count = 1
-        if self.contact_count >= 2 and self.contact_confirmed != measured:
-            self.contact_confirmed = measured
-            self.scene.set_desired(measured)
+        if self.contact_count >= 2:
+            if self.contact_confirmed != measured:
+                self.contact_confirmed = measured
+                # Partial/unknown contact must keep the prior attachment state;
+                # only dual contact attaches and only bilateral absence detaches.
+                self.scene.set_desired(attachment_after_contact(self.scene.desired_attached, measured))
+            self.contact_source_ns = stamp
+            self.contact_receipt_monotonic = time.monotonic()
+            self.contact_epoch = self.epoch
         # Republish only on advancing Gazebo sensor time. Steady receipt age in
         # the runtime makes this evidence expire while simulation is paused.
         if self.contact_count >= 2 and self.contact_pub is not None and self.feedback_enabled:
-            self.contact_pub.publish(Bool(data=measured))
+            # The legacy Bool remains diagnostic only; false is not proof of release.
+            self.contact_pub.publish(Bool(data=measured == ContactState.BOTH))
             stamped = GraspContact()
             stamped.source_stamp = message.header.stamp
             stamped.frame_id = self.world_frame
@@ -269,7 +280,8 @@ class GazeboSceneSync(Node):
             stamped.epoch = self.epoch
             self.contact_sequence += 1
             stamped.sequence = self.contact_sequence
-            stamped.detected = measured
+            stamped.schema_version = 2
+            stamped.state = int(measured)
             self.stamped_contact_pub.publish(stamped)
 
     def _world_collision(self, object_id, shapes):
@@ -282,6 +294,24 @@ class GazeboSceneSync(Node):
             message.primitive_poses.append(primitive_pose)
         message.operation = CollisionObject.ADD
         return message
+
+    def _publish_scene_status(self, fresh_inputs):
+        status = PlanningSceneStatus()
+        status.schema_version = 1
+        status.producer_id = self.scene_producer_id
+        status.source_clock_stamp = self.get_clock().now().to_msg()
+        self.scene_status_sequence += 1
+        status.sequence = self.scene_status_sequence
+        status.epoch = self.epoch
+        status.desired_version = self.scene.version
+        status.confirmed_version = self.scene.confirmed_version or 0
+        status.desired_attached_object = self.object_id if self.scene.desired_attached else ""
+        status.confirmed_attached_object = self.object_id if self.scene.confirmed_attached is True else ""
+        status.ready = bool(self.scene.ready and fresh_inputs and not self.scene.cleanup_pending)
+        status.request_in_flight = self.scene.in_flight is not None
+        status.cleanup_pending = self.scene.cleanup_pending
+        self.scene_status_pub.publish(status)
+        self.scene_ready_pub.publish(Bool(data=status.ready))
 
     def _fixed_pose(self, x, y, z):
         pose = Pose()
@@ -373,11 +403,18 @@ class GazeboSceneSync(Node):
     def _flush_scene(self):
         now = time.monotonic()
         if self.scene.check_timeout(now):
-            self.get_logger().error("MoveIt scene response exceeded 5.0 s; scene remains unsynchronized")
-        fresh_inputs = self.scene.cleanup_pending or all(
+            self.get_logger().error(
+                f"MoveIt scene response exceeded {self.get_parameter('scene_sync_timeout_ms').value} ms; scene remains unsynchronized")
+        contact_fresh = (self.contact_confirmed is not None and self.contact_epoch == self.epoch and
+                         self.contact_source_ns > 0 and
+                         now - self.contact_receipt_monotonic <=
+                         self.get_parameter("evidence_max_age_ms").value / 1000.0)
+        contact_matches_desired = ((self.scene.desired_attached and self.contact_confirmed == ContactState.BOTH) or
+                                   (not self.scene.desired_attached and self.contact_confirmed == ContactState.NONE))
+        fresh_inputs = self.scene.cleanup_pending or (contact_fresh and contact_matches_desired and all(
             name in self.poses and now - self.poses[name][2] <= 0.5 and
             self.poses[name][3] == self.epoch and self.poses[name][4] == self.world_frame
-            for name in (self.object_id, "tray"))
+            for name in (self.object_id, "tray")))
         if fresh_inputs and not self.fresh_inputs_reported:
             self.fresh_inputs_reported = True
             self.get_logger().info(
@@ -406,7 +443,7 @@ class GazeboSceneSync(Node):
                   now - self.started_monotonic > 2.0 and not self.scene_service_wait_reported):
                 self.scene_service_wait_reported = True
                 self.get_logger().warning("Waiting for MoveIt /get_planning_scene service")
-            self.scene_ready_pub.publish(Bool(data=False))
+            self._publish_scene_status(False)
             return
         if (not service_ready and now - self.started_monotonic > 2.0 and
                 not self.scene_service_wait_reported):
@@ -416,7 +453,7 @@ class GazeboSceneSync(Node):
         if service_ready and now - self.last_scene_request >= 0.1:
             request = self.scene.submit(now, fresh_inputs)
         if request is None:
-            self.scene_ready_pub.publish(Bool(data=bool(self.scene.ready and fresh_inputs)))
+            self._publish_scene_status(fresh_inputs)
             return
         scene = self._planning_scene(request)
         if scene is None:
@@ -424,7 +461,7 @@ class GazeboSceneSync(Node):
             self.get_logger().warning(
                 f"Could not build MoveIt scene request {request.request_id} "
                 f"(attached={request.attached}, cleanup={request.cleanup}, epoch={request.epoch})")
-            self.scene_ready_pub.publish(Bool(data=False))
+            self._publish_scene_status(False)
             return
         request = ApplyPlanningScene.Request()
         request.scene = scene
@@ -439,7 +476,7 @@ class GazeboSceneSync(Node):
         except Exception as error:
             self.scene.complete(submitted, False)
             self.get_logger().error(f"MoveIt scene request could not be sent: {error}")
-            self.scene_ready_pub.publish(Bool(data=False))
+            self._publish_scene_status(False)
             return
 
         def complete(done):
@@ -457,9 +494,10 @@ class GazeboSceneSync(Node):
             except Exception as error:  # service shutdown or transport failure
                 self.scene.complete(submitted, False)
                 self.get_logger().error(f"MoveIt scene update failed: {error}")
-            self.scene_ready_pub.publish(Bool(data=bool(self.scene.ready and not self.scene.cleanup_pending)))
+            self._publish_scene_status(fresh_inputs)
 
         future.add_done_callback(complete)
+        self._publish_scene_status(False)  # submitted is not applied/confirmed
 
 
 def main(args=None):
