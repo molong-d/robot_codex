@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 import sys
 
+import copy
 import rclpy
 from geometry_msgs.msg import Pose, Quaternion
 from moveit_msgs.msg import (
@@ -13,8 +14,9 @@ from moveit_msgs.msg import (
     AttachedCollisionObject,
     CollisionObject,
     PlanningScene,
+    PlanningSceneComponents,
 )
-from moveit_msgs.srv import ApplyPlanningScene
+from moveit_msgs.srv import ApplyPlanningScene, GetPlanningScene
 from rclpy.clock import Clock, ClockType
 from rclpy.node import Node
 from rclpy.time import Time
@@ -102,15 +104,28 @@ def _box(size, pose):
     return primitive, pose
 
 
-def _allow_collision_pair(scene, first, second):
-    """Permit known support contact while retaining all other collision checks."""
-    matrix = AllowedCollisionMatrix()
-    matrix.entry_names = [first, second]
-    matrix.entry_values = [
-        AllowedCollisionEntry(enabled=[True, True]),
-        AllowedCollisionEntry(enabled=[True, True]),
-    ]
-    scene.allowed_collision_matrix = matrix
+def _collision_matrix_with_allowed_pair(source, first, second):
+    """Preserve MoveIt's configured matrix while allowing a support pair."""
+    matrix = copy.deepcopy(source)
+    names = list(matrix.entry_names)
+    old_size = len(names)
+    old_rows = [list(entry.enabled) for entry in matrix.entry_values]
+    if len(old_rows) != old_size or any(len(row) != old_size for row in old_rows):
+        raise ValueError("MoveIt returned a malformed allowed collision matrix")
+    for name in (first, second):
+        if name not in names:
+            names.append(name)
+    size = len(names)
+    rows = [[i == j for j in range(size)] for i in range(size)]
+    for i, row in enumerate(old_rows):
+        for j, allowed in enumerate(row):
+            rows[i][j] = allowed
+    first_index, second_index = names.index(first), names.index(second)
+    rows[first_index][second_index] = True
+    rows[second_index][first_index] = True
+    matrix.entry_names = names
+    matrix.entry_values = [AllowedCollisionEntry(enabled=row) for row in rows]
+    return matrix
 
 
 class GazeboSceneSync(Node):
@@ -156,6 +171,9 @@ class GazeboSceneSync(Node):
         self.create_subscription(Contacts, self.get_parameter("contact_topic").value, self._on_contacts, 20)
         self.scene_ready_pub = self.create_publisher(Bool, "/panda_gz/scene_ready", 1)
         self.scene_client = self.create_client(ApplyPlanningScene, "/apply_planning_scene")
+        self.scene_query_client = self.create_client(GetPlanningScene, "/get_planning_scene")
+        self.base_collision_matrix = None
+        self.collision_matrix_future = None
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.timer = self.create_timer(0.05, self._flush_scene,
@@ -291,7 +309,10 @@ class GazeboSceneSync(Node):
         scene = PlanningScene()
         scene.is_diff = True
         scene.robot_state.is_diff = True
-        _allow_collision_pair(scene, "sim_table", self.object_id)
+        if self.base_collision_matrix is None:
+            return None
+        scene.allowed_collision_matrix = _collision_matrix_with_allowed_pair(
+            self.base_collision_matrix, "sim_table", self.object_id)
         table_pose = self._fixed_pose(0.58, 0.0, 0.325)
         scene.world.collision_objects.append(self._world_collision("sim_table", [((0.90, 0.80, 0.05), table_pose)]))
 
@@ -357,6 +378,30 @@ class GazeboSceneSync(Node):
                 f"Fresh Gazebo poses ready for scene sync: object={self.object_id}, "
                 f"tray=tray, epoch={self.epoch}, frame={self.world_frame}")
         service_ready = self.scene_client.service_is_ready()
+        if self.base_collision_matrix is None:
+            if self.scene_query_client.service_is_ready() and self.collision_matrix_future is None:
+                request = GetPlanningScene.Request()
+                request.components.components = PlanningSceneComponents.ALLOWED_COLLISION_MATRIX
+                self.collision_matrix_future = self.scene_query_client.call_async(request)
+
+                def capture_matrix(done):
+                    self.collision_matrix_future = None
+                    try:
+                        response = done.result()
+                        self.base_collision_matrix = response.scene.allowed_collision_matrix
+                        self.get_logger().info(
+                            "Captured MoveIt allowed-collision matrix "
+                            f"({len(self.base_collision_matrix.entry_names)} entries)")
+                    except Exception as error:
+                        self.get_logger().error(f"Could not read MoveIt collision matrix: {error}")
+
+                self.collision_matrix_future.add_done_callback(capture_matrix)
+            elif (not self.scene_query_client.service_is_ready() and
+                  now - self.started_monotonic > 2.0 and not self.scene_service_wait_reported):
+                self.scene_service_wait_reported = True
+                self.get_logger().warning("Waiting for MoveIt /get_planning_scene service")
+            self.scene_ready_pub.publish(Bool(data=False))
+            return
         if (not service_ready and now - self.started_monotonic > 2.0 and
                 not self.scene_service_wait_reported):
             self.scene_service_wait_reported = True

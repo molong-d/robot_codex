@@ -15,13 +15,22 @@ from source_time import SourceTimeGuard
 
 class SourceTimestampTests(unittest.TestCase):
     def test_support_contact_collision_matrix_is_explicit(self):
-        from moveit_msgs.msg import PlanningScene
+        from moveit_msgs.msg import AllowedCollisionEntry, AllowedCollisionMatrix
 
-        scene = PlanningScene()
-        module._allow_collision_pair(scene, "sim_table", "workpiece")
-        matrix = scene.allowed_collision_matrix
-        self.assertEqual(matrix.entry_names, ["sim_table", "workpiece"])
-        self.assertEqual([entry.enabled for entry in matrix.entry_values], [[True, True], [True, True]])
+        source = AllowedCollisionMatrix()
+        source.entry_names = ["panda_link0", "panda_link1"]
+        source.entry_values = [AllowedCollisionEntry(enabled=[True, False]),
+                              AllowedCollisionEntry(enabled=[False, True])]
+        source.default_entry_names = ["panda_link0"]
+        source.default_entry_values = [False]
+        matrix = module._collision_matrix_with_allowed_pair(source, "sim_table", "workpiece")
+        self.assertEqual(matrix.entry_names, ["panda_link0", "panda_link1", "sim_table", "workpiece"])
+        self.assertFalse(matrix.entry_values[0].enabled[1], "existing self-collision policy was overwritten")
+        self.assertFalse(matrix.entry_values[1].enabled[0], "existing matrix symmetry was overwritten")
+        self.assertTrue(matrix.entry_values[2].enabled[3])
+        self.assertTrue(matrix.entry_values[3].enabled[2])
+        self.assertEqual(matrix.default_entry_names, ["panda_link0"])
+        self.assertEqual(matrix.default_entry_values, [False])
 
     def test_current_sample_is_fresh(self):
         self.assertTrue(module._fresh_source_stamp(1_000_000_000, 1_000_000_000))
