@@ -1,0 +1,588 @@
+{
+  "action_endpoints": [
+    "/panda_arm_controller/follow_joint_trajectory [control_msgs/action/FollowJointTrajectory]",
+    "/panda_hand_controller/gripper_cmd [control_msgs/action/ParallelGripperCommand]"
+  ],
+  "arm_state": {
+    "hand_tf": null,
+    "joint_state": {
+      "names": [
+        "panda_finger_joint1",
+        "panda_finger_joint2",
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "positions": [
+        0.02600000000000671,
+        0.026000000000006053,
+        -0.13642276000110684,
+        0.2479190295833511,
+        -0.1861113612563768,
+        -1.337409725804855,
+        0.055222770000786445,
+        1.5919975401569937,
+        0.4584027596522766
+      ],
+      "stamp_ns": 25400000000,
+      "velocities": [
+        1.6541672545611341e-15,
+        1.6813807290905203e-15,
+        -3.9188744653875784e-10,
+        1.2412597200084363e-09,
+        -2.6932280277475185e-10,
+        2.320347384718313e-08,
+        -6.606063558591696e-11,
+        -2.0814682245157146e-08,
+        7.498365214332614e-10
+      ]
+    }
+  },
+  "cancel_accepted": null,
+  "cancel_requested": false,
+  "cancel_to_result_s": null,
+  "contact_state": {
+    "contacts": [
+      [
+        "workpiece::link::collision",
+        "tray::link::tray_floor"
+      ]
+    ],
+    "grasp_feedback": false,
+    "grasp_feedback_messages": 22098,
+    "messages": 22110,
+    "seen": [
+      [
+        "workpiece::link::collision",
+        "panda::panda_leftfinger::panda_leftfinger_collision"
+      ],
+      [
+        "workpiece::link::collision",
+        "panda::panda_rightfinger::panda_rightfinger_collision"
+      ],
+      [
+        "workpiece::link::collision",
+        "table::link::top_collision"
+      ],
+      [
+        "workpiece::link::collision",
+        "tray::link::tray_floor"
+      ]
+    ],
+    "stamp_ns": 25399000000,
+    "stamped_grasp_detected": false,
+    "stamped_grasp_messages": 22098,
+    "stamped_grasp_source_ns": 25399000000,
+    "table_collisions": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ],
+    "table_messages": 12296,
+    "table_seen": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ]
+  },
+  "error_code": "",
+  "finger_joint_extrema_rad": {
+    "panda_finger_joint1": [
+      1.1297457301305139e-07,
+      0.02600000000000671
+    ],
+    "panda_finger_joint2": [
+      1.2920936142767277e-07,
+      0.026000000000006053
+    ]
+  },
+  "gazebo_topics": [
+    "/panda_gz/tray/pose",
+    "/panda_gz/workpiece/pose",
+    "/world/panda_pick_place/model/table/link/link/sensor/table_contact/contact",
+    "/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact"
+  ],
+  "goal_status": 4,
+  "grasp_feedback_enabled": true,
+  "injected_grasp_miss_x_m": null,
+  "injected_placement_offset_y_m": null,
+  "launch_log": "docs/reports/phase2-trials/trial-115.log",
+  "message": "Gazebo object-state and contact evidence verified over the configured window",
+  "object_offset_xy_m": [
+    0.0,
+    0.0
+  ],
+  "pause_control": [],
+  "pose_samples": {
+    "tray": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 25398000000,
+      "xyz": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    "workpiece": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 25398000000,
+      "xyz": [
+        0.6057077580328669,
+        -0.18016865463345763,
+        0.3709999428703944
+      ]
+    }
+  },
+  "post_result_hand_tf": {
+    "quaternion_xyzw": [
+      0.9999624020287453,
+      0.004699287832404407,
+      0.00666935737732898,
+      -0.002937838481567855
+    ],
+    "stamp_ns": 25400000000,
+    "xyz": [
+      0.6044076933252143,
+      -0.17977007372190337,
+      0.5918177206338389
+    ]
+  },
+  "reset_control": null,
+  "seed": 115,
+  "status": "succeeded",
+  "success": true,
+  "task_elapsed_wall_s": 16.060478929000965,
+  "task_feedback": {
+    "active_skill": "verify_placement",
+    "history": [
+      {
+        "active_skill": "pick_object",
+        "message": "opening and verifying the empty gripper before approach",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=419; width_m=0.050627",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=421; width_m=0.050887",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=423; width_m=0.051099",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=425; width_m=0.051270",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=427; width_m=0.051409",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=429; width_m=0.051521",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=431; width_m=0.051612",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=433; width_m=0.051686",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=435; width_m=0.051745",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=437; width_m=0.051794",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "gripper open; arm approach started",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "approach complete; moving to manipulation pose",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "grasp started",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=1; sample_id=991; width_m=0.039169",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "grasp confirmed; lifting object",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_grasp",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "arm motion started; calibration=panda_gz_truth_v1; source_frame=world; tool=panda_hand",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "approach complete; moving to manipulation pose",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "release started",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1680; width_m=0.050711",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1682; width_m=0.050956",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1684; width_m=0.051154",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1686; width_m=0.051315",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1688; width_m=0.051445",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1690; width_m=0.051551",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1692; width_m=0.051636",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1694; width_m=0.051705",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1696; width_m=0.051761",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=1698; width_m=0.051807",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "release confirmed; retreating",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "place_object",
+        "message": "awaiting fresh stationary arm feedback",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "collecting distinct post-effect verification samples",
+        "status": "running"
+      },
+      {
+        "active_skill": "verify_placement",
+        "message": "awaiting a distinct verification sample",
+        "status": "running"
+      }
+    ],
+    "message": "awaiting a distinct verification sample",
+    "status": "running"
+  }
+}

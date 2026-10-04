@@ -1,0 +1,235 @@
+{
+  "action_endpoints": [
+    "/execute_plan [robot_interfaces/action/ExecutePlan]",
+    "/execute_task [robot_interfaces/action/ExecuteTask]",
+    "/execute_trajectory [moveit_msgs/action/ExecuteTrajectory]",
+    "/move_action [moveit_msgs/action/MoveGroup]",
+    "/panda_arm_controller/follow_joint_trajectory [control_msgs/action/FollowJointTrajectory]",
+    "/panda_hand_controller/gripper_cmd [control_msgs/action/ParallelGripperCommand]"
+  ],
+  "arm_state": {
+    "hand_tf": null,
+    "joint_state": {
+      "names": [
+        "panda_finger_joint1",
+        "panda_finger_joint2",
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "positions": [
+        0.025999999999605658,
+        0.025999999999559476,
+        0.007186600216894835,
+        -0.6602940710944138,
+        0.023663308934768174,
+        -2.2977532064676636,
+        0.012812180319544605,
+        1.6393791017115475,
+        0.8144678602233908
+      ],
+      "stamp_ns": 11860000000,
+      "velocities": [
+        4.360116055094482e-12,
+        4.667152054367227e-12,
+        -2.272304471492067e-07,
+        -4.781299602346981e-06,
+        -7.482013892830307e-07,
+        -1.8416838084220344e-06,
+        -4.0510358078520506e-07,
+        -2.463876393632436e-06,
+        -9.317333534163727e-07
+      ]
+    }
+  },
+  "cancel_accepted": true,
+  "cancel_requested": true,
+  "cancel_to_result_s": 0.8853391020020354,
+  "contact_state": {
+    "contacts": [
+      [
+        "workpiece::link::collision",
+        "table::link::top_collision"
+      ]
+    ],
+    "grasp_feedback": false,
+    "grasp_feedback_messages": 8934,
+    "messages": 8938,
+    "seen": [
+      [
+        "workpiece::link::collision",
+        "table::link::top_collision"
+      ]
+    ],
+    "stamp_ns": 11865000000,
+    "stamped_grasp_detected": false,
+    "stamped_grasp_messages": 8934,
+    "stamped_grasp_source_ns": 11864000000,
+    "table_collisions": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ],
+    "table_messages": 8937,
+    "table_seen": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ]
+  },
+  "error_code": "CANCELED",
+  "finger_joint_extrema_rad": {
+    "panda_finger_joint1": [
+      1.1297457064037573e-07,
+      0.025999999999605658
+    ],
+    "panda_finger_joint2": [
+      1.272366414775878e-07,
+      0.025999999999559476
+    ]
+  },
+  "gazebo_topics": [
+    "/panda_gz/tray/pose",
+    "/panda_gz/workpiece/pose",
+    "/world/panda_pick_place/model/table/link/link/sensor/table_contact/contact",
+    "/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact"
+  ],
+  "goal_status": 5,
+  "grasp_feedback_enabled": true,
+  "injected_grasp_miss_x_m": null,
+  "injected_placement_offset_y_m": null,
+  "launch_log": "docs/reports/phase2-gazebo-cancel-45.log",
+  "message": "all active actions confirmed stopped by measured feedback",
+  "object_offset_xy_m": [
+    0.0,
+    0.0
+  ],
+  "pause_control": [],
+  "pose_samples": {
+    "tray": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 11832000000,
+      "xyz": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    "workpiece": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 11832000000,
+      "xyz": [
+        0.44,
+        0.05,
+        0.3699999998283326
+      ]
+    }
+  },
+  "post_result_hand_tf": {
+    "quaternion_xyzw": [
+      0.9999971789509714,
+      -0.002022921499913752,
+      0.0009186908749806126,
+      0.0008401700900918162
+    ],
+    "stamp_ns": 11850000000,
+    "xyz": [
+      0.34797973757677314,
+      0.013927587551451594,
+      0.5830041632067632
+    ]
+  },
+  "reset_control": null,
+  "seed": 45,
+  "status": "canceled",
+  "success": false,
+  "task_elapsed_wall_s": 2.385429677000502,
+  "task_feedback": {
+    "active_skill": "pick_object",
+    "history": [
+      {
+        "active_skill": "pick_object",
+        "message": "opening and verifying the empty gripper before approach",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=432; width_m=0.050627",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=434; width_m=0.050887",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=436; width_m=0.051099",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=438; width_m=0.051270",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=440; width_m=0.051409",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=442; width_m=0.051521",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=444; width_m=0.051612",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=446; width_m=0.051686",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=448; width_m=0.051745",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=1; stopped=0; sample_id=450; width_m=0.051794",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "gripper open; arm approach started",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting component completion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting stop confirmation",
+        "status": "canceling"
+      }
+    ],
+    "message": "awaiting stop confirmation",
+    "status": "canceling"
+  }
+}

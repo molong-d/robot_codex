@@ -1,0 +1,912 @@
+{
+  "action_endpoints": [
+    "/execute_trajectory [moveit_msgs/action/ExecuteTrajectory]",
+    "/move_action [moveit_msgs/action/MoveGroup]",
+    "/panda_arm_controller/follow_joint_trajectory [control_msgs/action/FollowJointTrajectory]"
+  ],
+  "arm_state": {
+    "hand_tf": null,
+    "joint_state": {
+      "names": [
+        "panda_finger_joint1",
+        "panda_finger_joint2",
+        "panda_joint1",
+        "panda_joint2",
+        "panda_joint3",
+        "panda_joint4",
+        "panda_joint5",
+        "panda_joint6",
+        "panda_joint7"
+      ],
+      "positions": [
+        1.2552729768600452e-07,
+        1.3659919333146112e-07,
+        1.1876080942774377e-18,
+        -0.7849999999995498,
+        1.1888759862253869e-13,
+        -2.3560000000054964,
+        -1.7405234791741021e-12,
+        1.5709999999934396,
+        0.785000000000005
+      ],
+      "stamp_ns": 20510000000,
+      "velocities": [
+        1.328147661294743e-18,
+        -7.05191054245274e-07,
+        -4.889751797909625e-17,
+        4.943614961838705e-14,
+        -2.878556767949014e-17,
+        1.881619859922523e-13,
+        -1.9992688060632702e-16,
+        -9.53195855579736e-14,
+        -5.059104177251861e-14
+      ]
+    }
+  },
+  "cancel_accepted": null,
+  "cancel_requested": false,
+  "cancel_to_result_s": null,
+  "contact_state": {
+    "contacts": [
+      [
+        "workpiece::link::collision",
+        "table::link::top_collision"
+      ]
+    ],
+    "grasp_feedback": null,
+    "grasp_feedback_messages": 0,
+    "messages": 17589,
+    "seen": [
+      [
+        "workpiece::link::collision",
+        "table::link::top_collision"
+      ]
+    ],
+    "stamp_ns": 20513000000,
+    "stamped_grasp_detected": null,
+    "stamped_grasp_messages": 0,
+    "stamped_grasp_source_ns": 0,
+    "table_collisions": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ],
+    "table_messages": 17586,
+    "table_seen": [
+      [
+        "table::link::top_collision",
+        "workpiece::link::collision"
+      ]
+    ]
+  },
+  "error_code": "STOP_UNCONFIRMED",
+  "finger_joint_extrema_rad": {
+    "panda_finger_joint1": [
+      1.1297456814307106e-07,
+      1.2552731277375407e-07
+    ],
+    "panda_finger_joint2": [
+      1.2586844665914492e-07,
+      1.4112874462380857e-07
+    ]
+  },
+  "gazebo_topics": [
+    "/panda_gz/tray/pose",
+    "/panda_gz/workpiece/pose",
+    "/world/panda_pick_place/model/table/link/link/sensor/table_contact/contact",
+    "/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact"
+  ],
+  "goal_status": 6,
+  "grasp_feedback_enabled": false,
+  "injected_grasp_miss_x_m": null,
+  "injected_placement_offset_y_m": null,
+  "launch_log": "docs/reports/phase2-gazebo-feedback-loss-47.log",
+  "message": "stop deadline exceeded; control remains reserved",
+  "object_offset_xy_m": [
+    0.0,
+    0.0
+  ],
+  "pause_control": [],
+  "pose_samples": {
+    "tray": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 20502000000,
+      "xyz": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    "workpiece": {
+      "parent": "panda_pick_place",
+      "stamp_ns": 20502000000,
+      "xyz": [
+        0.44,
+        0.05,
+        0.3699999998283326
+      ]
+    }
+  },
+  "post_result_hand_tf": {
+    "quaternion_xyzw": [
+      0.9999999801832394,
+      0.00019908169376364783,
+      -6.254330386923357e-12,
+      4.374500761628041e-12
+    ],
+    "stamp_ns": 20470000000,
+    "xyz": [
+      0.3070195700508894,
+      -5.360003874222749e-12,
+      0.5902695582733344
+    ]
+  },
+  "reset_control": null,
+  "seed": 47,
+  "status": "faulted",
+  "success": false,
+  "task_elapsed_wall_s": 8.525848433993815,
+  "task_feedback": {
+    "active_skill": "pick_object",
+    "history": [
+      {
+        "active_skill": "pick_object",
+        "message": "waiting for gripper to stop before arm motion",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=352; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=354; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=356; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=358; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=360; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=362; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=364; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=366; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=368; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=370; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=372; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=374; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=376; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=378; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=380; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=382; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=384; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=386; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=388; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=390; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=392; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=394; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=396; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=398; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=400; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=402; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=404; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=406; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=408; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=410; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=412; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=414; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=416; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=418; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=420; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=422; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=424; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=426; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=428; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=430; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=432; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=434; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=436; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=438; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=440; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=442; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=444; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=446; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=448; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=450; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=452; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=454; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=456; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=458; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=460; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=462; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=464; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=466; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=468; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=470; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=472; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=474; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=476; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=478; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=480; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=482; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=484; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=486; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=488; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=490; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=492; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=494; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=496; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=498; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=500; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=502; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=504; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=506; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=508; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=510; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=512; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=514; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=516; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=518; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=520; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=522; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=524; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=526; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=528; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=530; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=532; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=534; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=536; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=538; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=540; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=542; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=544; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=546; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=548; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=550; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=552; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=554; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=556; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=558; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=560; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=562; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=564; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=566; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=568; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=570; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=572; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=574; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=576; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=578; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=580; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=582; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=584; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=586; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=588; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=590; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=592; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=594; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=596; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=598; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=600; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=602; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=604; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=606; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=608; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=610; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=612; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=614; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=616; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=618; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=620; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=622; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=624; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=626; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=628; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=630; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=632; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=634; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=636; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=638; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=640; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=642; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=644; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=646; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting fresh stationary gripper feedback: valid=0; stopped=1; sample_id=648; width_m=0.000000",
+        "status": "running"
+      },
+      {
+        "active_skill": "pick_object",
+        "message": "awaiting stop confirmation",
+        "status": "canceling"
+      }
+    ],
+    "message": "awaiting stop confirmation",
+    "status": "canceling"
+  }
+}
