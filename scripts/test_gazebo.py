@@ -20,6 +20,7 @@ import rclpy
 from rclpy.action import ActionClient
 from rclpy.context import Context
 from rclpy.executors import SingleThreadedExecutor
+from rclpy.parameter import Parameter
 from rclpy.time import Time
 from robot_interfaces.action import ExecuteTask
 from robot_interfaces.msg import GraspContact
@@ -174,7 +175,11 @@ def main():
     reset_result = None
     try:
         rclpy.init(context=context)
-        node = rclpy.create_node("gazebo_pick_place_test", context=context)
+        # Sensor source stamps are Gazebo /clock time. Keep ROS time for source
+        # ordering/age checks and use time.monotonic_ns() only for receipt age,
+        # cancellation and process-stop deadlines.
+        node = rclpy.create_node("gazebo_pick_place_test", context=context,
+                                 parameter_overrides=[Parameter("use_sim_time", value=True)])
         executor = SingleThreadedExecutor(context=context)
         executor.add_node(node)
         tf_buffer = Buffer(node=node)
