@@ -24,10 +24,11 @@ class SourceTimestampTests(unittest.TestCase):
         source.default_entry_names = ["panda_link0"]
         source.default_entry_values = [False]
         matrix = module._collision_matrix_with_allowed_pairs(
-            source, (("sim_table", "workpiece"), ("workpiece", "panda_leftfinger"),
+            source, (("sim_table", "workpiece"), ("sim_tray", "workpiece"),
+                    ("workpiece", "panda_leftfinger"),
                     ("workpiece", "panda_rightfinger")))
         self.assertEqual(matrix.entry_names, ["panda_link0", "panda_link1", "sim_table", "workpiece",
-                                              "panda_leftfinger", "panda_rightfinger"])
+                                              "sim_tray", "panda_leftfinger", "panda_rightfinger"])
         self.assertFalse(matrix.entry_values[0].enabled[1], "existing self-collision policy was overwritten")
         self.assertFalse(matrix.entry_values[1].enabled[0], "existing matrix symmetry was overwritten")
         self.assertTrue(matrix.entry_values[2].enabled[3])
@@ -36,6 +37,8 @@ class SourceTimestampTests(unittest.TestCase):
         self.assertTrue(matrix.entry_values[4].enabled[3])
         self.assertTrue(matrix.entry_values[3].enabled[5])
         self.assertTrue(matrix.entry_values[5].enabled[3])
+        self.assertTrue(matrix.entry_values[3].enabled[6])
+        self.assertTrue(matrix.entry_values[6].enabled[3])
         self.assertEqual(matrix.default_entry_names, ["panda_link0"])
         self.assertEqual(matrix.default_entry_values, [False])
 

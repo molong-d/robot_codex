@@ -316,6 +316,7 @@ class GazeboSceneSync(Node):
         scene.allowed_collision_matrix = _collision_matrix_with_allowed_pairs(
             self.base_collision_matrix,
             (("sim_table", self.object_id),
+             ("sim_tray", self.object_id),
              (self.object_id, "panda_leftfinger"),
              (self.object_id, "panda_rightfinger")))
         table_pose = self._fixed_pose(0.58, 0.0, 0.325)
