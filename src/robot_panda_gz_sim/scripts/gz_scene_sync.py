@@ -104,25 +104,27 @@ def _box(size, pose):
     return primitive, pose
 
 
-def _collision_matrix_with_allowed_pair(source, first, second):
-    """Preserve MoveIt's configured matrix while allowing a support pair."""
+def _collision_matrix_with_allowed_pairs(source, pairs):
+    """Preserve MoveIt's configured matrix while adding intentional contacts."""
     matrix = copy.deepcopy(source)
     names = list(matrix.entry_names)
     old_size = len(names)
     old_rows = [list(entry.enabled) for entry in matrix.entry_values]
     if len(old_rows) != old_size or any(len(row) != old_size for row in old_rows):
         raise ValueError("MoveIt returned a malformed allowed collision matrix")
-    for name in (first, second):
-        if name not in names:
-            names.append(name)
+    for first, second in pairs:
+        for name in (first, second):
+            if name not in names:
+                names.append(name)
     size = len(names)
     rows = [[i == j for j in range(size)] for i in range(size)]
     for i, row in enumerate(old_rows):
         for j, allowed in enumerate(row):
             rows[i][j] = allowed
-    first_index, second_index = names.index(first), names.index(second)
-    rows[first_index][second_index] = True
-    rows[second_index][first_index] = True
+    for first, second in pairs:
+        first_index, second_index = names.index(first), names.index(second)
+        rows[first_index][second_index] = True
+        rows[second_index][first_index] = True
     matrix.entry_names = names
     matrix.entry_values = [AllowedCollisionEntry(enabled=row) for row in rows]
     return matrix
@@ -311,8 +313,11 @@ class GazeboSceneSync(Node):
         scene.robot_state.is_diff = True
         if self.base_collision_matrix is None:
             return None
-        scene.allowed_collision_matrix = _collision_matrix_with_allowed_pair(
-            self.base_collision_matrix, "sim_table", self.object_id)
+        scene.allowed_collision_matrix = _collision_matrix_with_allowed_pairs(
+            self.base_collision_matrix,
+            (("sim_table", self.object_id),
+             (self.object_id, "panda_leftfinger"),
+             (self.object_id, "panda_rightfinger")))
         table_pose = self._fixed_pose(0.58, 0.0, 0.325)
         scene.world.collision_objects.append(self._world_collision("sim_table", [((0.90, 0.80, 0.05), table_pose)]))
 
