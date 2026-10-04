@@ -26,6 +26,9 @@ def validate_case(name, expectation, trial, result):
         "result_present": trial["result_present"],
         "run_identity_matches": all(trial["identity_checks"].values()),
     }
+    if "expected_object_offset_xy_m" in expectation:
+        checks["initial_pose_perturbation_applied"] = (
+            result.get("object_offset_xy_m") == expectation["expected_object_offset_xy_m"])
     if "expected_status" in expectation:
         checks["expected_status"] = result.get("status") == expectation["expected_status"]
     if "forbidden_status" in expectation:

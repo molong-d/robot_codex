@@ -7,6 +7,15 @@
     "requires_physical_audit_success": true,
     "requires_safe_terminal_resources": true
   },
+  "initial_pose_perturbation": {
+    "seed": 708,
+    "args": ["--object-dx", "0.01", "--object-dy", "-0.01"],
+    "expected_object_offset_xy_m": [0.01, -0.01],
+    "expected_status": "succeeded",
+    "expected_error_code": "",
+    "requires_physical_audit_success": true,
+    "requires_safe_terminal_resources": true
+  },
   "placement_verification_reject": {
     "seed": 701,
     "args": ["--placement-offset-y", "0.055"],
