@@ -7,7 +7,13 @@ import sys
 
 import rclpy
 from geometry_msgs.msg import Pose, Quaternion
-from moveit_msgs.msg import AttachedCollisionObject, CollisionObject, PlanningScene
+from moveit_msgs.msg import (
+    AllowedCollisionEntry,
+    AllowedCollisionMatrix,
+    AttachedCollisionObject,
+    CollisionObject,
+    PlanningScene,
+)
 from moveit_msgs.srv import ApplyPlanningScene
 from rclpy.clock import Clock, ClockType
 from rclpy.node import Node
@@ -94,6 +100,17 @@ def _box(size, pose):
     primitive.type = SolidPrimitive.BOX
     primitive.dimensions = list(size)
     return primitive, pose
+
+
+def _allow_collision_pair(scene, first, second):
+    """Permit known support contact while retaining all other collision checks."""
+    matrix = AllowedCollisionMatrix()
+    matrix.entry_names = [first, second]
+    matrix.entry_values = [
+        AllowedCollisionEntry(enabled=[True, True]),
+        AllowedCollisionEntry(enabled=[True, True]),
+    ]
+    scene.allowed_collision_matrix = matrix
 
 
 class GazeboSceneSync(Node):
@@ -274,6 +291,7 @@ class GazeboSceneSync(Node):
         scene = PlanningScene()
         scene.is_diff = True
         scene.robot_state.is_diff = True
+        _allow_collision_pair(scene, "sim_table", self.object_id)
         table_pose = self._fixed_pose(0.58, 0.0, 0.325)
         scene.world.collision_objects.append(self._world_collision("sim_table", [((0.90, 0.80, 0.05), table_pose)]))
 
@@ -311,10 +329,9 @@ class GazeboSceneSync(Node):
             attached.object.primitive_poses = [pose]
             attached.object.operation = CollisionObject.ADD
             attached.touch_links = [self.hand_frame, "panda_leftfinger", "panda_rightfinger"]
-            detach = CollisionObject()
-            detach.id = self.object_id
-            detach.operation = CollisionObject.REMOVE
-            scene.world.collision_objects.append(detach)
+            # Adding an attached body removes its world representation in
+            # MoveIt. A second explicit world REMOVE in this same diff makes
+            # ApplyPlanningScene report failure after the attach is applied.
             scene.robot_state.attached_collision_objects.append(attached)
         else:
             # REMOVE is idempotent and repairs state after a reset or a late

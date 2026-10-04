@@ -14,6 +14,15 @@ from source_time import SourceTimeGuard
 
 
 class SourceTimestampTests(unittest.TestCase):
+    def test_support_contact_collision_matrix_is_explicit(self):
+        from moveit_msgs.msg import PlanningScene
+
+        scene = PlanningScene()
+        module._allow_collision_pair(scene, "sim_table", "workpiece")
+        matrix = scene.allowed_collision_matrix
+        self.assertEqual(matrix.entry_names, ["sim_table", "workpiece"])
+        self.assertEqual([entry.enabled for entry in matrix.entry_values], [[True, True], [True, True]])
+
     def test_current_sample_is_fresh(self):
         self.assertTrue(module._fresh_source_stamp(1_000_000_000, 1_000_000_000))
 
