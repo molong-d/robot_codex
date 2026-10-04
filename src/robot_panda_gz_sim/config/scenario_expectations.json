@@ -18,12 +18,14 @@
   },
   "placement_verification_reject": {
     "seed": 701,
-    "args": ["--placement-offset-y", "0.055"],
+    "args": ["--disturb-object-before-verification"],
     "expected_status": "failed",
     "expected_error_code": "PLACEMENT_NOT_VERIFIED",
     "requires_step": "verify_placement",
     "requires_step_status": "failed",
     "requires_completed_place_motion": true,
+    "requires_object_disturbance": true,
+    "requires_physical_audit_rejection": true,
     "requires_safe_terminal_resources": true
   },
   "post_grasp_drop": {

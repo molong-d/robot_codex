@@ -79,6 +79,14 @@ def validate_case(name, expectation, trial, result):
         checks["physical_gripper_open_command_succeeded"] = command.get("returncode") == 0
         checks["drop_injection_event_recorded"] = any(
             e.get("phase") == "external_gripper_open_during_lift" for e in result.get("task_events", []))
+    if expectation.get("requires_object_disturbance"):
+        disturbance = next((e for e in result.get("task_events", [])
+                            if e.get("phase") == "off_target_pose_injected_before_verification"), None)
+        checks["off_target_fault_injection_succeeded"] = bool(
+            disturbance and disturbance.get("returncode") == 0 and disturbance.get("successful") is True)
+        checks["fault_injected_after_place_motion"] = bool(
+            _step(result, "place_object") and _step(result, "place_object").get("status") == "succeeded" and
+            _step(result, "verify_placement"))
     if expectation.get("requires_feedback_interruption"):
         checks["feedback_was_interrupted_after_release"] = \
             result.get("contact_feedback_dropped_after_release") is True

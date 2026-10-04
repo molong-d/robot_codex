@@ -16,16 +16,19 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from control_msgs.action import ParallelGripperCommand
+from geometry_msgs.msg import Pose
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.context import Context
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.parameter import Parameter
+from rcl_interfaces.srv import SetParameters
 from rclpy.time import Time
 from robot_interfaces.action import ExecuteTask
 from robot_interfaces.msg import GraspContact
 from robot_interfaces.srv import GetExecution, GetRuntimeState
-from ros_gz_interfaces.msg import Contacts
+from ros_gz_interfaces.msg import Contacts, Entity
+from ros_gz_interfaces.srv import SetEntityPose
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Bool
 from tf2_msgs.msg import TFMessage
@@ -54,6 +57,8 @@ def main():
     parser.add_argument("--drop-grasp-feedback", action="store_true")
     parser.add_argument("--drop-contact-after-release", action="store_true",
                         help="stop stamped contact feedback after release is independently confirmed")
+    parser.add_argument("--disturb-object-before-verification", action="store_true",
+                        help="fault-inject an off-tray Gazebo pose after placement motion, before verification")
     parser.add_argument("--drop-object-after-grasp", action="store_true",
                         help="open the simulated gripper during lift to produce a physical drop")
     parser.add_argument("--run-id", default=None)
@@ -138,11 +143,13 @@ def main():
             config_text = config_text[:match.start()] + replacement + config_text[match.end():]
         config_path = Path(temp_world_dir.name) / "runtime.yaml"
         config_path.write_text(config_text, encoding="utf-8")
+    launch_command = ["ros2", "launch", "robot_panda_gz_sim", "panda_pick_place.launch.py",
+                      f"seed:={args.seed}", f"world_file:={world_path}",
+                      f"config_file:={config_path}",
+                      f"publish_grasp_feedback:={'false' if args.drop_grasp_feedback else 'true'}",
+                      f"enable_test_fault_services:={'true' if args.disturb_object_before_verification else 'false'}"]
     process = subprocess.Popen(
-        ["ros2", "launch", "robot_panda_gz_sim", "panda_pick_place.launch.py",
-         f"seed:={args.seed}", f"world_file:={world_path}",
-         f"config_file:={config_path}",
-         f"publish_grasp_feedback:={'false' if args.drop_grasp_feedback else 'true'}"],
+        launch_command,
         cwd=root, stdout=launch_output, stderr=subprocess.STDOUT,
         start_new_session=True, env=launch_env)
     context = Context()
@@ -172,6 +179,10 @@ def main():
     gazebo_topics = []
     action_endpoints = []
     task_feedback = {"active_skill": "", "status": "", "message": "", "history": []}
+    feedback_parameter_client = None
+    set_pose_client = None
+    verification_fault_future = None
+    verification_fault_started = False
     reset_result = None
     try:
         rclpy.init(context=context)
@@ -182,6 +193,14 @@ def main():
                                  parameter_overrides=[Parameter("use_sim_time", value=True)])
         executor = SingleThreadedExecutor(context=context)
         executor.add_node(node)
+        if args.drop_contact_after_release:
+            feedback_parameter_client = node.create_client(SetParameters, "/gazebo_scene_sync/set_parameters")
+            if not feedback_parameter_client.wait_for_service(timeout_sec=8.0):
+                raise TimeoutError("Gazebo contact-feedback parameter service did not become ready")
+        if args.disturb_object_before_verification:
+            set_pose_client = node.create_client(SetEntityPose, "/world/panda_pick_place/set_pose")
+            if not set_pose_client.wait_for_service(timeout_sec=8.0):
+                raise TimeoutError("Gazebo test-only set-pose service did not become ready")
         tf_buffer = Buffer(node=node)
         tf_listener = TransformListener(tf_buffer, node, spin_thread=False)
         def on_poses(message):
@@ -467,15 +486,44 @@ def main():
             grasp_seen = any(event.get("phase") == "grasp_confirmed" for event in task_events)
             if args.drop_contact_after_release and not feedback_drop_attempted and release_seen:
                 feedback_drop_attempted = True
-                feedback_result = subprocess.run(
-                    ["ros2", "param", "set", "/gazebo_scene_sync", "publish_grasp_feedback", "false"],
-                    cwd=root, env=launch_env, text=True, capture_output=True, timeout=8.0)
-                feedback_dropped_after_release = feedback_result.returncode == 0
+                feedback_started = time.monotonic()
+                request = SetParameters.Request()
+                request.parameters = [Parameter("publish_grasp_feedback", value=False).to_parameter_msg()]
+                future = feedback_parameter_client.call_async(request)
+                executor.spin_until_future_complete(future, timeout_sec=2.0)
+                response = future.result() if future.done() else None
+                successful = bool(response and response.results and response.results[0].successful)
+                feedback_dropped_after_release = successful
                 task_events.append({"phase": "contact_feedback_interrupted_after_release",
                     "sim_time_ns": node.get_clock().now().nanoseconds,
                     "receipt_monotonic_ns": time.monotonic_ns(),
-                    "returncode": feedback_result.returncode,
-                    "stdout": feedback_result.stdout.strip(), "stderr": feedback_result.stderr.strip()})
+                    "returncode": 0 if successful else 1,
+                    "elapsed_wall_s": time.monotonic()-feedback_started,
+                    "successful": successful,
+                    "reason": "parameter response timed out or was rejected" if not successful else ""})
+            if (args.disturb_object_before_verification and not verification_fault_started and
+                    task_feedback.get("active_skill") == "verify_placement"):
+                verification_fault_started = True
+                request = SetEntityPose.Request()
+                request.entity.name = "workpiece"
+                request.entity.type = Entity.MODEL
+                request.pose = Pose()
+                request.pose.position.x = 0.80
+                request.pose.position.y = -0.18
+                request.pose.position.z = 0.40
+                request.pose.orientation.w = 1.0
+                fault_started = time.monotonic()
+                verification_fault_future = set_pose_client.call_async(request)
+                executor.spin_until_future_complete(verification_fault_future, timeout_sec=2.0)
+                response = verification_fault_future.result() if verification_fault_future.done() else None
+                successful = bool(response and response.success)
+                task_events.append({"phase": "off_target_pose_injected_before_verification",
+                    "sim_time_ns": node.get_clock().now().nanoseconds,
+                    "receipt_monotonic_ns": time.monotonic_ns(),
+                    "returncode": 0 if successful else 1,
+                    "elapsed_wall_s": time.monotonic()-fault_started,
+                    "requested_pose_m": [0.80, -0.18, 0.40],
+                    "successful": successful})
             if args.drop_object_after_grasp and object_drop_command is None and grasp_seen:
                 command_text = "{command: {name: [panda_finger_joint1], position: [0.04], effort: [20.0]}}"
                 drop_result = subprocess.run(

@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -116,6 +117,10 @@ def generate_launch_description():
             "/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact@ros_gz_interfaces/msg/Contacts[gz.msgs.Contacts",
             "/world/panda_pick_place/model/table/link/link/sensor/table_contact/contact@ros_gz_interfaces/msg/Contacts[gz.msgs.Contacts",
         ], output="screen")
+    fault_bridge = Node(
+        package="ros_gz_bridge", executable="parameter_bridge", name="gazebo_fault_bridge",
+        arguments=["/world/panda_pick_place/set_pose@ros_gz_interfaces/srv/SetEntityPose"],
+        condition=IfCondition(LaunchConfiguration("enable_test_fault_services")), output="screen")
     scene_sync = Node(package="robot_panda_gz_sim", executable="gz_scene_sync",
                       parameters=[{"use_sim_time": True,
                                    "world_frame": acceptance["world_frame"],
@@ -147,8 +152,10 @@ def generate_launch_description():
         DeclareLaunchArgument("seed", default_value="42"),
         DeclareLaunchArgument("world_file", default_value=str(world)),
         DeclareLaunchArgument("publish_grasp_feedback", default_value="true"),
+        DeclareLaunchArgument("enable_test_fault_services", default_value="false"),
         gazebo,
         bridge,
+        fault_bridge,
         joint_states,
         move_group,
         scene_sync,
