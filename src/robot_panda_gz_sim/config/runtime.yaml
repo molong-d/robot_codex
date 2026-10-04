@@ -41,14 +41,6 @@ robot_runtime:
     target_resolution.place_tool_offset: [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0]
     approach_clearance_m: 0.08
     post_action_clearance_m: 0.12
-    support_surface_z: 0.35
-    object_height_m: 0.04
-    grasp_lift_m: 0.04
-    placement_xy_tolerance_m: 0.05
-    placement_z_tolerance_m: 0.015
-    stable_speed_mps: 0.04
-    verification_window_ms: 500
     skill_timeout_ms: 30000
-    stop_timeout_ms: 5000
     tick_period_ms: 20
     execution_history_capacity: 32

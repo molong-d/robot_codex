@@ -41,6 +41,7 @@ struct MotionFeedback {
   bool valid{false};
   bool stopped{false};
   uint64_t sample_id{0};  // oldest contributing source stamp in the demo adapters
+  uint64_t epoch{0};
 };
 class ArmMotion : public Component {
  public:
@@ -60,6 +61,7 @@ struct GripperFeedback {
   bool stopped{false};
   bool grasp_detected{false};
   uint64_t sample_id{0};  // producer sample identity, unchanged for cached ROS messages
+  uint64_t source_time_ns{0}, epoch{0};
 };
 class Gripper : public Component {
  public:

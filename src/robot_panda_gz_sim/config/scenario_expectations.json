@@ -1,0 +1,70 @@
+{
+  "normal": {
+    "seed": 700,
+    "args": [],
+    "expected_status": "succeeded",
+    "expected_error_code": "",
+    "requires_physical_audit_success": true,
+    "requires_safe_terminal_resources": true
+  },
+  "placement_verification_reject": {
+    "seed": 701,
+    "args": ["--placement-offset-y", "0.055"],
+    "expected_status": "failed",
+    "expected_error_code": "PLACEMENT_NOT_VERIFIED",
+    "requires_step": "verify_placement",
+    "requires_step_status": "failed",
+    "requires_completed_place_motion": true,
+    "requires_safe_terminal_resources": true
+  },
+  "post_grasp_drop": {
+    "seed": 702,
+    "args": ["--drop-object-after-grasp"],
+    "forbidden_status": "succeeded",
+    "requires_drop_command_success": true,
+    "requires_physical_audit_rejection": true,
+    "requires_safe_terminal_resources": true
+  },
+  "post_release_contact_feedback_loss": {
+    "seed": 703,
+    "args": ["--drop-contact-after-release"],
+    "expected_status": "failed",
+    "expected_error_code": "INVALID_VERIFICATION_EVIDENCE",
+    "requires_step": "verify_placement",
+    "requires_feedback_interruption": true,
+    "requires_safe_terminal_resources": true
+  },
+  "cancel": {
+    "seed": 704,
+    "args": ["--cancel-after-ms", "1000"],
+    "expected_status": "canceled",
+    "requires_cancel_accepted": true,
+    "requires_safe_terminal_resources": true,
+    "maximum_stop_confirmation_ms": 5000
+  },
+  "timeout": {
+    "seed": 705,
+    "task_timeout_ms": 3000,
+    "args": [],
+    "expected_status": "timed_out",
+    "expected_error_code": "TIMEOUT",
+    "requires_safe_terminal_resources": true,
+    "maximum_stop_confirmation_ms": 5000
+  },
+  "pause_resume": {
+    "seed": 706,
+    "args": ["--pause-after-ms", "1000", "--pause-duration-ms", "1000"],
+    "expected_status": "succeeded",
+    "requires_pause_and_resume_success": true,
+    "requires_physical_audit_success": true,
+    "requires_safe_terminal_resources": true
+  },
+  "time_reset": {
+    "seed": 707,
+    "args": ["--reset-after-ms", "1000"],
+    "expected_status": "faulted",
+    "expected_error_code": "STOP_UNCONFIRMED",
+    "requires_reset_success": true,
+    "requires_retained_resources": true
+  }
+}

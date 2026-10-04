@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import os
 import xml.etree.ElementTree as ET
 
@@ -43,6 +44,21 @@ def _gazebo_robot_description(description: str, controllers_file: Path, fixed_ba
 
 def generate_launch_description():
     share = Path(get_package_share_directory("robot_panda_gz_sim"))
+    acceptance_file = share / "config" / "acceptance.json"
+    acceptance = json.loads(acceptance_file.read_text(encoding="utf-8"))
+    acceptance_parameters = {
+        "support_surface_z": acceptance["support_surface_z_m"],
+        "object_height_m": acceptance["object_height_m"],
+        "grasp_lift_m": acceptance["grasp_lift_m"],
+        "placement_xy_tolerance_m": acceptance["placement_xy_tolerance_m"],
+        "placement_z_tolerance_m": acceptance["placement_z_tolerance_m"],
+        "stable_speed_mps": acceptance["stable_speed_mps"],
+        "verification_window_ms": acceptance["verification_window_ms"],
+        "verification_minimum_samples": acceptance["minimum_physical_samples"],
+        "evidence_max_age_ms": acceptance["evidence_max_age_ms"],
+        "contact_pose_pairing_tolerance_ms": acceptance["contact_pose_pairing_tolerance_ms"],
+        "stop_timeout_ms": acceptance["stop_timeout_ms"],
+    }
     moveit = (
         MoveItConfigsBuilder("moveit_resources_panda", package_name="moveit_resources_panda_moveit_config")
         .robot_description(file_path="config/panda.urdf.xacro",
@@ -100,6 +116,7 @@ def generate_launch_description():
         ], output="screen")
     scene_sync = Node(package="robot_panda_gz_sim", executable="gz_scene_sync",
                       parameters=[{"use_sim_time": True,
+                                   "evidence_max_age_ms": acceptance["evidence_max_age_ms"],
                                    "publish_grasp_feedback": ParameterValue(
                                        LaunchConfiguration("publish_grasp_feedback"), value_type=bool)}],
                       output="screen")
@@ -118,7 +135,8 @@ def generate_launch_description():
         output="screen")
     runtime = Node(
         package="robot_bt_runtime", executable="robot_runtime", name="robot_runtime",
-        parameters=[LaunchConfiguration("config_file"), {"use_sim_time": True}], output="screen")
+        parameters=[LaunchConfiguration("config_file"), acceptance_parameters,
+                    {"use_sim_time": True}], output="screen")
     return LaunchDescription([
         DeclareLaunchArgument("config_file", default_value=str(share / "config" / "runtime.yaml")),
         DeclareLaunchArgument("seed", default_value="42"),

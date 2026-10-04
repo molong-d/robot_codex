@@ -112,6 +112,8 @@ class Manipulate final : public Skill {
       world_.known_locations.erase(object_);
       world_.placement_candidates.erase(object_);
       world_.release_stamps.erase(object_);
+      world_.release_source_times_ns.erase(object_);
+      world_.release_epochs.erase(object_);
     }
     // Set phase before dispatch so a throwing adapter can still receive best-effort stop.
     if (open_before_motion) {
@@ -217,13 +219,19 @@ class Manipulate final : public Skill {
     if (g.grasp_detected && pick_) {
       world_.attached_object = object_;
       world_.attachment_stamp = g.stamp;
+      world_.attachment_source_time_ns = g.source_time_ns;
+      world_.attachment_epoch = g.epoch;
       world_.known_locations[object_] = "gripper";
     } else if (!g.grasp_detected && !pick_) {
       world_.attached_object.clear();
       world_.attachment_stamp = {};
+      world_.attachment_source_time_ns = 0;
+      world_.attachment_epoch = g.epoch;
       world_.known_locations.erase(object_);
       world_.placement_candidates[object_] = target_id_;
       world_.release_stamps[object_] = g.stamp;
+      world_.release_source_times_ns[object_] = g.source_time_ns;
+      world_.release_epochs[object_] = g.epoch;
     }
     if (stopping_) return complete({Status::canceled, "CANCELED", "gripper stopped; state reconciled"});
     if (status != Status::succeeded)

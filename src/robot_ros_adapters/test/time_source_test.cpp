@@ -26,17 +26,31 @@ int main() {
   require(source.observe(2'000'000'000, 2'000'000'000, steady0+2s), "resumed sample was rejected");
   require(source.sample_id() == 2 && source.stamp() == steady0+2s, "resume did not advance sample time");
 
-  // A clock reset starts an epoch while keeping the monotonic identity and
-  // mapped timestamp increasing; old and new evidence cannot be conflated.
-  require(source.observe(100'000'000, 100'000'000, steady0+3s), "reset epoch sample was rejected");
-  require(source.sample_id() == 3 && source.epoch() == 1 && source.stamp() == steady0+3s,
+  // A confirmed /clock reset advances the epoch immediately, but each stream
+  // remains invalid until its restarted source passes the old source watermark.
+  require(!source.observe(100'000'000, 100'000'000, steady0+3s), "low post-reset source crossed the barrier");
+  require(source.sample_id() == 2 && source.epoch() == 1,
           "clock reset reused sample identity or failed to advance epoch");
-  require(source.observe(200'000'000, 200'000'000, steady0+3100ms), "post-reset sample was rejected");
-  require(source.sample_id() == 4 && source.epoch() == 1 && source.stamp() > steady0+3s,
-          "post-reset sample time did not remain monotonic");
+  require(!source.observe(1'950'000'000, 1'950'000'000, steady0+3100ms),
+          "delayed old-epoch source crossed the reset barrier");
+  require(source.sample_id() == 2 && source.epoch() == 1,
+          "rejected reset-barrier sample refreshed identity");
+  require(source.observe(2'100'000'000, 2'100'000'000, steady0+4s),
+          "post-reset stream failed to recover after crossing old watermark");
+  require(source.sample_id() == 3 && source.epoch() == 1 && source.stamp() > steady0+3s,
+          "post-reset sample identity/time did not remain monotonic");
+
+  // A delayed old sensor message while ROS time advances is out of order, not
+  // a simulator reset, and cannot refresh identity or freshness.
+  MonotonicSampleClock ordered;
+  require(ordered.observe(2'000'000'000, 2'000'000'000, steady0), "ordered first sample rejected");
+  require(!ordered.observe(1'900'000'000, 2'100'000'000, steady0+100ms),
+          "out-of-order sensor message was accepted while ROS time advanced");
+  require(ordered.sample_id() == 1 && ordered.epoch() == 0 && ordered.source_ns() == 2'000'000'000,
+          "out-of-order message changed evidence identity");
 
   // Future and stale source messages are rejected without changing the cache.
-  require(!source.observe(500'000'000, 200'000'000, steady0+4s), "future sample was accepted");
-  require(!source.observe(100'000'000, 1'000'000'000, steady0+4s), "stale sample was accepted");
-  require(source.sample_id() == 4 && source.epoch() == 1, "rejected sample changed clock state");
+  require(!source.observe(2'300'000'000, 2'200'000'000, steady0+4100ms), "future sample was accepted");
+  require(!source.observe(1'500'000'000, 2'200'000'000, steady0+4100ms), "stale sample was accepted");
+  require(source.sample_id() == 3 && source.epoch() == 1, "rejected sample changed clock state");
 }

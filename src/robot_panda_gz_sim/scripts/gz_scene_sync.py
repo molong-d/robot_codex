@@ -2,19 +2,27 @@
 """Publish measured Gazebo contacts and mirror collision state into MoveIt."""
 
 import time
+from pathlib import Path
+import sys
 
 import rclpy
 from geometry_msgs.msg import Pose, Quaternion
 from moveit_msgs.msg import AttachedCollisionObject, CollisionObject, PlanningScene
 from moveit_msgs.srv import ApplyPlanningScene
+from rclpy.clock import Clock, ClockType
 from rclpy.node import Node
 from rclpy.time import Time
+from rcl_interfaces.msg import SetParametersResult
 from robot_interfaces.msg import GraspContact
 from ros_gz_interfaces.msg import Contacts
 from shape_msgs.msg import SolidPrimitive
 from std_msgs.msg import Bool
 from tf2_msgs.msg import TFMessage
 from tf2_ros import Buffer, TransformListener
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scene_state import SceneReconciler
+from source_time import SourceTimeGuard
 
 
 def _stamp_ns(stamp):
@@ -100,6 +108,7 @@ class GazeboSceneSync(Node):
         self.declare_parameter("gazebo_world_name", "panda_pick_place")
         self.declare_parameter("object_id", "workpiece")
         self.declare_parameter("hand_frame", "panda_hand")
+        self.declare_parameter("evidence_max_age_ms", 500)
         self.pose_topics = self.get_parameter("pose_topics").value
         self.object_id = self.get_parameter("object_id").value
         self.hand_frame = self.get_parameter("hand_frame").value
@@ -107,18 +116,17 @@ class GazeboSceneSync(Node):
         self.gazebo_world_name = self.get_parameter("gazebo_world_name").value
         self.poses = {}
         self.epoch = 0
-        self.pose_source_ns = {}
-        self.reset_reference = {}
-        self.awaiting_reset_epoch = set()
-        self.last_contact_stamp_ns = 0
+        evidence_max_age_ms = self.get_parameter("evidence_max_age_ms").value
+        if evidence_max_age_ms <= 0:
+            raise ValueError("evidence_max_age_ms must be positive")
+        self.time_guard = SourceTimeGuard(max_age_ns=evidence_max_age_ms * 1_000_000)
         self.contact_run = None
         self.contact_count = 0
-        self.contact_confirmed = False
-        self.last_grasp_publish = None
-        self.attached = False
-        self.scene_dirty = True
-        self.scene_in_flight = False
+        self.contact_confirmed = None
+        self.contact_sequence = 0
+        self.scene = SceneReconciler(response_timeout_s=5.0)
         self.last_scene_request = 0.0
+        self.feedback_enabled = self.get_parameter("publish_grasp_feedback").value
 
         self.contact_pub = (self.create_publisher(Bool, self.get_parameter("grasp_topic").value, 10)
                             if self.get_parameter("publish_grasp_feedback").value else None)
@@ -126,74 +134,73 @@ class GazeboSceneSync(Node):
             self.create_publisher(GraspContact, self.get_parameter("grasp_stamped_topic").value, 10)
             if self.get_parameter("publish_grasp_feedback").value else None)
         self.create_subscription(Contacts, self.get_parameter("contact_topic").value, self._on_contacts, 20)
+        self.scene_ready_pub = self.create_publisher(Bool, "/panda_gz/scene_ready", 1)
         self.scene_client = self.create_client(ApplyPlanningScene, "/apply_planning_scene")
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
-        self.timer = self.create_timer(0.05, self._flush_scene)
+        self.timer = self.create_timer(0.05, self._flush_scene,
+                                       clock=Clock(clock_type=ClockType.STEADY_TIME))
+        self.add_on_set_parameters_callback(self._on_parameters)
         for topic in self.pose_topics:
             self.create_subscription(TFMessage, topic, self._on_poses, 10)
 
+    def _on_parameters(self, parameters):
+        for parameter in parameters:
+            if parameter.name == "publish_grasp_feedback":
+                self.feedback_enabled = bool(parameter.value)
+        return SetParametersResult(successful=True)
+
+    def _begin_epoch(self, epoch):
+        if epoch <= self.epoch:
+            return
+        self.epoch = epoch
+        self.poses.clear()
+        self.contact_run = None
+        self.contact_count = 0
+        self.contact_confirmed = None
+        self.scene.reset()
+        if self.contact_pub is not None and self.feedback_enabled:
+            self.contact_pub.publish(Bool(data=False))
+        self.get_logger().warning(f"Confirmed ROS simulation clock rewind; invalidated truth to epoch {self.epoch}")
+
     def _on_poses(self, message):
-        candidates = {}
         clock_ns = self.get_clock().now().nanoseconds
+        candidates = {}
         for transform in message.transforms:
             if transform.header.frame_id not in (self.world_frame, self.gazebo_world_name):
                 continue
             source_ns = _stamp_ns(transform.header.stamp)
-            if not _fresh_source_stamp(source_ns, clock_ns):
-                continue
             for name in (self.object_id, "tray"):
                 score = _frame_score(transform.child_frame_id, name)
                 if score and (name not in candidates or score > candidates[name][0]):
                     candidates[name] = (score, transform, source_ns)
-        if not candidates:
-            return
-
-        rewound = any(name in self.pose_source_ns and stamp + 100_000_000 < self.pose_source_ns[name]
-                      for name, (_, _, stamp) in candidates.items())
-        if rewound:
-            self.epoch += 1
-            self.reset_reference = dict(self.pose_source_ns)
-            self.awaiting_reset_epoch = set(self.reset_reference)
-            self.pose_source_ns.clear()
-            self.poses.clear()
-            self.attached = False
-            self.contact_confirmed = False
-            self.contact_count = 0
-            self.contact_run = None
-            if self.contact_pub is not None:
-                self.contact_pub.publish(Bool(data=False))
-            self.scene_dirty = True
-            self.get_logger().warning(f"Gazebo time moved backwards; reset truth cache to epoch {self.epoch}")
-        for name, (_, transform, stamp) in candidates.items():
-            if stamp <= 0:
+        for name, (_, transform, source_ns) in candidates.items():
+            accepted, epoch, reason = self.time_guard.observe(f"pose:{name}", source_ns, clock_ns)
+            self._begin_epoch(epoch)
+            if not accepted:
+                if reason not in ("duplicate_or_out_of_order", "stale_source_time"):
+                    self.get_logger().debug(f"discarding {name} pose sample: {reason}")
                 continue
-            if name in self.awaiting_reset_epoch:
-                if stamp + 100_000_000 >= self.reset_reference[name]:
-                    continue
-                self.awaiting_reset_epoch.remove(name)
-            if stamp <= self.pose_source_ns.get(name, 0):
+            if transform.header.frame_id != self.world_frame:
                 continue
-            self.pose_source_ns[name] = stamp
-            if transform.header.frame_id == self.world_frame:
-                self.poses[name] = (_pose_from_transform(transform.transform), stamp, time.monotonic())
-                self.scene_dirty = True
+            pose = _pose_from_transform(transform.transform)
+            previous = self.poses.get(name)
+            moved = previous is None or any(abs(a - b) > 0.001 for a, b in zip(
+                (pose.position.x, pose.position.y, pose.position.z),
+                (previous[0].position.x, previous[0].position.y, previous[0].position.z)))
+            self.poses[name] = (pose, source_ns, time.monotonic(), epoch, self.world_frame)
+            if moved and (name == "tray" or self.contact_confirmed is not True):
+                self.scene.mark_dirty()
 
     def _on_contacts(self, message):
         stamp = _stamp_ns(message.header.stamp)
         clock_ns = self.get_clock().now().nanoseconds
-        if not _fresh_source_stamp(stamp, clock_ns) or stamp == self.last_contact_stamp_ns:
+        accepted, epoch, reason = self.time_guard.observe("contact", stamp, clock_ns)
+        self._begin_epoch(epoch)
+        if not accepted:
+            if reason not in ("duplicate_or_out_of_order", "stale_source_time"):
+                self.get_logger().debug(f"discarding contact sample: {reason}")
             return
-        if self.last_contact_stamp_ns and stamp < self.last_contact_stamp_ns:
-            self.contact_run = None
-            self.contact_count = 0
-            self.contact_confirmed = False
-            self.last_grasp_publish = None
-            self.last_contact_stamp_ns = 0
-            if self.contact_pub is not None:
-                self.contact_pub.publish(Bool(data=False))
-            self.get_logger().warning("Gazebo time moved backwards; discarded cached contact evidence")
-        self.last_contact_stamp_ns = stamp
 
         left = right = False
         for contact in message.contacts:
@@ -212,16 +219,20 @@ class GazeboSceneSync(Node):
             self.contact_count = 1
         if self.contact_count >= 2 and self.contact_confirmed != measured:
             self.contact_confirmed = measured
-            self.scene_dirty = True
+            self.scene.set_desired(measured)
         # Republish only on advancing Gazebo sensor time. Steady receipt age in
         # the runtime makes this evidence expire while simulation is paused.
-        if self.contact_count >= 2 and self.contact_pub is not None:
+        if self.contact_count >= 2 and self.contact_pub is not None and self.feedback_enabled:
             self.contact_pub.publish(Bool(data=measured))
             stamped = GraspContact()
             stamped.source_stamp = message.header.stamp
+            stamped.frame_id = self.world_frame
+            stamped.object_id = self.object_id
+            stamped.epoch = self.epoch
+            self.contact_sequence += 1
+            stamped.sequence = self.contact_sequence
             stamped.detected = measured
             self.stamped_contact_pub.publish(stamped)
-            self.last_grasp_publish = measured
 
     def _world_collision(self, object_id, shapes):
         message = CollisionObject()
@@ -240,8 +251,24 @@ class GazeboSceneSync(Node):
         pose.orientation.w = 1.0
         return pose
 
-    def _planning_scene(self):
-        if self.object_id not in self.poses or "tray" not in self.poses:
+    def _planning_scene(self, request):
+        if request.cleanup:
+            scene = PlanningScene()
+            scene.is_diff = True
+            scene.robot_state.is_diff = True
+            attached = AttachedCollisionObject()
+            attached.object.id = self.object_id
+            attached.object.operation = CollisionObject.REMOVE
+            scene.robot_state.attached_collision_objects.append(attached)
+            removed = CollisionObject()
+            removed.id = self.object_id
+            removed.operation = CollisionObject.REMOVE
+            scene.world.collision_objects.append(removed)
+            return scene
+        now = time.monotonic()
+        if any(name not in self.poses or now - self.poses[name][2] > 0.5 or
+               self.poses[name][3] != self.epoch or self.poses[name][4] != self.world_frame
+               for name in (self.object_id, "tray")):
             return None
         scene = PlanningScene()
         scene.is_diff = True
@@ -264,11 +291,11 @@ class GazeboSceneSync(Node):
 
         object_pose, _, _ = self.poses[self.object_id]
         box = ((0.04, 0.04, 0.04), object_pose)
-        if self.contact_confirmed:
+        if request.attached:
             try:
                 hand_transform = self.tf_buffer.lookup_transform(self.world_frame, self.hand_frame, Time())
             except Exception:
-                self.scene_dirty = True
+                self.scene.mark_dirty()
                 return None
             hand_pose = _pose_from_transform(hand_transform.transform)
             attached = AttachedCollisionObject()
@@ -286,41 +313,57 @@ class GazeboSceneSync(Node):
             scene.world.collision_objects.append(detach)
             scene.robot_state.attached_collision_objects.append(attached)
         else:
-            if self.attached:
-                attached = AttachedCollisionObject()
-                attached.object.id = self.object_id
-                attached.object.operation = CollisionObject.REMOVE
-                scene.robot_state.attached_collision_objects.append(attached)
+            # REMOVE is idempotent and repairs state after a reset or a late
+            # attach response even when our prior local confirmation was lost.
+            attached = AttachedCollisionObject()
+            attached.object.id = self.object_id
+            attached.object.operation = CollisionObject.REMOVE
+            scene.robot_state.attached_collision_objects.append(attached)
             scene.world.collision_objects.append(self._world_collision(self.object_id, [box]))
         return scene
 
     def _flush_scene(self):
-        if self.scene_in_flight or not self.scene_dirty or not self.scene_client.service_is_ready():
+        now = time.monotonic()
+        if self.scene.check_timeout(now):
+            self.get_logger().error("MoveIt scene response exceeded 5.0 s; scene remains unsynchronized")
+        fresh_inputs = self.scene.cleanup_pending or all(
+            name in self.poses and now - self.poses[name][2] <= 0.5 and
+            self.poses[name][3] == self.epoch and self.poses[name][4] == self.world_frame
+            for name in (self.object_id, "tray"))
+        request = None
+        if self.scene_client.service_is_ready() and now - self.last_scene_request >= 0.1:
+            request = self.scene.submit(now, fresh_inputs)
+        if request is None:
+            self.scene_ready_pub.publish(Bool(data=bool(self.scene.ready and fresh_inputs)))
             return
-        if time.monotonic() - self.last_scene_request < 0.1:
-            return
-        scene = self._planning_scene()
+        scene = self._planning_scene(request)
         if scene is None:
+            self.scene.complete(request, False)
+            self.scene_ready_pub.publish(Bool(data=False))
             return
         request = ApplyPlanningScene.Request()
         request.scene = scene
-        self.scene_in_flight = True
-        self.scene_dirty = False
         self.last_scene_request = time.monotonic()
-        future = self.scene_client.call_async(request)
+        submitted = self.scene.in_flight
+        try:
+            future = self.scene_client.call_async(request)
+        except Exception as error:
+            self.scene.complete(submitted, False)
+            self.get_logger().error(f"MoveIt scene request could not be sent: {error}")
+            self.scene_ready_pub.publish(Bool(data=False))
+            return
 
         def complete(done):
-            self.scene_in_flight = False
             try:
                 result = done.result()
+                if not self.scene.complete(submitted, result.success):
+                    self.get_logger().warning("Ignoring duplicate or stale MoveIt scene callback")
                 if not result.success:
-                    self.scene_dirty = True
                     self.get_logger().error("MoveIt rejected the Gazebo collision scene update")
-                    return
-                self.attached = self.contact_confirmed
             except Exception as error:  # service shutdown or transport failure
-                self.scene_dirty = True
+                self.scene.complete(submitted, False)
                 self.get_logger().error(f"MoveIt scene update failed: {error}")
+            self.scene_ready_pub.publish(Bool(data=bool(self.scene.ready and not self.scene.cleanup_pending)))
 
         future.add_done_callback(complete)
 

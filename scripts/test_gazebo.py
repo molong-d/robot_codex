@@ -11,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -22,11 +23,15 @@ from rclpy.executors import SingleThreadedExecutor
 from rclpy.time import Time
 from robot_interfaces.action import ExecuteTask
 from robot_interfaces.msg import GraspContact
+from robot_interfaces.srv import GetExecution, GetRuntimeState
 from ros_gz_interfaces.msg import Contacts
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Bool
 from tf2_msgs.msg import TFMessage
 from tf2_ros import Buffer, TransformListener
+
+from gazebo_evidence import audit_physics
+from source_time import SourceTimeGuard
 
 
 def main():
@@ -45,6 +50,12 @@ def main():
     parser.add_argument("--reset-after-ms", type=int, default=0,
                         help="reset the Gazebo world while the task is active")
     parser.add_argument("--drop-grasp-feedback", action="store_true")
+    parser.add_argument("--drop-contact-after-release", action="store_true",
+                        help="stop stamped contact feedback after release is independently confirmed")
+    parser.add_argument("--drop-object-after-grasp", action="store_true",
+                        help="open the simulated gripper during lift to produce a physical drop")
+    parser.add_argument("--run-id", default=None)
+    parser.add_argument("--code-commit", default=None)
     parser.add_argument("--result-json", type=Path, default=Path("docs/reports/phase2-gazebo-result.json"))
     parser.add_argument("--probe-gripper", action="store_true",
                         help="command the actuated Panda finger and report the measured joint state")
@@ -54,8 +65,14 @@ def main():
         parser.error("--timeout-ms must be between 1000 and 600000")
 
     root = Path(__file__).resolve().parents[1]
+    run_id = args.run_id or f"standalone-{uuid.uuid4().hex}"
+    code_commit = args.code_commit or subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, text=True, capture_output=True, check=True).stdout.strip()
+    acceptance = json.loads((root / "src/robot_panda_gz_sim/config/acceptance.json").read_text(encoding="utf-8"))
     args.launch_log.parent.mkdir(parents=True, exist_ok=True)
     args.result_json.parent.mkdir(parents=True, exist_ok=True)
+    if args.result_json.exists():
+        parser.error(f"refusing to reuse an existing result file: {args.result_json}")
     numeric_options = (args.object_dx, args.object_dy) + tuple(
         value for value in (args.placement_offset_y, args.grasp_miss_x) if value is not None)
     if not all(map(math.isfinite, numeric_options)):
@@ -70,6 +87,9 @@ def main():
         parser.error("run cancellation, pause, and reset scenarios separately")
 
     def emit_result(value):
+        value["run_id"] = run_id
+        value["code_commit"] = code_commit
+        value["seed"] = args.seed
         serialized = json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2)
         args.result_json.write_text(serialized + "\n", encoding="utf-8")
         print(serialized)
@@ -130,6 +150,16 @@ def main():
     tf_buffer = None
     outcome = {"success": False, "status": "not_started", "error_code": "", "message": ""}
     pose_samples = {}
+    pose_history = []
+    contact_samples = []
+    task_events = []
+    sample_guard = SourceTimeGuard(max_age_ns=int(acceptance["evidence_max_age_ms"] * 1_000_000))
+    stream_sequences = {}
+    scene_ready_state = {"ready": False, "messages": 0}
+    cancel_timing = {"requested_monotonic_ns": None, "requested_sim_time_ns": None,
+                     "result_received_monotonic_ns": None, "stop_confirmed_monotonic_ns": None,
+                     "stop_confirmed_source_ns": None, "timeout_deadline_monotonic_ns": None,
+                     "stop_trigger_monotonic_ns": None, "stop_trigger_sim_time_ns": None}
     contact_state = {"messages": 0, "stamp_ns": 0, "contacts": [], "seen": [],
                      "table_messages": 0, "table_collisions": [], "table_seen": [],
                      "grasp_feedback_messages": 0, "grasp_feedback": None,
@@ -150,6 +180,9 @@ def main():
         tf_listener = TransformListener(tf_buffer, node, spin_thread=False)
         def on_poses(message):
             for transform in message.transforms:
+                receipt_ns = time.monotonic_ns()
+                sim_ns = node.get_clock().now().nanoseconds
+                source_ns = transform.header.stamp.sec * 1_000_000_000 + transform.header.stamp.nanosec
                 child = transform.child_frame_id
                 if child == "panda_hand":
                     arm_state["hand_tf"] = {
@@ -160,23 +193,55 @@ def main():
                         "quaternion_xyzw": [transform.transform.rotation.x, transform.transform.rotation.y,
                                              transform.transform.rotation.z, transform.transform.rotation.w],
                     }
-                if child in ("workpiece", "tray") or child.endswith("::workpiece") or child.endswith("::tray"):
-                    pose_samples[child] = {
-                        "parent": transform.header.frame_id,
-                        "stamp_ns": transform.header.stamp.sec * 1_000_000_000 + transform.header.stamp.nanosec,
-                        "xyz": [transform.transform.translation.x, transform.transform.translation.y,
-                                transform.transform.translation.z],
-                    }
+                object_id = ("workpiece" if child == "workpiece" or child.endswith("::workpiece") else
+                             "tray" if child == "tray" or child.endswith("::tray") else None)
+                if object_id is None:
+                    continue
+                accepted, epoch, reason = sample_guard.observe(f"pose:{object_id}", source_ns, sim_ns)
+                stream_sequences[object_id] = stream_sequences.get(object_id, 0) + 1
+                sample = {
+                    "stream": f"pose:{object_id}", "object_id": object_id, "child_frame_id": child,
+                    "frame_id": transform.header.frame_id, "source_stamp_ns": source_ns,
+                    "sim_time_ns": sim_ns, "receipt_monotonic_ns": receipt_ns,
+                    "epoch": epoch, "sequence": stream_sequences[object_id],
+                    "accepted": accepted, "reject_reason": reason,
+                    "xyz": [transform.transform.translation.x, transform.transform.translation.y,
+                            transform.transform.translation.z],
+                }
+                pose_history.append(sample)
+                if accepted:
+                    pose_samples[object_id] = sample
         pose_subscriptions = [
             node.create_subscription(TFMessage, "/panda_gz/workpiece/pose", on_poses, 10),
             node.create_subscription(TFMessage, "/panda_gz/tray/pose", on_poses, 10),
         ]
         def on_joint_state(message):
+            receipt_ns = time.monotonic_ns()
+            source_ns = message.header.stamp.sec * 1_000_000_000 + message.header.stamp.nanosec
+            sim_ns = node.get_clock().now().nanoseconds
+            accepted, epoch, reason = sample_guard.observe("joint_state", source_ns, sim_ns)
             arm_state["joint_state"] = {
-                "stamp_ns": message.header.stamp.sec * 1_000_000_000 + message.header.stamp.nanosec,
+                "stamp_ns": source_ns, "sim_time_ns": sim_ns, "epoch": epoch,
+                "accepted": accepted, "reject_reason": reason,
+                "receipt_monotonic_ns": receipt_ns,
                 "names": list(message.name), "positions": list(message.position),
                 "velocities": list(message.velocity),
             }
+            stop_trigger = cancel_timing["stop_trigger_monotonic_ns"]
+            if stop_trigger is not None and cancel_timing["stop_confirmed_monotonic_ns"] is None:
+                required = ["panda_joint1", "panda_joint2", "panda_joint3", "panda_joint4",
+                            "panda_joint5", "panda_joint6", "panda_joint7",
+                            "panda_finger_joint1", "panda_finger_joint2"]
+                stationary = all(name in message.name and
+                    message.name.index(name) < len(message.velocity) and
+                    abs(message.velocity[message.name.index(name)]) <= 0.001 for name in required)
+                source_ns = arm_state["joint_state"]["stamp_ns"]
+                trigger_sim = cancel_timing["stop_trigger_sim_time_ns"]
+                after_trigger = trigger_sim is None or source_ns > trigger_sim
+                if accepted and epoch == sample_guard.epoch and stationary and after_trigger and \
+                        receipt_ns >= stop_trigger:
+                    cancel_timing["stop_confirmed_monotonic_ns"] = receipt_ns
+                    cancel_timing["stop_confirmed_source_ns"] = source_ns
             for name, extrema in finger_extrema.items():
                 if name in message.name:
                     value = message.position[message.name.index(name)]
@@ -184,12 +249,24 @@ def main():
                     extrema[1] = value if extrema[1] is None else max(extrema[1], value)
         pose_subscriptions.append(node.create_subscription(JointState, "/joint_states", on_joint_state, 20))
         def on_contacts(message):
+            receipt_ns = time.monotonic_ns()
+            sim_ns = node.get_clock().now().nanoseconds
+            source_ns = message.header.stamp.sec * 1_000_000_000 + message.header.stamp.nanosec
             contact_state["messages"] += 1
-            contact_state["stamp_ns"] = message.header.stamp.sec * 1_000_000_000 + message.header.stamp.nanosec
+            contact_state["stamp_ns"] = source_ns
             contact_state["contacts"] = [
                 [contact.collision1.name, contact.collision2.name] for contact in message.contacts
             ]
             contact_state["seen"] = sorted({tuple(pair) for pair in contact_state["seen"] + contact_state["contacts"]})
+            accepted, epoch, reason = sample_guard.observe("contact", source_ns, sim_ns)
+            stream_sequences["contact"] = stream_sequences.get("contact", 0) + 1
+            contact_samples.append({
+                "stream": "contact", "object_id": "workpiece", "frame_id": "world",
+                "source_stamp_ns": source_ns, "sim_time_ns": sim_ns,
+                "receipt_monotonic_ns": receipt_ns, "epoch": epoch,
+                "sequence": stream_sequences["contact"], "accepted": accepted,
+                "reject_reason": reason, "contacts": contact_state["contacts"],
+            })
         pose_subscriptions.append(node.create_subscription(Contacts,
             "/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact", on_contacts, 10))
         def on_table_contacts(message):
@@ -211,8 +288,16 @@ def main():
             contact_state["stamped_grasp_source_ns"] = (
                 message.source_stamp.sec * 1_000_000_000 + message.source_stamp.nanosec)
             contact_state["stamped_grasp_detected"] = message.detected
+            contact_state["stamped_grasp_epoch"] = message.epoch
+            contact_state["stamped_grasp_sequence"] = message.sequence
+            contact_state["stamped_grasp_frame"] = message.frame_id
+            contact_state["stamped_grasp_object_id"] = message.object_id
         pose_subscriptions.append(node.create_subscription(
             GraspContact, "/panda/grasp_contact_stamped", on_stamped_grasp_feedback, 10))
+        pose_subscriptions.append(node.create_subscription(
+            Bool, "/panda_gz/scene_ready",
+            lambda message: scene_ready_state.update(ready=message.data,
+                                                     messages=scene_ready_state["messages"] + 1), 10))
         client = ActionClient(node, ExecuteTask, "/execute_task")
         deadline = time.monotonic() + 90.0
         last_launch_check = 0.0
@@ -241,6 +326,12 @@ def main():
                                        text=True, capture_output=True, timeout=8.0)
         if action_result.returncode == 0:
             action_endpoints = [line.strip() for line in action_result.stdout.splitlines() if line.strip()]
+
+        scene_deadline = time.monotonic() + 20.0
+        while time.monotonic() < scene_deadline and not scene_ready_state["ready"]:
+            executor.spin_once(timeout_sec=0.1)
+        if not scene_ready_state["ready"]:
+            raise TimeoutError("MoveIt planning scene did not receive a successful current-epoch confirmation")
 
         if args.probe_gripper:
             probe = {"goals": [], "joint_state": arm_state["joint_state"]}
@@ -281,10 +372,17 @@ def main():
                                 timeout_ms=args.timeout_ms)
         def on_feedback(message):
             entry = {"active_skill": message.feedback.active_skill, "status": message.feedback.status,
-                     "message": message.feedback.message}
+                     "message": message.feedback.message,
+                     "receipt_monotonic_ns": time.monotonic_ns(),
+                     "sim_time_ns": node.get_clock().now().nanoseconds}
+            if "release confirmed" in entry["message"].lower():
+                entry["phase"] = "release_confirmed"
+            elif "grasp confirmed" in entry["message"].lower():
+                entry["phase"] = "grasp_confirmed"
             task_feedback.update(entry)
             if not task_feedback["history"] or task_feedback["history"][-1] != entry:
                 task_feedback["history"].append(entry)
+                task_events.append(entry)
         sent = client.send_goal_async(goal, feedback_callback=on_feedback)
         executor.spin_until_future_complete(sent, timeout_sec=15.0)
         if not sent.done():
@@ -293,8 +391,16 @@ def main():
         if not handle.accepted:
             raise RuntimeError("robot_runtime rejected the pick_place goal")
         task_started = time.monotonic()
+        task_started_monotonic_ns = time.monotonic_ns()
+        cancel_timing["timeout_deadline_monotonic_ns"] = (
+            task_started_monotonic_ns + args.timeout_ms * 1_000_000)
+        cancel_timing["stop_trigger_monotonic_ns"] = cancel_timing["timeout_deadline_monotonic_ns"]
+        cancel_timing["stop_trigger_sim_time_ns"] = None
         cancel_requested_at = None
         cancel_accepted = None
+        feedback_dropped_after_release = False
+        feedback_drop_attempted = False
+        object_drop_command = None
         pause_result = []
         if args.pause_after_ms:
             pause_deadline = task_started + args.pause_after_ms / 1000.0
@@ -334,14 +440,50 @@ def main():
             while time.monotonic() < cancel_deadline:
                 executor.spin_once(timeout_sec=min(0.05, cancel_deadline-time.monotonic()))
             cancel_requested_at = time.monotonic()
+            cancel_timing["requested_monotonic_ns"] = time.monotonic_ns()
+            cancel_timing["requested_sim_time_ns"] = node.get_clock().now().nanoseconds
+            cancel_timing["stop_trigger_monotonic_ns"] = cancel_timing["requested_monotonic_ns"]
+            cancel_timing["stop_trigger_sim_time_ns"] = cancel_timing["requested_sim_time_ns"]
             cancel_future = handle.cancel_goal_async()
             executor.spin_until_future_complete(cancel_future, timeout_sec=8.0)
             cancel_accepted = bool(cancel_future.done() and cancel_future.result().goals_canceling)
         result_future = handle.get_result_async()
-        executor.spin_until_future_complete(result_future, timeout_sec=args.timeout_ms / 1000.0 + 20.0)
+        result_deadline = time.monotonic() + args.timeout_ms / 1000.0 + 20.0
+        while not result_future.done() and time.monotonic() < result_deadline:
+            executor.spin_once(timeout_sec=min(0.1, max(0.0, result_deadline-time.monotonic())))
+            release_seen = any(event.get("phase") == "release_confirmed" for event in task_events)
+            grasp_seen = any(event.get("phase") == "grasp_confirmed" for event in task_events)
+            if args.drop_contact_after_release and not feedback_drop_attempted and release_seen:
+                feedback_drop_attempted = True
+                feedback_result = subprocess.run(
+                    ["ros2", "param", "set", "/gazebo_scene_sync", "publish_grasp_feedback", "false"],
+                    cwd=root, env=launch_env, text=True, capture_output=True, timeout=8.0)
+                feedback_dropped_after_release = feedback_result.returncode == 0
+                task_events.append({"phase": "contact_feedback_interrupted_after_release",
+                    "sim_time_ns": node.get_clock().now().nanoseconds,
+                    "receipt_monotonic_ns": time.monotonic_ns(),
+                    "returncode": feedback_result.returncode,
+                    "stdout": feedback_result.stdout.strip(), "stderr": feedback_result.stderr.strip()})
+            if args.drop_object_after_grasp and object_drop_command is None and grasp_seen:
+                command_text = "{command: {name: [panda_finger_joint1], position: [0.04], effort: [20.0]}}"
+                drop_result = subprocess.run(
+                    ["ros2", "action", "send_goal", "/panda_hand_controller/gripper_cmd",
+                     "control_msgs/action/ParallelGripperCommand", command_text],
+                    cwd=root, env=launch_env, text=True, capture_output=True, timeout=12.0)
+                object_drop_command = {"returncode": drop_result.returncode,
+                                       "stdout": drop_result.stdout.strip(),
+                                       "stderr": drop_result.stderr.strip()}
+                task_events.append({"phase": "external_gripper_open_during_lift",
+                    "sim_time_ns": node.get_clock().now().nanoseconds,
+                    "receipt_monotonic_ns": time.monotonic_ns(), **object_drop_command})
         if not result_future.done():
             raise TimeoutError("pick_place result did not arrive before the observation deadline")
         wrapped = result_future.result()
+        result_received_monotonic_ns = time.monotonic_ns()
+        cancel_timing["result_received_monotonic_ns"] = result_received_monotonic_ns
+        if cancel_requested_at is None and wrapped.result.status != "timed_out":
+            cancel_timing["stop_trigger_monotonic_ns"] = result_received_monotonic_ns
+            cancel_timing["stop_trigger_sim_time_ns"] = node.get_clock().now().nanoseconds
         settle_deadline = time.monotonic() + 0.5
         while time.monotonic() < settle_deadline:
             executor.spin_once(timeout_sec=0.05)
@@ -357,6 +499,49 @@ def main():
             }
         except Exception as error:
             hand_transform = {"error": f"{type(error).__name__}: {error}"}
+        execution_record = None
+        execution_client = node.create_client(GetExecution, "/get_execution")
+        if execution_client.wait_for_service(timeout_sec=3.0):
+            execution_request = GetExecution.Request()
+            execution_request.execution_id = ""
+            execution_future = execution_client.call_async(execution_request)
+            executor.spin_until_future_complete(execution_future, timeout_sec=3.0)
+            if execution_future.done():
+                response = execution_future.result()
+                snapshot = response.record.snapshot if response.found else None
+                execution_record = {
+                    "found": response.found,
+                    "lookup_status": response.lookup_status,
+                    "status": response.record.status if response.found else None,
+                    "error_code": response.record.error_code if response.found else None,
+                    "stop_confirmed": snapshot.stop_confirmed if snapshot is not None else None,
+                    "resources_empty": snapshot.resources_empty if snapshot is not None else None,
+                    "fault_latched": snapshot.fault_latched if snapshot is not None else None,
+                    "resource_leases": ([{"resource_id": lease.resource_id,
+                                           "owner_request_id": lease.owner_request_id}
+                                          for lease in snapshot.resource_leases]
+                                         if snapshot is not None else None),
+                    "steps": ([{"skill_id": step.step.skill_id, "status": step.status,
+                                "error_code": step.error_code,
+                                "has_verification": step.has_verification}
+                               for step in response.record.steps] if response.found else None),
+                }
+        runtime_state = None
+        state_client = node.create_client(GetRuntimeState, "/get_runtime_state")
+        if state_client.wait_for_service(timeout_sec=3.0):
+            state_future = state_client.call_async(GetRuntimeState.Request())
+            executor.spin_until_future_complete(state_future, timeout_sec=3.0)
+            if state_future.done():
+                response = state_future.result()
+                runtime_state = {
+                    "busy": response.busy,
+                    "active_execution_id": response.active_execution_id,
+                    "resources_empty": response.snapshot.resources_empty,
+                    "fault_latched": response.snapshot.fault_latched,
+                    "resource_leases": [{"resource_id": lease.resource_id,
+                                         "owner_request_id": lease.owner_request_id}
+                                        for lease in response.snapshot.resource_leases],
+                }
         outcome = {
             "success": bool(wrapped.result.success),
             "status": wrapped.result.status,
@@ -365,24 +550,50 @@ def main():
             "goal_status": int(wrapped.status),
             "launch_log": str(args.launch_log),
             "pose_samples": pose_samples,
+            "pose_history": pose_history,
+            "contact_samples": contact_samples,
+            "task_events": task_events,
             "contact_state": contact_state,
             "arm_state": arm_state,
             "finger_joint_extrema_rad": finger_extrema,
             "post_result_hand_tf": hand_transform,
             "task_feedback": task_feedback,
+            "execution_record": execution_record,
+            "runtime_state": runtime_state,
             "gazebo_topics": gazebo_topics,
             "action_endpoints": action_endpoints,
             "seed": args.seed,
+            "run_id": run_id,
+            "code_commit": code_commit,
+            "final_sim_time_ns": node.get_clock().now().nanoseconds,
+            "final_receipt_monotonic_ns": time.monotonic_ns(),
+            "final_epoch": sample_guard.epoch,
+            "scene_ready": scene_ready_state["ready"],
             "object_offset_xy_m": [args.object_dx, args.object_dy],
             "injected_placement_offset_y_m": args.placement_offset_y,
             "injected_grasp_miss_x_m": args.grasp_miss_x,
             "task_elapsed_wall_s": time.monotonic()-task_started,
             "cancel_requested": cancel_requested_at is not None,
             "cancel_accepted": cancel_accepted,
-            "cancel_to_result_s": None if cancel_requested_at is None else time.monotonic()-cancel_requested_at,
+            "cancel_requested_monotonic_ns": cancel_timing["requested_monotonic_ns"],
+            "timeout_deadline_monotonic_ns": cancel_timing["timeout_deadline_monotonic_ns"],
+            "cancel_result_received_monotonic_ns": cancel_timing["result_received_monotonic_ns"],
+            "cancel_stop_confirmed_monotonic_ns": cancel_timing["stop_confirmed_monotonic_ns"],
+            "cancel_stop_confirmed_source_ns": cancel_timing["stop_confirmed_source_ns"],
+            "cancel_to_result_s": None if cancel_requested_at is None else
+                (result_received_monotonic_ns-cancel_timing["requested_monotonic_ns"])*1e-9,
+            "cancel_to_stop_confirmed_s": None if cancel_timing["stop_confirmed_monotonic_ns"] is None or
+                cancel_requested_at is None else
+                (cancel_timing["stop_confirmed_monotonic_ns"]-cancel_timing["requested_monotonic_ns"])*1e-9,
+            "timeout_to_stop_confirmed_s": None if cancel_timing["stop_confirmed_monotonic_ns"] is None or
+                args.cancel_after_ms else
+                (cancel_timing["stop_confirmed_monotonic_ns"]-
+                 cancel_timing["timeout_deadline_monotonic_ns"])*1e-9,
             "pause_control": pause_result,
             "reset_control": reset_result,
             "grasp_feedback_enabled": not args.drop_grasp_feedback,
+            "contact_feedback_dropped_after_release": feedback_dropped_after_release,
+            "object_drop_command": object_drop_command,
         }
         emit_result(outcome)
         client.destroy()
@@ -391,12 +602,25 @@ def main():
         return 1
     except Exception as error:
         outcome.update({"error_code": type(error).__name__, "message": str(error),
+                        "status": "runner_error",
+                        "success": False,
                         "launch_log": str(args.launch_log), "pose_samples": pose_samples,
+                        "pose_history": pose_history, "contact_samples": contact_samples,
+                        "task_events": task_events,
                         "contact_state": contact_state, "arm_state": arm_state,
                         "finger_joint_extrema_rad": finger_extrema,
                         "task_feedback": task_feedback,
                         "gazebo_topics": gazebo_topics, "action_endpoints": action_endpoints,
                         "seed": args.seed, "object_offset_xy_m": [args.object_dx, args.object_dy],
+                        "run_id": run_id, "code_commit": code_commit,
+                        "final_sim_time_ns": 0 if node is None else node.get_clock().now().nanoseconds,
+                        "final_receipt_monotonic_ns": time.monotonic_ns(),
+                        "final_epoch": sample_guard.epoch,
+                        "scene_ready": scene_ready_state["ready"],
+                        "cancel_requested_monotonic_ns": cancel_timing["requested_monotonic_ns"],
+                        "cancel_result_received_monotonic_ns": cancel_timing["result_received_monotonic_ns"],
+                        "cancel_stop_confirmed_monotonic_ns": cancel_timing["stop_confirmed_monotonic_ns"],
+                        "cancel_stop_confirmed_source_ns": cancel_timing["stop_confirmed_source_ns"],
                         "injected_placement_offset_y_m": args.placement_offset_y,
                         "injected_grasp_miss_x_m": args.grasp_miss_x,
                         "reset_control": reset_result,

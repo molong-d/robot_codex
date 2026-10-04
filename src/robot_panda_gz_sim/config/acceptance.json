@@ -1,0 +1,16 @@
+{
+  "world_frame": "world",
+  "object_id": "workpiece",
+  "target_id": "tray",
+  "support_surface_z_m": 0.35,
+  "object_height_m": 0.04,
+  "grasp_lift_m": 0.04,
+  "placement_xy_tolerance_m": 0.05,
+  "placement_z_tolerance_m": 0.015,
+  "stable_speed_mps": 0.04,
+  "verification_window_ms": 500,
+  "minimum_physical_samples": 3,
+  "evidence_max_age_ms": 500,
+  "contact_pose_pairing_tolerance_ms": 100,
+  "stop_timeout_ms": 5000
+}

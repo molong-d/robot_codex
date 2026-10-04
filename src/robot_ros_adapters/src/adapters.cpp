@@ -21,33 +21,77 @@ robot_core::Pose as_pose(const geometry_msgs::msg::Transform& transform) {
 }
 }  // namespace
 
-GazeboWorldAdapter::GazeboWorldAdapter(rclcpp::Node* node, Config config, robot_core::DemoScene scene)
-    : node_(node), config_(std::move(config)), scene_(std::move(scene)) {
+GazeboWorldAdapter::GazeboWorldAdapter(rclcpp::Node* node, Config config, robot_core::DemoScene scene,
+                                       robot_core::WorldState* world_state)
+    : node_(node), config_(std::move(config)), scene_(std::move(scene)), world_state_(world_state) {
   if (config_.world_pose_topics.empty() || config_.world_frame.empty() ||
       !std::isfinite(config_.support_surface_z) || !std::isfinite(config_.object_height_m) ||
       config_.object_height_m <= 0.0 || !std::isfinite(config_.grasp_lift_m) || config_.grasp_lift_m <= 0.0 ||
       !std::isfinite(config_.placement_xy_tolerance_m) || config_.placement_xy_tolerance_m <= 0.0 ||
       !std::isfinite(config_.placement_z_tolerance_m) || config_.placement_z_tolerance_m <= 0.0 ||
-      !std::isfinite(config_.stable_speed_mps) || config_.stable_speed_mps <= 0.0)
+      !std::isfinite(config_.stable_speed_mps) || config_.stable_speed_mps <= 0.0 ||
+      config_.evidence_max_age.count() <= 0 || config_.contact_pose_pairing_tolerance.count() <= 0)
     throw std::invalid_argument("invalid Gazebo ground-truth configuration");
   for (const auto role : {robot_core::EntityRole::object, robot_core::EntityRole::target})
-    for (const auto& id : scene_.ids(role)) poses_.emplace(id, PoseSample{});
+    for (const auto& id : scene_.ids(role)) {
+      poses_.emplace(id, PoseSample{});
+      pose_clocks_.emplace(id, MonotonicSampleClock(config_.evidence_max_age));
+    }
   for (const auto& topic : config_.world_pose_topics) {
     if (topic.empty()) throw std::invalid_argument("empty Gazebo pose topic");
     pose_subs_.push_back(node_->create_subscription<tf2_msgs::msg::TFMessage>(topic, 10,
         [this](tf2_msgs::msg::TFMessage::ConstSharedPtr message) { on_poses(std::move(message)); }));
   }
+  contact_clock_ = MonotonicSampleClock(config_.evidence_max_age);
   contact_sub_ = node_->create_subscription<robot_interfaces::msg::GraspContact>(config_.grasp_stamped_topic, 10,
       [this](robot_interfaces::msg::GraspContact::ConstSharedPtr message) {
-        if (!observe_ros_stamp(node_, contact_clock_, message->source_stamp)) return;
+        const auto old_epoch = contact_clock_.epoch();
+        const bool accepted = observe_ros_stamp(node_, contact_clock_, message->source_stamp);
+        if (contact_clock_.epoch() != old_epoch) {
+          activate_epoch(contact_clock_.epoch());
+          finger_contact_ = false;
+          contact_stamp_ = {};
+          contact_source_ns_ = 0;
+        }
+        if (!accepted || message->frame_id != config_.world_frame || message->object_id != "workpiece" ||
+            message->epoch != contact_clock_.epoch() || message->sequence == 0 ||
+            message->sequence <= contact_sequence_) return;
         finger_contact_ = message->detected;
         contact_stamp_ = contact_clock_.stamp();
+        contact_source_ns_ = contact_clock_.source_ns();
+        contact_epoch_ = contact_clock_.epoch();
+        contact_sequence_ = message->sequence;
       });
+}
+
+void GazeboWorldAdapter::activate_epoch(uint64_t epoch) {
+  if (epoch <= epoch_) return;
+  epoch_ = epoch;
+  for (auto& entry : poses_) entry.second = PoseSample{};
+  finger_contact_ = false;
+  contact_stamp_ = {};
+  contact_source_ns_ = 0;
+  contact_epoch_ = epoch;
+  contact_sequence_ = 0;
+  if (world_state_) {
+    world_state_->observations.clear();
+    world_state_->attached_object.clear();
+    world_state_->known_locations.clear();
+    world_state_->placement_candidates.clear();
+    world_state_->attachment_stamp = {};
+    world_state_->attachment_source_time_ns = 0;
+    world_state_->attachment_epoch = epoch;
+    world_state_->release_stamps.clear();
+    world_state_->release_source_times_ns.clear();
+    world_state_->release_epochs.clear();
+    world_state_->grasp_verifications.clear();
+    world_state_->placement_verifications.clear();
+  }
 }
 
 void GazeboWorldAdapter::on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr message) {
   if (!message || message->transforms.empty()) return;
-  struct Selected { int score; const geometry_msgs::msg::Transform* transform; uint64_t source_ns; };
+  struct Selected { int score; const geometry_msgs::msg::Transform* transform; uint64_t source_ns; std::string frame; };
   std::map<std::string, Selected> selected;
   const auto simulation_now_ns = node_->now().nanoseconds();
   if (simulation_now_ns <= 0) return;
@@ -59,54 +103,38 @@ void GazeboWorldAdapter::on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr messa
       const uint64_t source_ns = static_cast<uint64_t>(transform.header.stamp.sec) * 1000000000ULL +
                                  transform.header.stamp.nanosec;
       if (source_ns == 0 || source_ns > static_cast<uint64_t>(simulation_now_ns) ||
-          static_cast<uint64_t>(simulation_now_ns)-source_ns > 500000000ULL) continue;
+          static_cast<uint64_t>(simulation_now_ns)-source_ns >
+              static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(config_.evidence_max_age).count())) continue;
       if (score > 0 && (!selected.count(entry.first) || score > selected.at(entry.first).score))
-        selected[entry.first] = {score, &transform.transform, source_ns};
+        selected[entry.first] = {score, &transform.transform, source_ns, transform.header.frame_id};
     }
   }
   if (selected.empty()) return;
 
-  bool reset = false;
-  for (const auto& [id, value] : selected) {
-    const auto previous = source_highwater_.find(id);
-    if (previous != source_highwater_.end() && value.source_ns + 100000000ULL < previous->second)
-      reset = true;
-  }
-  if (reset) {
-    ++epoch_;
-    reset_reference_ = source_highwater_;
-    awaiting_reset_epoch_.clear();
-    for (const auto& [id, stamp] : reset_reference_) {
-      (void)stamp;
-      awaiting_reset_epoch_.insert(id);
-    }
-    source_highwater_.clear();
-    for (auto& entry : poses_) entry.second = PoseSample{};
-  }
-
-  const auto receipt = robot_core::Clock::now();
   for (const auto& entry : selected) {
     const auto id = entry.first;
     const auto& selected_pose = entry.second;
-    const auto waiting = awaiting_reset_epoch_.find(id);
-    if (waiting != awaiting_reset_epoch_.end()) {
-      const auto old = reset_reference_.find(id);
-      if (old == reset_reference_.end() || selected_pose.source_ns + 100000000ULL >= old->second) continue;
-      awaiting_reset_epoch_.erase(waiting);
+    auto& clock = pose_clocks_.at(id);
+    const auto old_epoch = clock.epoch();
+    if (!clock.observe(static_cast<int64_t>(selected_pose.source_ns), simulation_now_ns, robot_core::Clock::now())) {
+      if (clock.epoch() != old_epoch) activate_epoch(clock.epoch());
+      continue;
     }
-    const auto old_source = source_highwater_.find(id);
-    if (old_source != source_highwater_.end() && selected_pose.source_ns <= old_source->second) continue;
+    if (clock.epoch() != old_epoch) activate_epoch(clock.epoch());
+    if (clock.epoch() != epoch_) continue;
     const auto pose = as_pose(*selected_pose.transform);
     if (!robot_core::valid_pose(pose)) continue;
     auto& sample = poses_.at(id);
     sample.previous_pose = sample.pose;
     sample.previous_stamp = sample.stamp;
+    sample.previous_source_ns = sample.source_ns;
     sample.pose = pose;
-    sample.stamp = receipt;
+    sample.stamp = clock.stamp();
+    sample.frame_id = selected_pose.frame;
     sample.sample_id = ++world_sample_sequence_;
-    sample.source_ns = selected_pose.source_ns;
+    sample.source_ns = static_cast<uint64_t>(clock.source_ns());
+    sample.epoch = clock.epoch();
     sample.valid = true;
-    source_highwater_[id] = selected_pose.source_ns;
   }
 }
 
@@ -114,7 +142,8 @@ const GazeboWorldAdapter::PoseSample* GazeboWorldAdapter::fresh_pose(const std::
                                                                      robot_core::Time now) const {
   const auto found = poses_.find(id);
   if (found == poses_.end() || !found->second.valid ||
-      !robot_core::fresh(found->second.stamp, now, std::chrono::milliseconds(500))) return nullptr;
+      found->second.epoch != epoch_ || found->second.frame_id != config_.world_frame ||
+      !robot_core::fresh(found->second.stamp, now, config_.evidence_max_age)) return nullptr;
   return &found->second;
 }
 
@@ -141,29 +170,50 @@ std::optional<robot_core::Observation> GazeboWorldAdapter::locate(const std::str
 std::optional<robot_core::OutcomeEvidence> GazeboWorldAdapter::grasp(const std::string& object,
                                                                      robot_core::Time now) {
   const auto* sample = fresh_pose(object, now);
-  if (!sample) return std::nullopt;
-  const bool contact = finger_contact_ && robot_core::fresh(contact_stamp_, now, std::chrono::milliseconds(500));
+  const bool contact_fresh = contact_sequence_ != 0 && contact_epoch_ == epoch_ &&
+      contact_clock_.epoch() == epoch_ && robot_core::fresh(contact_stamp_, now, config_.evidence_max_age);
+  if (!sample || !contact_fresh) return std::nullopt;
+  const bool contact = finger_contact_;
   const bool lifted = sample->pose.z >= config_.support_surface_z+config_.object_height_m/2.0+config_.grasp_lift_m;
-  return robot_core::OutcomeEvidence{object, "", sample->stamp, true, contact && lifted,
-      {evidence_source(), true, 1.0}, sample->sample_id};
+  robot_core::OutcomeEvidence evidence{object, "", sample->stamp, true, contact && lifted,
+      {evidence_source(), true, 1.0}, sample->sample_id, sample->source_ns, sample->epoch};
+  evidence.contact_state = contact ? robot_core::OutcomeEvidence::ContactState::contact :
+                                     robot_core::OutcomeEvidence::ContactState::no_contact;
+  evidence.contact_source_time_ns = contact_source_ns_;
+  return evidence;
 }
 
 std::optional<robot_core::OutcomeEvidence> GazeboWorldAdapter::placement(const std::string& object,
     const std::string& target, robot_core::Time now) {
   const auto* sample = fresh_pose(object, now);
   const auto* goal = fresh_pose(target, now);
-  if (!sample || !goal) return std::nullopt;
-  const bool contact = finger_contact_ && robot_core::fresh(contact_stamp_, now, std::chrono::milliseconds(500));
-  const double speed = sample->previous_stamp < sample->stamp ?
+  const bool contact_fresh = contact_sequence_ != 0 && contact_epoch_ == epoch_ &&
+      contact_clock_.epoch() == epoch_ && robot_core::fresh(contact_stamp_, now, config_.evidence_max_age);
+  if (!sample || !goal || !contact_fresh || sample->epoch != goal->epoch ||
+      contact_source_ns_ == 0 || contact_epoch_ != sample->epoch) return std::nullopt;
+  const auto pairing_limit_ns = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+      config_.contact_pose_pairing_tolerance).count());
+  const auto absolute_delta = [](uint64_t left, uint64_t right) {
+    return left > right ? left - right : right - left;
+  };
+  if (absolute_delta(sample->source_ns, goal->source_ns) > pairing_limit_ns ||
+      absolute_delta(sample->source_ns, contact_source_ns_) > pairing_limit_ns) return std::nullopt;
+  const bool confirmed_no_contact = !finger_contact_;
+  const double speed = sample->previous_source_ns != 0 && sample->source_ns > sample->previous_source_ns &&
+      sample->epoch == epoch_ ?
       distance(sample->pose, sample->previous_pose)/
-          std::chrono::duration<double>(sample->stamp-sample->previous_stamp).count() :
+          (static_cast<double>(sample->source_ns-sample->previous_source_ns)*1e-9) :
       std::numeric_limits<double>::infinity();
-  const bool in_region = std::abs(sample->pose.x-goal->pose.x) <= config_.placement_xy_tolerance_m &&
-                         std::abs(sample->pose.y-goal->pose.y) <= config_.placement_xy_tolerance_m &&
+  const double xy_error = std::hypot(sample->pose.x-goal->pose.x, sample->pose.y-goal->pose.y);
+  const bool in_region = xy_error <= config_.placement_xy_tolerance_m &&
                          std::abs(sample->pose.z-(config_.support_surface_z+config_.object_height_m/2.0)) <=
                              config_.placement_z_tolerance_m;
-  const bool condition = !contact && in_region && speed <= config_.stable_speed_mps;
-  return robot_core::OutcomeEvidence{object, target, sample->stamp, true, condition,
-      {evidence_source(), true, 1.0}, sample->sample_id};
+  const bool condition = confirmed_no_contact && in_region && speed <= config_.stable_speed_mps;
+  robot_core::OutcomeEvidence evidence{object, target, sample->stamp, true, condition,
+      {evidence_source(), true, 1.0}, sample->sample_id, sample->source_ns, sample->epoch};
+  evidence.contact_state = confirmed_no_contact ? robot_core::OutcomeEvidence::ContactState::no_contact :
+                                                  robot_core::OutcomeEvidence::ContactState::contact;
+  evidence.contact_source_time_ns = contact_source_ns_;
+  return evidence;
 }
 }  // namespace robot_ros_adapters

@@ -148,6 +148,11 @@ struct OutcomeEvidence {
   bool valid{false}, condition_met{false};
   EvidenceMetadata evidence;
   uint64_t sample_id{0};
+  // Optional source-domain measurement time and epoch. Adapters keep this
+  // independent from the steady-time stamp used for communication freshness.
+  uint64_t source_time_ns{0}, epoch{0};
+  enum class ContactState { unknown, contact, no_contact } contact_state{ContactState::unknown};
+  uint64_t contact_source_time_ns{0};
 };
 struct OutcomeVerification {
   OutcomeEvidence evidence;
@@ -161,7 +166,9 @@ struct WorldState {
   // An inferred release location is not a new perception measurement.
   std::map<std::string, std::string> placement_candidates;
   Time attachment_stamp{};
+  uint64_t attachment_source_time_ns{0}, attachment_epoch{0};
   std::map<std::string, Time> release_stamps;
+  std::map<std::string, uint64_t> release_source_times_ns, release_epochs;
   std::map<std::string, OutcomeVerification> grasp_verifications, placement_verifications;
 };
 struct Requirement {

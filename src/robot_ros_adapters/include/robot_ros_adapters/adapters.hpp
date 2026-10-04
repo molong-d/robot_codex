@@ -35,6 +35,7 @@ struct Config {
   double gripper_release_width_m{0.08};
   double support_surface_z{0.35}, object_height_m{0.04}, grasp_lift_m{0.04};
   double placement_xy_tolerance_m{0.05}, placement_z_tolerance_m{0.015}, stable_speed_mps{0.04};
+  std::chrono::milliseconds evidence_max_age{500}, contact_pose_pairing_tolerance{100};
   double approach_clearance_m{0.0}, post_action_clearance_m{0.0};
   double velocity_scaling{0.2}, acceleration_scaling{0.2};
 };
@@ -100,10 +101,13 @@ class MoveItArm final : public rc::ArmMotion {
   MoveItArm(rclcpp::Node* node, Config config)
       : node_(node), config_(std::move(config)), channel_(node, config_.move_action),
         buffer_(std::make_shared<tf2_ros::Buffer>(node->get_clock())),
-    listener_(std::make_shared<tf2_ros::TransformListener>(*buffer_, node, false)) {
+    listener_(std::make_shared<tf2_ros::TransformListener>(*buffer_, node, false)),
+    joint_clock_(config_.evidence_max_age), tf_clock_(config_.evidence_max_age) {
     sub_ = node->create_subscription<sensor_msgs::msg::JointState>(config_.joint_states_topic, 10,
         [this](sensor_msgs::msg::JointState::ConstSharedPtr s) {
+          const auto old_epoch = joint_clock_.epoch();
           if (observe_ros_stamp(node_, joint_clock_, s->header.stamp)) joints_ = *s;
+          if (joint_clock_.epoch() != old_epoch) joints_ = sensor_msgs::msg::JointState{};
         });
     if (config_.arm_joints.empty() || config_.arm_resource.empty() ||
         config_.velocity_scaling <= 0.0 || config_.velocity_scaling > 1.0 ||
@@ -156,14 +160,17 @@ class MoveItArm final : public rc::ArmMotion {
     measured_ = {};
     try {
       const auto t = buffer_->lookupTransform(config_.frame, config_.tip, tf2::TimePointZero);
-      observe_ros_stamp(node_, tf_clock_, t.header.stamp);
+      const auto old_epoch = tf_clock_.epoch();
+      if (!observe_ros_stamp(node_, tf_clock_, t.header.stamp)) return channel_.status();
+      if (tf_clock_.epoch() != old_epoch) measured_ = {};
       measured_.frame_id = config_.frame;
       measured_.pose = {t.transform.translation.x, t.transform.translation.y, t.transform.translation.z,
                         t.transform.rotation.x, t.transform.rotation.y, t.transform.rotation.z, t.transform.rotation.w};
       measured_.stamp = std::min(joint_clock_.stamp(), tf_clock_.stamp());
       measured_.sample_id = std::min(joint_clock_.sample_id(), tf_clock_.sample_id());
-      measured_.valid = measured_.stamp != rc::Time{} &&
-                        rc::fresh(measured_.stamp, now, std::chrono::milliseconds(500)) && rc::valid_pose(measured_.pose);
+      measured_.epoch = tf_clock_.epoch();
+      measured_.valid = joint_clock_.epoch() == tf_clock_.epoch() && measured_.stamp != rc::Time{} &&
+                        rc::fresh(measured_.stamp, now, config_.evidence_max_age) && rc::valid_pose(measured_.pose);
       measured_.stopped = measured_.valid && stationary(joints_, config_.arm_joints);
     } catch (const tf2::TransformException&) { /* missing TF is unavailable feedback */ }
     return channel_.status();
@@ -185,23 +192,40 @@ class MoveItArm final : public rc::ArmMotion {
 class ParallelGripper final : public rc::Gripper {
  public:
   ParallelGripper(rclcpp::Node* node, Config config)
-      : node_(node), config_(std::move(config)), channel_(node, config_.gripper_action) {
+      : node_(node), config_(std::move(config)), channel_(node, config_.gripper_action),
+        joint_clock_(config_.evidence_max_age), contact_clock_(config_.evidence_max_age) {
     sub_ = node->create_subscription<sensor_msgs::msg::JointState>(config_.joint_states_topic, 10,
         [this](sensor_msgs::msg::JointState::ConstSharedPtr s) {
+          const auto old_epoch = joint_clock_.epoch();
           if (observe_ros_stamp(node_, joint_clock_, s->header.stamp)) joints_ = *s;
+          if (joint_clock_.epoch() != old_epoch) joints_ = sensor_msgs::msg::JointState{};
         });
     if (config_.grasp_stamped_topic.empty()) {
       contact_ = node->create_subscription<std_msgs::msg::Bool>(config_.grasp_topic, 10,
           [this](std_msgs::msg::Bool::ConstSharedPtr m) {
-            contact_value_ = m->data;
-            contact_stamp_ = rc::Clock::now();
-          });
+          contact_value_ = m->data;
+          contact_stamp_ = rc::Clock::now();
+          contact_source_ns_ = 0;
+          contact_epoch_ = 0;
+        });
     } else {
       stamped_contact_ = node->create_subscription<robot_interfaces::msg::GraspContact>(
           config_.grasp_stamped_topic, 10, [this](robot_interfaces::msg::GraspContact::ConstSharedPtr m) {
-            if (!observe_ros_stamp(node_, contact_clock_, m->source_stamp)) return;
+            const auto old_epoch = contact_clock_.epoch();
+            const bool accepted = observe_ros_stamp(node_, contact_clock_, m->source_stamp);
+            if (contact_clock_.epoch() != old_epoch) {
+              contact_value_ = false;
+              contact_stamp_ = {};
+              contact_source_ns_ = 0;
+            }
+            if (!accepted || m->frame_id != config_.world_frame || m->object_id != "workpiece" ||
+                m->epoch != contact_clock_.epoch() || m->sequence == 0 ||
+                m->sequence <= contact_message_sequence_) return;
             contact_value_ = m->detected;
             contact_stamp_ = contact_clock_.stamp();
+            contact_source_ns_ = contact_clock_.source_ns();
+            contact_epoch_ = contact_clock_.epoch();
+            contact_message_sequence_ = m->sequence;
           });
     }
   }
@@ -227,7 +251,7 @@ class ParallelGripper final : public rc::Gripper {
         measured_.stamp = joint_clock_.stamp();
         measured_.sample_id = joint_clock_.sample_id();
         measured_.valid = measured_.stamp != rc::Time{} &&
-                          rc::fresh(measured_.stamp, now, std::chrono::milliseconds(500)) &&
+                          rc::fresh(measured_.stamp, now, config_.evidence_max_age) &&
                           first_position_valid && std::isfinite(measured_.width_m) && measured_.width_m >= 0.0;
         joint_fresh = measured_.valid;
         measured_.stopped = measured_.valid && stationary(joints_, {config_.finger_joint});
@@ -240,9 +264,15 @@ class ParallelGripper final : public rc::Gripper {
           std::abs(measured_.width_m-commanded_width_) <= 0.002) sim_holding_ = closing_;
       measured_.grasp_detected = sim_holding_;
     } else {
-      contact_fresh = rc::fresh(contact_stamp_, now, std::chrono::milliseconds(500));
+      contact_fresh = rc::fresh(contact_stamp_, now, config_.evidence_max_age);
+      contact_fresh = contact_fresh && contact_epoch_ == contact_clock_.epoch() &&
+                      contact_clock_.epoch() == joint_clock_.epoch();
       measured_.valid = measured_.valid && contact_fresh;
       measured_.grasp_detected = contact_value_;
+      measured_.stamp = std::min(measured_.stamp, contact_stamp_);
+      measured_.sample_id = std::min(measured_.sample_id, contact_clock_.sample_id());
+      measured_.source_time_ns = contact_source_ns_;
+      measured_.epoch = contact_epoch_;
     }
     if (!measured_.valid) {
       const auto joint_age_ms = measured_.stamp == rc::Time{} ? -1.0 :
@@ -284,6 +314,7 @@ class ParallelGripper final : public rc::Gripper {
   rclcpp::Subscription<robot_interfaces::msg::GraspContact>::SharedPtr stamped_contact_;
   sensor_msgs::msg::JointState joints_;
   rc::Time contact_stamp_{};
+  uint64_t contact_source_ns_{0}, contact_epoch_{0}, contact_message_sequence_{0};
   MonotonicSampleClock joint_clock_, contact_clock_;
   bool contact_value_{false}, closing_{false}, sim_holding_{false};
   double commanded_width_{0.08};
@@ -294,7 +325,8 @@ class ParallelGripper final : public rc::Gripper {
 // advances only on new simulator timestamps; it never commands the robot.
 class GazeboWorldAdapter final : public rc::ObjectLocator {
  public:
-  GazeboWorldAdapter(rclcpp::Node* node, Config config, rc::DemoScene scene);
+  GazeboWorldAdapter(rclcpp::Node* node, Config config, rc::DemoScene scene,
+                     rc::WorldState* world_state = nullptr);
   std::string resource_id() const override { return "gazebo_world_state"; }
   std::optional<rc::Observation> locate(const std::string& id, rc::Time now) override;
   std::optional<rc::OutcomeEvidence> grasp(const std::string& object, rc::Time now);
@@ -306,24 +338,27 @@ class GazeboWorldAdapter final : public rc::ObjectLocator {
     rc::Time stamp{};
     rc::Pose previous_pose;
     rc::Time previous_stamp{};
-    uint64_t sample_id{0}, source_ns{0};
+    std::string frame_id;
+    uint64_t sample_id{0}, source_ns{0}, previous_source_ns{0}, epoch{0};
     bool valid{false};
   };
   void on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr message);
+  void activate_epoch(uint64_t epoch);
   const PoseSample* fresh_pose(const std::string& id, rc::Time now) const;
   std::string evidence_source() const;
   rclcpp::Node* node_;
   Config config_;
   rc::DemoScene scene_;
+  rc::WorldState* world_state_{nullptr};
   std::map<std::string, PoseSample> poses_;
   std::vector<rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr> pose_subs_;
-  std::map<std::string, uint64_t> source_highwater_, reset_reference_;
-  std::set<std::string> awaiting_reset_epoch_;
+  std::map<std::string, MonotonicSampleClock> pose_clocks_;
   uint64_t epoch_{0}, world_sample_sequence_{0};
   rclcpp::Subscription<robot_interfaces::msg::GraspContact>::SharedPtr contact_sub_;
   MonotonicSampleClock contact_clock_;
   bool finger_contact_{false};
   rc::Time contact_stamp_{};
+  uint64_t contact_source_ns_{0}, contact_epoch_{0}, contact_sequence_{0};
 };
 
 // Separate core interfaces avoid a Component diamond while sharing the same

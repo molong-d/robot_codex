@@ -38,6 +38,7 @@ struct Engine {
   Engine(std::string motion, int ticks, int stop_ticks, bool fail_grasp, bool permitted, rclcpp::Node* node,
          bool ros_backend, bool gazebo_backend, robot_ros_adapters::Config config, const rc::DemoScene& scene, size_t history_capacity,
          bool outcome_enabled, const std::string& verification_failure, int verification_window_ms,
+         int evidence_max_age_ms, unsigned verification_minimum_samples,
          const rc::DemoScene& perception_scene, rc::PoseMeaning perception_meaning,
          std::shared_ptr<rc::MotionTargetResolver> target_resolver)
       : bindings(components, {{"perception", gazebo_backend ? "gazebo_world" : "mock_camera"}, {"motion", motion},
@@ -48,7 +49,7 @@ struct Engine {
     const auto robot = std::make_shared<rc::MockRobotState>();
     components.add("execution_gate", std::make_shared<rc::MockExecutionGate>(permitted));
     if (gazebo_backend) {
-      auto gazebo_world = std::make_shared<robot_ros_adapters::GazeboWorldAdapter>(node, config, scene);
+      auto gazebo_world = std::make_shared<robot_ros_adapters::GazeboWorldAdapter>(node, config, scene, &world);
       components.add("gazebo_world", gazebo_world);
       components.add("gazebo_outcome", std::make_shared<robot_ros_adapters::GazeboOutcomeAdapter>(gazebo_world));
     } else
@@ -60,6 +61,7 @@ struct Engine {
     policy.tool_frame = config.tip;
     policy.allow_synthetic = true;  // this runtime only has demonstration backends
     policy.release_width_m = config.gripper_release_width_m;
+    policy.feedback_max_age = std::chrono::milliseconds(evidence_max_age_ms);
     policy.approach_clearance_m = config.approach_clearance_m;
     policy.post_action_clearance_m = config.post_action_clearance_m;
     if (ros_backend) {
@@ -78,7 +80,9 @@ struct Engine {
     bindings.get<rc::ExecutionGate>("safety");
     rc::VerificationPolicy verification;
     verification.evidence.allow_synthetic = true;
+    verification.evidence.max_age = std::chrono::milliseconds(evidence_max_age_ms);
     verification.stable_duration = std::chrono::milliseconds(verification_window_ms);
+    verification.minimum_samples = verification_minimum_samples;
     rc::register_demo_skills(skills, policy, verification);
   }
   std::shared_ptr<rc::Session> start(std::string skill, std::string implementation, rc::Arguments args) {
@@ -192,6 +196,10 @@ class RuntimeNode final : public rclcpp::Node {
     config.support_surface_z = catalog_support::startup_parameter<double>(this, "support_surface_z", config.support_surface_z);
     config.object_height_m = catalog_support::startup_parameter<double>(this, "object_height_m", config.object_height_m);
     config.grasp_lift_m = catalog_support::startup_parameter<double>(this, "grasp_lift_m", config.grasp_lift_m);
+    const auto evidence_max_age_ms = catalog_support::startup_parameter<int>(this, "evidence_max_age_ms", 500);
+    config.evidence_max_age = std::chrono::milliseconds(evidence_max_age_ms);
+    config.contact_pose_pairing_tolerance = std::chrono::milliseconds(
+        catalog_support::startup_parameter<int>(this, "contact_pose_pairing_tolerance_ms", 100));
     config.placement_xy_tolerance_m = catalog_support::startup_parameter<double>(this, "placement_xy_tolerance_m", config.placement_xy_tolerance_m);
     config.placement_z_tolerance_m = catalog_support::startup_parameter<double>(this, "placement_z_tolerance_m", config.placement_z_tolerance_m);
     config.stable_speed_mps = catalog_support::startup_parameter<double>(this, "stable_speed_mps", config.stable_speed_mps);
@@ -200,10 +208,14 @@ class RuntimeNode final : public rclcpp::Node {
     const auto outcome_enabled = catalog_support::startup_parameter<bool>(this, "simulation_outcome_evidence", backend == "mock");
     const auto verification_failure = catalog_support::startup_parameter<std::string>(this, "mock_verification_failure", "none");
     const auto verification_window_ms = catalog_support::startup_parameter<int>(this, "verification_window_ms", gazebo_backend ? 500 : 100);
+    const auto verification_minimum_samples = catalog_support::startup_parameter<int>(
+        this, "verification_minimum_samples", 3);
     if (verification_failure != "none" && verification_failure != "grasp" && verification_failure != "placement")
       throw std::invalid_argument("mock verification failure must be none, grasp or placement");
-    if (verification_window_ms < 1 || verification_window_ms > 30000)
-      throw std::invalid_argument("verification window must be 1..30000 ms");
+    if (verification_window_ms < 1 || verification_window_ms > 30000 ||
+        verification_minimum_samples < 2 || verification_minimum_samples > 1000 ||
+        evidence_max_age_ms < 1 || evidence_max_age_ms > 30000)
+      throw std::invalid_argument("invalid verification window, sample count, or evidence age");
     const auto motion = declare_parameter<std::string>("motion_component", "mock_arm");
     const auto ticks = declare_parameter<int>("mock_action_ticks", 3);
     const auto stop_ticks = catalog_support::startup_parameter<int>(this, "mock_stop_ticks", 2);
@@ -227,6 +239,7 @@ class RuntimeNode final : public rclcpp::Node {
     if (history_capacity < 1 || history_capacity > 128) throw std::invalid_argument("execution history capacity requires 1..128");
     engine_ = std::make_unique<Engine>(motion, ticks, stop_ticks, fail, motion_permitted, this, ros_backend, gazebo_backend, config, *scene_,
                                      static_cast<size_t>(history_capacity), outcome_enabled, verification_failure, verification_window_ms,
+                                     evidence_max_age_ms, static_cast<unsigned>(verification_minimum_samples),
                                      perception_scene, perception_mode == "object_pose" ? rc::PoseMeaning::object_pose : rc::PoseMeaning::motion_target,
                                      std::move(target_resolver));
     tasks_->validate_configuration(*scene_, engine_->skills, engine_->bindings);
