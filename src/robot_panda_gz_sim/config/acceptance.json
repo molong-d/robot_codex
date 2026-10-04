@@ -1,5 +1,6 @@
 {
   "world_frame": "world",
+  "gazebo_world_name": "panda_pick_place",
   "object_id": "workpiece",
   "target_id": "tray",
   "support_surface_z_m": 0.35,

@@ -205,9 +205,14 @@ def main():
                     continue
                 accepted, epoch, reason = sample_guard.observe(f"pose:{object_id}", source_ns, sim_ns)
                 stream_sequences[object_id] = stream_sequences.get(object_id, 0) + 1
+                source_frame = transform.header.frame_id
+                canonical_frame = (acceptance["world_frame"] if source_frame in
+                                   (acceptance["world_frame"], acceptance["gazebo_world_name"])
+                                   else source_frame)
                 sample = {
                     "stream": f"pose:{object_id}", "object_id": object_id, "child_frame_id": child,
-                    "frame_id": transform.header.frame_id, "source_stamp_ns": source_ns,
+                    "frame_id": canonical_frame, "source_frame_id": source_frame,
+                    "source_stamp_ns": source_ns,
                     "sim_time_ns": sim_ns, "receipt_monotonic_ns": receipt_ns,
                     "epoch": epoch, "sequence": stream_sequences[object_id],
                     "accepted": accepted, "reject_reason": reason,
@@ -267,7 +272,8 @@ def main():
             accepted, epoch, reason = sample_guard.observe("contact", source_ns, sim_ns)
             stream_sequences["contact"] = stream_sequences.get("contact", 0) + 1
             contact_samples.append({
-                "stream": "contact", "object_id": "workpiece", "frame_id": "world",
+                "stream": "contact", "object_id": "workpiece", "frame_id": acceptance["world_frame"],
+                "source_frame_id": message.header.frame_id,
                 "source_stamp_ns": source_ns, "sim_time_ns": sim_ns,
                 "receipt_monotonic_ns": receipt_ns, "epoch": epoch,
                 "sequence": stream_sequences["contact"], "accepted": accepted,

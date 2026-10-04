@@ -91,7 +91,7 @@ void GazeboWorldAdapter::activate_epoch(uint64_t epoch) {
 
 void GazeboWorldAdapter::on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr message) {
   if (!message || message->transforms.empty()) return;
-  struct Selected { int score; const geometry_msgs::msg::Transform* transform; uint64_t source_ns; std::string frame; };
+  struct Selected { int score; const geometry_msgs::msg::Transform* transform; uint64_t source_ns; };
   std::map<std::string, Selected> selected;
   const auto simulation_now_ns = node_->now().nanoseconds();
   if (simulation_now_ns <= 0) return;
@@ -106,7 +106,7 @@ void GazeboWorldAdapter::on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr messa
           static_cast<uint64_t>(simulation_now_ns)-source_ns >
               static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(config_.evidence_max_age).count())) continue;
       if (score > 0 && (!selected.count(entry.first) || score > selected.at(entry.first).score))
-        selected[entry.first] = {score, &transform.transform, source_ns, transform.header.frame_id};
+        selected[entry.first] = {score, &transform.transform, source_ns};
     }
   }
   if (selected.empty()) return;
@@ -130,7 +130,9 @@ void GazeboWorldAdapter::on_poses(tf2_msgs::msg::TFMessage::ConstSharedPtr messa
     sample.previous_source_ns = sample.source_ns;
     sample.pose = pose;
     sample.stamp = clock.stamp();
-    sample.frame_id = selected_pose.frame;
+    // The configured Gazebo world name was explicitly accepted above as an
+    // alias for the canonical world frame.
+    sample.frame_id = config_.world_frame;
     sample.sample_id = ++world_sample_sequence_;
     sample.source_ns = static_cast<uint64_t>(clock.source_ns());
     sample.epoch = clock.epoch();

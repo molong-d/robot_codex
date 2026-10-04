@@ -47,6 +47,8 @@ def generate_launch_description():
     acceptance_file = share / "config" / "acceptance.json"
     acceptance = json.loads(acceptance_file.read_text(encoding="utf-8"))
     acceptance_parameters = {
+        "perception_frame": acceptance["world_frame"],
+        "gazebo_world_name": acceptance["gazebo_world_name"],
         "support_surface_z": acceptance["support_surface_z_m"],
         "object_height_m": acceptance["object_height_m"],
         "grasp_lift_m": acceptance["grasp_lift_m"],
@@ -116,6 +118,9 @@ def generate_launch_description():
         ], output="screen")
     scene_sync = Node(package="robot_panda_gz_sim", executable="gz_scene_sync",
                       parameters=[{"use_sim_time": True,
+                                   "world_frame": acceptance["world_frame"],
+                                   "gazebo_world_name": acceptance["gazebo_world_name"],
+                                   "object_id": acceptance["object_id"],
                                    "evidence_max_age_ms": acceptance["evidence_max_age_ms"],
                                    "publish_grasp_feedback": ParameterValue(
                                        LaunchConfiguration("publish_grasp_feedback"), value_type=bool)}],

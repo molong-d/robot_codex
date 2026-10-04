@@ -25,7 +25,8 @@ def _valid_source_time(sample, max_age_ns):
             source <= clock and clock - source <= max_age_ns)
 
 
-def _ordered_valid_samples(samples, epoch, world_frame, max_age_ns, expected_object=None):
+def _ordered_valid_samples(samples, epoch, world_frame, max_age_ns, gazebo_world_name,
+                           expected_object=None):
     last_source = {}
     last_sequence = {}
     valid = set()
@@ -34,10 +35,16 @@ def _ordered_valid_samples(samples, epoch, world_frame, max_age_ns, expected_obj
         current_epoch = sample.get("epoch")
         source = sample.get("source_stamp_ns")
         sequence = sample.get("sequence")
+        source_frame = sample.get("source_frame_id")
         if (sample.get("accepted") is not True or sample.get("frame_id") != world_frame or
                 current_epoch != epoch or not _valid_source_time(sample, max_age_ns) or
                 not isinstance(stream, str) or not isinstance(sequence, int) or sequence <= 0 or
                 (expected_object is not None and sample.get("object_id") != expected_object)):
+            continue
+        allowed_source_frames = {world_frame, gazebo_world_name}
+        if stream == "contact":
+            allowed_source_frames.add("")
+        if source_frame not in allowed_source_frames:
             continue
         key = (stream, current_epoch)
         if source <= last_source.get(key, 0) or sequence <= last_sequence.get(key, 0):
@@ -63,13 +70,15 @@ def audit_physics(result, acceptance):
     poses = result.get("pose_history", [])
     contacts = result.get("contact_samples", [])
     events = result.get("task_events", [])
-    valid_pose_indices = _ordered_valid_samples(poses, epoch, acceptance["world_frame"], max_age_ns)
+    valid_pose_indices = _ordered_valid_samples(
+        poses, epoch, acceptance["world_frame"], max_age_ns, acceptance["gazebo_world_name"])
     accepted_poses = [s for i, s in enumerate(poses) if i in valid_pose_indices and
                       isinstance(s.get("xyz"), list) and len(s["xyz"]) == 3]
     object_poses = [s for s in accepted_poses if s.get("object_id") == acceptance["object_id"]]
     tray_poses = [s for s in accepted_poses if s.get("object_id") == acceptance["target_id"]]
     valid_contact_indices = _ordered_valid_samples(contacts, epoch, acceptance["world_frame"],
-                                                    max_age_ns, acceptance["object_id"])
+                                                    max_age_ns, acceptance["gazebo_world_name"],
+                                                    acceptance["object_id"])
     accepted_contacts = [s for i, s in enumerate(contacts) if i in valid_contact_indices]
 
     release_events = [e for e in events if e.get("phase") == "release_confirmed" and

@@ -12,7 +12,8 @@ from test_gazebo_trials import run_one_trial
 
 
 ACCEPTANCE = {
-    "world_frame": "world", "object_id": "workpiece", "target_id": "tray",
+    "world_frame": "world", "gazebo_world_name": "panda_pick_place",
+    "object_id": "workpiece", "target_id": "tray",
     "support_surface_z_m": 0.35, "object_height_m": 0.04, "grasp_lift_m": 0.04,
     "placement_xy_tolerance_m": 0.05, "placement_z_tolerance_m": 0.015,
     "stable_speed_mps": 0.04, "verification_window_ms": 500,
@@ -24,6 +25,7 @@ ACCEPTANCE = {
 def pose(object_id, stamp, xyz, receipt=9_900_000_000, frame="world", epoch=0, sequence=None):
     return {
         "stream": f"pose:{object_id}", "object_id": object_id, "frame_id": frame,
+        "source_frame_id": frame,
         "source_stamp_ns": stamp, "sim_time_ns": stamp + 10_000_000,
         "receipt_monotonic_ns": receipt, "epoch": epoch, "sequence": sequence or stamp,
         "accepted": True, "xyz": xyz,
@@ -33,6 +35,7 @@ def pose(object_id, stamp, xyz, receipt=9_900_000_000, frame="world", epoch=0, s
 def contact(stamp, pairs, receipt=9_900_000_000, epoch=0, sequence=None, frame="world"):
     return {
         "stream": "contact", "object_id": "workpiece", "frame_id": frame,
+        "source_frame_id": frame,
         "source_stamp_ns": stamp, "sim_time_ns": stamp + 10_000_000,
         "receipt_monotonic_ns": receipt, "epoch": epoch, "sequence": sequence or stamp,
         "accepted": True, "contacts": pairs,
@@ -113,6 +116,18 @@ def main():
         "frame_id"] = "base_link"
     require(not audit_physics(wrong_frame, ACCEPTANCE)["independently_valid_physical_outcome"],
             "wrong-coordinate-frame sample was accepted")
+
+    wrong_source_frame = successful_physics()
+    next(s for s in reversed(wrong_source_frame["pose_history"]) if s["object_id"] == "workpiece")[
+        "source_frame_id"] = "base_link"
+    require(not audit_physics(wrong_source_frame, ACCEPTANCE)["independently_valid_physical_outcome"],
+            "unrecognized source frame was accepted after normalization")
+
+    gaz_world_alias = successful_physics()
+    for sample in gaz_world_alias["pose_history"]:
+        sample["source_frame_id"] = ACCEPTANCE["gazebo_world_name"]
+    require(audit_physics(gaz_world_alias, ACCEPTANCE)["independently_valid_physical_outcome"],
+            "configured Gazebo world alias was not normalized to the world frame")
 
     historical_contact = successful_physics()
     historical_contact["contact_samples"][-1]["contacts"] = []

@@ -181,8 +181,6 @@ class GazeboSceneSync(Node):
                 if reason not in ("duplicate_or_out_of_order", "stale_source_time"):
                     self.get_logger().debug(f"discarding {name} pose sample: {reason}")
                 continue
-            if transform.header.frame_id != self.world_frame:
-                continue
             pose = _pose_from_transform(transform.transform)
             previous = self.poses.get(name)
             moved = previous is None or any(abs(a - b) > 0.001 for a, b in zip(
