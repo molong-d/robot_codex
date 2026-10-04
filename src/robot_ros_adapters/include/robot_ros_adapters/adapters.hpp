@@ -157,11 +157,25 @@ class MoveItArm final : public rc::ArmMotion {
     channel_.send(goal, [](const auto& r) { return r.result->error_code.val == 1; });
   }
   rc::Status poll(rc::Time now) override {
+    const auto cached = measured_;
     measured_ = {};
+    const auto reuse_cached = [&]() {
+      if (!cached.valid || cached.epoch != tf_clock_.epoch() || cached.epoch != joint_clock_.epoch() ||
+          !rc::fresh(cached.stamp, now, config_.evidence_max_age) ||
+          !rc::fresh(joint_clock_.stamp(), now, config_.evidence_max_age)) return;
+      measured_ = cached;
+      measured_.stopped = stationary(joints_, config_.arm_joints);
+    };
     try {
       const auto t = buffer_->lookupTransform(config_.frame, config_.tip, tf2::TimePointZero);
       const auto old_epoch = tf_clock_.epoch();
-      if (!observe_ros_stamp(node_, tf_clock_, t.header.stamp)) return channel_.status();
+      if (!observe_ros_stamp(node_, tf_clock_, t.header.stamp)) {
+        // Duplicate or out-of-order TF does not become new evidence. Keep the
+        // prior sample identity and its original receipt-derived expiry so a
+        // polling boundary cannot turn a still-fresh cache into an error.
+        reuse_cached();
+        return channel_.status();
+      }
       if (tf_clock_.epoch() != old_epoch) measured_ = {};
       measured_.frame_id = config_.frame;
       measured_.pose = {t.transform.translation.x, t.transform.translation.y, t.transform.translation.z,
@@ -172,7 +186,11 @@ class MoveItArm final : public rc::ArmMotion {
       measured_.valid = joint_clock_.epoch() == tf_clock_.epoch() && measured_.stamp != rc::Time{} &&
                         rc::fresh(measured_.stamp, now, config_.evidence_max_age) && rc::valid_pose(measured_.pose);
       measured_.stopped = measured_.valid && stationary(joints_, config_.arm_joints);
-    } catch (const tf2::TransformException&) { /* missing TF is unavailable feedback */ }
+    } catch (const tf2::TransformException&) {
+      // A transiently unavailable lookup may reuse the old cache only until
+      // its original freshness deadline; it never advances sample identity.
+      reuse_cached();
+    }
     return channel_.status();
   }
   void request_stop() override { channel_.stop(); }
