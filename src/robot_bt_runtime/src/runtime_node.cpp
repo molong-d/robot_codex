@@ -185,7 +185,8 @@ class RuntimeNode final : public rclcpp::Node {
     config.grasp_stamped_topic = declare_parameter<std::string>("grasp_stamped_topic", config.grasp_stamped_topic);
     config.world_pose_topics = catalog_support::startup_parameter<std::vector<std::string>>(
         this, "world_pose_topics", config.world_pose_topics);
-    config.world_frame = catalog_support::startup_parameter<std::string>(this, "perception_frame", config.world_frame);
+    if (gazebo_backend)
+      config.world_frame = catalog_support::startup_parameter<std::string>(this, "perception_frame", config.world_frame);
     config.gazebo_world_name = catalog_support::startup_parameter<std::string>(
         this, "gazebo_world_name", config.gazebo_world_name);
     config.support_surface_z = catalog_support::startup_parameter<double>(this, "support_surface_z", config.support_surface_z);
