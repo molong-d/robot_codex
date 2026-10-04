@@ -505,7 +505,7 @@ def main():
                     "successful": successful,
                     "reason": "parameter response timed out or was rejected" if not successful else ""})
             if (args.disturb_object_before_verification and not verification_fault_started and
-                    task_feedback.get("active_skill") == "verify_placement"):
+                    release_seen and task_feedback.get("active_skill") == "place_object"):
                 verification_fault_started = True
                 request = SetEntityPose.Request()
                 request.entity.name = "workpiece"
@@ -520,9 +520,11 @@ def main():
                 executor.spin_until_future_complete(verification_fault_future, timeout_sec=2.0)
                 response = verification_fault_future.result() if verification_fault_future.done() else None
                 successful = bool(response and response.success)
-                task_events.append({"phase": "off_target_pose_injected_before_verification",
+                task_events.append({"phase": "off_target_pose_injected_after_release",
                     "sim_time_ns": node.get_clock().now().nanoseconds,
                     "receipt_monotonic_ns": time.monotonic_ns(),
+                    "trigger_active_skill": task_feedback.get("active_skill"),
+                    "release_already_observed": release_seen,
                     "returncode": 0 if successful else 1,
                     "elapsed_wall_s": time.monotonic()-fault_started,
                     "requested_pose_m": [0.80, -0.18, 0.40],

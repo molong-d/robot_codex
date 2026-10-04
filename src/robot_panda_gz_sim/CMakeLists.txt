@@ -20,5 +20,7 @@ if(BUILD_TESTING)
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/test_evidence_release_window.py)
   add_test(NAME gazebo_offline_evidence_roundtrip
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/test_offline_evidence.py)
+  add_test(NAME gazebo_scenario_fault_order
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/test_gazebo_scenario_validation.py)
 endif()
 ament_package()

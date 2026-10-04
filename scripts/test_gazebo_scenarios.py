@@ -81,9 +81,18 @@ def validate_case(name, expectation, trial, result):
             e.get("phase") == "external_gripper_open_during_lift" for e in result.get("task_events", []))
     if expectation.get("requires_object_disturbance"):
         disturbance = next((e for e in result.get("task_events", [])
-                            if e.get("phase") == "off_target_pose_injected_before_verification"), None)
+                            if e.get("phase") == "off_target_pose_injected_after_release"), None)
         checks["off_target_fault_injection_succeeded"] = bool(
             disturbance and disturbance.get("returncode") == 0 and disturbance.get("successful") is True)
+        release = next((e for e in result.get("task_events", []) if e.get("phase") == "release_confirmed"), None)
+        place = _step(result, "place_object")
+        verification = _step(result, "verify_placement")
+        checks["fault_injected_after_release_before_verification"] = bool(
+            disturbance and release and place and place.get("status") == "succeeded" and verification and
+            disturbance.get("trigger_active_skill") == "place_object" and
+            disturbance.get("release_already_observed") is True and
+            release.get("receipt_monotonic_ns", 0) < disturbance.get("receipt_monotonic_ns", 0) <
+            result.get("final_receipt_monotonic_ns", 0))
         checks["fault_injected_after_place_motion"] = bool(
             _step(result, "place_object") and _step(result, "place_object").get("status") == "succeeded" and
             _step(result, "verify_placement"))
