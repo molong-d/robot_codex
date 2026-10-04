@@ -126,6 +126,9 @@ class GazeboSceneSync(Node):
         self.contact_sequence = 0
         self.scene = SceneReconciler(response_timeout_s=5.0)
         self.last_scene_request = 0.0
+        self.started_monotonic = time.monotonic()
+        self.fresh_inputs_reported = False
+        self.scene_service_wait_reported = False
         self.feedback_enabled = self.get_parameter("publish_grasp_feedback").value
 
         self.contact_pub = (self.create_publisher(Bool, self.get_parameter("grasp_topic").value, 10)
@@ -331,8 +334,18 @@ class GazeboSceneSync(Node):
             name in self.poses and now - self.poses[name][2] <= 0.5 and
             self.poses[name][3] == self.epoch and self.poses[name][4] == self.world_frame
             for name in (self.object_id, "tray"))
+        if fresh_inputs and not self.fresh_inputs_reported:
+            self.fresh_inputs_reported = True
+            self.get_logger().info(
+                f"Fresh Gazebo poses ready for scene sync: object={self.object_id}, "
+                f"tray=tray, epoch={self.epoch}, frame={self.world_frame}")
+        service_ready = self.scene_client.service_is_ready()
+        if (not service_ready and now - self.started_monotonic > 2.0 and
+                not self.scene_service_wait_reported):
+            self.scene_service_wait_reported = True
+            self.get_logger().warning("Waiting for MoveIt /apply_planning_scene service")
         request = None
-        if self.scene_client.service_is_ready() and now - self.last_scene_request >= 0.1:
+        if service_ready and now - self.last_scene_request >= 0.1:
             request = self.scene.submit(now, fresh_inputs)
         if request is None:
             self.scene_ready_pub.publish(Bool(data=bool(self.scene.ready and fresh_inputs)))
@@ -340,12 +353,19 @@ class GazeboSceneSync(Node):
         scene = self._planning_scene(request)
         if scene is None:
             self.scene.complete(request, False)
+            self.get_logger().warning(
+                f"Could not build MoveIt scene request {request.request_id} "
+                f"(attached={request.attached}, cleanup={request.cleanup}, epoch={request.epoch})")
             self.scene_ready_pub.publish(Bool(data=False))
             return
         request = ApplyPlanningScene.Request()
         request.scene = scene
         self.last_scene_request = time.monotonic()
         submitted = self.scene.in_flight
+        self.get_logger().info(
+            f"Submitting MoveIt scene request {submitted.request_id}: "
+            f"version={submitted.version}, epoch={submitted.epoch}, "
+            f"attached={submitted.attached}, cleanup={submitted.cleanup}")
         try:
             future = self.scene_client.call_async(request)
         except Exception as error:
@@ -359,6 +379,11 @@ class GazeboSceneSync(Node):
                 result = done.result()
                 if not self.scene.complete(submitted, result.success):
                     self.get_logger().warning("Ignoring duplicate or stale MoveIt scene callback")
+                self.get_logger().info(
+                    f"MoveIt scene request {submitted.request_id} response: "
+                    f"success={result.success}, ready={self.scene.ready}, "
+                    f"dirty={self.scene.dirty}, desired_version={self.scene.version}, "
+                    f"confirmed_version={self.scene.confirmed_version}")
                 if not result.success:
                     self.get_logger().error("MoveIt rejected the Gazebo collision scene update")
             except Exception as error:  # service shutdown or transport failure
