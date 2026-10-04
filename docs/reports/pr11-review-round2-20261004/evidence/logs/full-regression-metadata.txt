@@ -1,0 +1,4 @@
+exit_code=0
+code_sha=f92d5325d13505f14a3d24767fdc4dab9b314560
+tracked_worktree_status=clean
+command=bash scripts/with_jazzy.sh bash scripts/test_all_jazzy.sh

@@ -1,0 +1,185 @@
+Starting >>> robot_core
+Starting >>> robot_interfaces
+Finished <<< robot_interfaces [0.01s]
+UpdateCTestConfiguration  from :/workspace/build/robot_core/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_core/CTestConfiguration.ini
+   Site: LOONG
+   Build name: (empty)
+ Add coverage exclude regular expressions.
+Create new tag: 20261004-1140 - Experimental
+UpdateCTestConfiguration  from :/workspace/build/robot_core/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_core/CTestConfiguration.ini
+Test project /workspace/build/robot_core
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: core_contracts
+
+1: Test command: /workspace/build/robot_core/core_test
+1: Working Directory: /workspace/build/robot_core
+1: Test timeout computed to be: 10000000
+1: PASS native poses resolve through rotation and separate tool offsets
+1: PASS static calibration rejects malformed profiles and wrong input semantics
+1: PASS calibration preserves real source age and marks synthetic geometry
+1: PASS resolved six-step task preserves goals and calibration trace
+1: PASS resolved implementation needs its own dependency before plan admission
+1: PASS skills reject altered resolution provenance frames and tool identities
+1: PASS resolution failures and stale sources terminate without actuator commands
+1: PASS resolved motion uses the same gate and confirmed cancellation leases
+1: PASS evidence policy rejects missing source quality and synthetic data by default
+1: PASS locate validates source quality and pose meaning before storing
+1: PASS native object pose cannot be sent directly to arm motion
+1: PASS six-step verification promotes only accepted placement evidence
+1: PASS plan admission validates verification ordering without predicted facts
+1: PASS verification requires post-effect samples and does not count cached data
+1: PASS demo outcome identity advances only when oldest contributing sample advances
+1: PASS verification rejects malformed negative and misidentified evidence
+1: PASS verification rejects source changes regressions and large sample gaps
+1: PASS failed placement evidence leaves candidate and does not promote location
+1: PASS read-only verification cancellation releases leases without manipulating
+1: PASS execution journal keeps terminal evidence and snapshot copies
+1: PASS execution history evicts oldest completion and preserves active task
+1: PASS execution recording rejects invalid bounds and duplicate starts
+1: PASS fault diagnostic snapshot retains unknown resource ownership
+1: PASS cancel recording distinguishes stop request from confirmation
+1: PASS plan validation never writes predicted effects or dispatches
+1: PASS late invalid plan step blocks the entire plan before execution
+1: PASS plan checks locate grasp release ordering and matching identities
+1: PASS plan bounds versions and XML-like inputs are rejected
+1: PASS plan uses actual held state and requires new within-plan observations
+1: PASS plan permits implementation-specific dependencies without constructing skills
+1: PASS validated plan steps still execute through verified skill sessions
+1: PASS entity input schema rejects malformed identifiers before dispatch
+1: PASS demo scene rejects duplicate IDs and invalid poses
+1: PASS catalog reports implementation bindings without executing factories or gates
+1: PASS task admission checks every step before any actuator or factory
+1: PASS task aliases validate roles and only select reviewed templates
+1: PASS second configured object and target reuse complete manipulation flow
+1: PASS pose validation rejects NaN and invalid quaternion
+1: PASS cancel winning completion race never dispatches gripper
+1: PASS terminal result needs fresh stationary feedback to release lease
+1: PASS outside-tolerance pose blocks grasp after successful action
+1: PASS dispatch exception still requests stop and keeps ownership
+1: PASS skill composes perception arm motion and gripper
+1: PASS closed empty gripper opens and verifies before arm approach
+1: PASS moving gripper is allowed to stop before manipulation starts
+1: PASS configured manipulation approaches, descends, then lifts or retreats
+1: PASS motion implementation can change without skill changes
+1: PASS stale and future pose observations are rejected
+1: PASS place requires a fresh target pose
+1: PASS execution gate blocks all actuators before resource claim
+1: PASS invalid arguments fail before dispatch
+1: PASS unbound wrong type and wrong version are rejected
+1: PASS unknown implementation fails without resource leak
+1: PASS resource contention is atomic and owner IDs are unique
+1: PASS arm and gripper leases span the complete skill
+1: PASS cancel holds both leases until active component confirms stop
+1: PASS timeout uses confirmed cancellation path
+1: PASS start is idempotent across a multi-component skill
+1: PASS motion and gripper failures remain distinct
+1: PASS exceptions latch unknown state and retain control ownership
+1: PASS destruction does not falsely confirm a stop
+1: PASS skill implementation selection is independent of definition
+1: 62 tests passed
+1/1 Test #1: core_contracts ...................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec
+Finished <<< robot_core [0.03s]
+Starting >>> robot_ros_adapters
+UpdateCTestConfiguration  from :/workspace/build/robot_ros_adapters/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_ros_adapters/CTestConfiguration.ini
+   Site: LOONG
+   Build name: (empty)
+ Add coverage exclude regular expressions.
+Create new tag: 20261004-1140 - Experimental
+UpdateCTestConfiguration  from :/workspace/build/robot_ros_adapters/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_ros_adapters/CTestConfiguration.ini
+Test project /workspace/build/robot_ros_adapters
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: simulation_time_contracts
+
+1: Test command: /workspace/build/robot_ros_adapters/time_source_test
+1: Working Directory: /workspace/build/robot_ros_adapters
+1: Test timeout computed to be: 10000000
+1/2 Test #1: simulation_time_contracts ........   Passed    0.00 sec
+test 2
+    Start 2: panda_joint_position_roundoff
+
+2: Test command: /workspace/build/robot_ros_adapters/joint_position_test
+2: Working Directory: /workspace/build/robot_ros_adapters
+2: Test timeout computed to be: 10000000
+2/2 Test #2: panda_joint_position_roundoff ....   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.01 sec
+Finished <<< robot_ros_adapters [0.05s]
+Starting >>> robot_bt_runtime
+Finished <<< robot_bt_runtime [0.01s]
+Starting >>> robot_panda_demo
+Starting >>> robot_bringup
+Finished <<< robot_panda_demo [0.01s]
+Starting >>> robot_panda_gz_sim
+Finished <<< robot_bringup [0.01s]
+UpdateCTestConfiguration  from :/workspace/build/robot_panda_gz_sim/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_panda_gz_sim/CTestConfiguration.ini
+   Site: LOONG
+   Build name: (empty)
+ Add coverage exclude regular expressions.
+Create new tag: 20261004-1140 - Experimental
+UpdateCTestConfiguration  from :/workspace/build/robot_panda_gz_sim/CTestConfiguration.ini
+Parse Config file:/workspace/build/robot_panda_gz_sim/CTestConfiguration.ini
+Test project /workspace/build/robot_panda_gz_sim
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: gazebo_sensor_timestamp_guard
+
+1: Test command: /usr/bin/python3 "/workspace/src/robot_panda_gz_sim/test/test_sensor_timestamps.py"
+1: Working Directory: /workspace/build/robot_panda_gz_sim
+1: Test timeout computed to be: 10000000
+1: .........
+1: ----------------------------------------------------------------------
+1: Ran 9 tests in 0.000s
+1: 
+1: OK
+1/3 Test #1: gazebo_sensor_timestamp_guard ....   Passed    0.36 sec
+test 2
+    Start 2: gazebo_scene_state_guard
+
+2: Test command: /usr/bin/python3 "/workspace/src/robot_panda_gz_sim/test/test_scene_state.py"
+2: Working Directory: /workspace/build/robot_panda_gz_sim
+2: Test timeout computed to be: 10000000
+2: scene state races, reset cleanup, failure, timeout, and readiness passed
+2/3 Test #2: gazebo_scene_state_guard .........   Passed    0.02 sec
+test 3
+    Start 3: gazebo_trial_audit_guard
+
+3: Test command: /usr/bin/python3 "/workspace/src/robot_panda_gz_sim/test/test_gazebo_trials.py"
+3: Working Directory: /workspace/build/robot_panda_gz_sim
+3: Test timeout computed to be: 10000000
+3: stale-result isolation and independent physical evidence audit passed
+3/3 Test #3: gazebo_trial_audit_guard .........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.41 sec
+Finished <<< robot_panda_gz_sim [0.43s]
+
+Summary: 7 packages finished [0.63s]

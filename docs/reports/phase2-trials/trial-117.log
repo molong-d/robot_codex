@@ -1,0 +1,498 @@
+[INFO] [launch]: All log files can be found below /home/ubuntu/.ros/log/2026-10-04-07-17-23-916260-LOONG-42
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [gazebo-1]: process started with pid [56]
+[INFO] [parameter_bridge-2]: process started with pid [57]
+[INFO] [robot_state_publisher-3]: process started with pid [59]
+[INFO] [move_group-4]: process started with pid [60]
+[INFO] [gz_scene_sync-5]: process started with pid [61]
+[INFO] [create-6]: process started with pid [62]
+[robot_state_publisher-3] [WARN] [1791098244.132430261] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_state_publisher-3] [WARN] [1791098244.132450750] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[create-6] [WARN] [1791098244.132532898] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[create-6] [WARN] [1791098244.132539847] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_state_publisher-3] [INFO] [1791098244.145047389] [robot_state_publisher]: Robot initialized
+[parameter_bridge-2] [WARN] [1791098244.147299971] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[parameter_bridge-2] [WARN] [1791098244.147309658] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[move_group-4] [WARN] [1791098244.152776985] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[move_group-4] [WARN] [1791098244.152786407] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[parameter_bridge-2] [INFO] [1791098244.155677435] [gazebo_ros_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1791098244.156296633] [gazebo_ros_bridge]: Creating GZ->ROS Bridge: [/panda_gz/workpiece/pose (gz.msgs.Pose_V) -> /panda_gz/workpiece/pose (tf2_msgs/msg/TFMessage)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1791098244.157562266] [gazebo_ros_bridge]: Creating GZ->ROS Bridge: [/panda_gz/tray/pose (gz.msgs.Pose_V) -> /panda_gz/tray/pose (tf2_msgs/msg/TFMessage)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1791098244.157729987] [gazebo_ros_bridge]: Creating GZ->ROS Bridge: [/world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact (gz.msgs.Contacts) -> /world/panda_pick_place/model/workpiece/link/link/sensor/workpiece_contact/contact (ros_gz_interfaces/msg/Contacts)] (Lazy 0)
+[parameter_bridge-2] [INFO] [1791098244.158711000] [gazebo_ros_bridge]: Creating GZ->ROS Bridge: [/world/panda_pick_place/model/table/link/link/sensor/table_contact/contact (gz.msgs.Contacts) -> /world/panda_pick_place/model/table/link/link/sensor/table_contact/contact (ros_gz_interfaces/msg/Contacts)] (Lazy 0)
+[move_group-4] [INFO] [1791098244.168045660] [move_group.moveit.moveit.ros.rdf_loader]: Loaded robot model in 0 seconds
+[move_group-4] [INFO] [1791098244.168110819] [move_group.moveit.moveit.core.robot_model]: Loading robot model 'panda'...
+[move_group-4] [WARN] [1791098244.171242027] [kdl_parser]: The root link panda_link0 has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[move_group-4] [INFO] [1791098244.171284172] [move_group.moveit.moveit.kinematics.kdl_kinematics_plugin]: Joint weights for group 'panda_arm': 1 1 1 1 1 1 1
+[move_group-4] [INFO] [1791098244.185327509] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-4] [INFO] [1791098244.185407498] [move_group.moveit.moveit.ros.moveit_cpp]: Listening to 'joint_states' for joint states
+[move_group-4] [INFO] [1791098244.185961464] [move_group.moveit.moveit.ros.current_state_monitor]: Listening to joint states on topic 'joint_states'
+[move_group-4] [INFO] [1791098244.186128683] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/attached_collision_object' for attached collision objects
+[move_group-4] [INFO] [1791098244.186134596] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping existing planning scene publisher.
+[move_group-4] [INFO] [1791098244.186197967] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[move_group-4] [INFO] [1791098244.186309298] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-4] [INFO] [1791098244.186339310] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting planning scene monitor
+[move_group-4] [INFO] [1791098244.186449536] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/planning_scene'
+[move_group-4] [INFO] [1791098244.186454431] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting world geometry update monitor for collision objects, attached objects, octomap updates.
+[move_group-4] [INFO] [1791098244.186849412] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'collision_object'
+[move_group-4] [INFO] [1791098244.186985878] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'planning_scene_world' for planning scene world geometry
+[move_group-4] [WARN] [1791098244.187076854] [move_group.moveit.moveit.ros.occupancy_map_monitor]: Resolution not specified for Octomap. Assuming resolution = 0.1 instead
+[move_group-4] [ERROR] [1791098244.187083018] [move_group.moveit.moveit.ros.occupancy_map_monitor]: No 3D sensor plugin(s) defined for octomap updates
+[move_group-4] [INFO] [1791098244.195464609] [move_group.moveit.moveit.ros.planning_pipeline]: Successfully loaded planner 'OMPL'
+[move_group-4] [INFO] [1791098244.195939261] [move_group]: Try loading adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098244.196424472] [move_group]: Loaded adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098244.196429686] [move_group]: Try loading adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-4] [INFO] [1791098244.196510882] [move_group]: Loaded adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-4] [INFO] [1791098244.196513050] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-4] [INFO] [1791098244.196522418] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-4] [INFO] [1791098244.196524164] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-4] [INFO] [1791098244.196528981] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-4] [INFO] [1791098244.196935115] [move_group]: Try loading adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098244.197967368] [move_group]: Loaded adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098244.197974041] [move_group]: Try loading adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-4] [INFO] [1791098244.199035465] [move_group]: Loaded adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-4] [INFO] [1791098244.199043609] [move_group]: Try loading adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-4] [INFO] [1791098244.199268965] [move_group]: Loaded adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-4] [INFO] [1791098244.209441366] [move_group.moveit.moveit.plugins.simple_controller_manager]: Added FollowJointTrajectory controller for panda_arm_controller
+[move_group-4] [INFO] [1791098244.209533299] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098244.209544843] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098244.209774937] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Trajectory execution is managing controllers
+[move_group-4] [INFO] [1791098244.209782725] [move_group]: MoveGroup debug mode is ON
+[move_group-4] [INFO] [1791098244.216220324] [move_group.moveit.moveit.ros.move_group.executable]: 
+[move_group-4] 
+[move_group-4] ********************************************************
+[move_group-4] * MoveGroup using: 
+[move_group-4] *     - apply_planning_scene_service
+[move_group-4] *     - clear_octomap_service
+[move_group-4] *     - get_group_urdf
+[move_group-4] *     - load_geometry_from_file
+[move_group-4] *     - CartesianPathService
+[move_group-4] *     - execute_trajectory_action
+[move_group-4] *     - get_planning_scene_service
+[move_group-4] *     - kinematics_service
+[move_group-4] *     - move_action
+[move_group-4] *     - motion_plan_service
+[move_group-4] *     - query_planners_service
+[move_group-4] *     - state_validation_service
+[move_group-4] *     - save_geometry_to_file
+[move_group-4] ********************************************************
+[move_group-4] 
+[move_group-4] [INFO] [1791098244.216253239] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context using pipeline ompl
+[move_group-4] [INFO] [1791098244.216258733] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context initialization complete
+[move_group-4] [96mLoading 'move_group/ApplyPlanningSceneService'...[0m
+[move_group-4] [96mLoading 'move_group/ClearOctomapService'...[0m
+[move_group-4] [96mLoading 'move_group/GetUrdfService'...[0m
+[move_group-4] [96mLoading 'move_group/LoadGeometryFromFileService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupCartesianPathService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupExecuteTrajectoryAction'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupGetPlanningSceneService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupKinematicsService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupMoveAction'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupPlanService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupQueryPlannersService'...[0m
+[move_group-4] [96mLoading 'move_group/MoveGroupStateValidationService'...[0m
+[move_group-4] [96mLoading 'move_group/SaveGeometryToFileService'...[0m
+[move_group-4] 
+[move_group-4] [92mYou can start planning now![0m
+[move_group-4] 
+[gz_scene_sync-5] [WARN] [1791098244.462496836] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[gz_scene_sync-5] [WARN] [1791098244.462504112] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[create-6] [INFO] [1791098244.533218294] [spawn_panda]: Entity creation successful.
+[INFO] [create-6]: process has finished cleanly [pid 62]
+[INFO] [spawner-7]: process started with pid [179]
+[spawner-7] [WARN] [1791098244.837622408] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-7] [WARN] [1791098244.837636613] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-7] [INFO] [1791098244.880326787] [spawner_joint_state_broadcaster]: waiting for service /controller_manager/list_controllers to become available...
+[gazebo-1] [WARN] [1791098246.274823460] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[gazebo-1] [WARN] [1791098246.274837804] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[gazebo-1] [INFO] [1791098246.284114589] [gz_ros_control]: [gz_ros2_control] Fixed joint ['world_anchor'] (Entity='69') is skipped.
+[gazebo-1] [INFO] [1791098246.284690593] [gz_ros_control]: Loading controller_manager
+[gazebo-1] [INFO] [1791098246.289619065] [controller_manager]: Using ROS clock for triggering controller manager cycles.
+[gazebo-1] [WARN] [1791098246.289637225] [controller_manager]: The resource manager is not yet initialized, will wait for the robot description to initialize it..
+[gazebo-1] [INFO] [1791098246.292957113] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[gazebo-1] [WARN] [1791098246.292981880] [gz_ros_control]: Waiting RM to load and initialize hardware...
+[gazebo-1] [INFO] [1791098246.474071383] [controller_manager]: Received robot description from topic.
+[gazebo-1] [INFO] [1791098246.474290555] [controller_manager]: Enforcing command limits is disabled. Command limits from URDF will be ignored.
+[gazebo-1] [INFO] [1791098246.485581450] [gz_ros_control]: The position_proportional_gain has been set to: 0.1
+[gazebo-1] [INFO] [1791098246.485729416] [gz_ros_control]: Loading joint: panda_joint1
+[gazebo-1] [INFO] [1791098246.485749202] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.485768307] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.485798342] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.485812888] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.485828277] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.485836895] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.485844388] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.485873670] [gz_ros_control]: Loading joint: panda_joint2
+[gazebo-1] [INFO] [1791098246.485881976] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.485889079] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.485897505] [gz_ros_control]: 			 found initial value: -0.785000
+[gazebo-1] [INFO] [1791098246.485907152] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.485914136] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.485922095] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.485928709] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.485949750] [gz_ros_control]: Loading joint: panda_joint3
+[gazebo-1] [INFO] [1791098246.485957573] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.485964329] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.485973007] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.485981417] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.485988334] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.485996151] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.486002663] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486028813] [gz_ros_control]: Loading joint: panda_joint4
+[gazebo-1] [INFO] [1791098246.486037066] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.486043913] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486051335] [gz_ros_control]: 			 found initial value: -2.356000
+[gazebo-1] [INFO] [1791098246.486065556] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.486072246] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.486080611] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.486087379] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486105918] [gz_ros_control]: Loading joint: panda_joint5
+[gazebo-1] [INFO] [1791098246.486113465] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.486120476] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486129660] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.486137727] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.486144886] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.486152507] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.486158931] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486177447] [gz_ros_control]: Loading joint: panda_joint6
+[gazebo-1] [INFO] [1791098246.486185393] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.486192366] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486199154] [gz_ros_control]: 			 found initial value: 1.571000
+[gazebo-1] [INFO] [1791098246.486207608] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.486214608] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.486222263] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.486276386] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486293981] [gz_ros_control]: Loading joint: panda_joint7
+[gazebo-1] [INFO] [1791098246.486301580] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.486308461] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486315281] [gz_ros_control]: 			 found initial value: 0.785000
+[gazebo-1] [INFO] [1791098246.486323693] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.486330063] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.486337732] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.486344203] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.486599264] [controller_manager]: Initialize hardware 'PandaFakeSystem' 
+[gazebo-1] [WARN] [1791098246.486665087] [controller_manager.hardware_component.system.PandaFakeSystem]: Executor is not available during hardware component initialization for 'PandaFakeSystem'. Skipping node creation!
+[gazebo-1] [INFO] [1791098246.486827770] [controller_manager]: Successful initialization of hardware 'PandaFakeSystem'
+[gazebo-1] [INFO] [1791098246.487242903] [gz_ros_control]: The position_proportional_gain has been set to: 0.1
+[gazebo-1] [INFO] [1791098246.487269200] [gz_ros_control]: Loading joint: panda_finger_joint1
+[gazebo-1] [INFO] [1791098246.487279148] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.487287559] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.487295974] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.487304602] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.487313144] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.487320885] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.487328093] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.487350383] [gz_ros_control]: Loading joint: panda_finger_joint2
+[gazebo-1] [INFO] [1791098246.487362119] [gz_ros_control]: Joint 'panda_finger_joint2'is mimicking joint 'panda_finger_joint1' with multiplier: 1 and offset: 0
+[gazebo-1] [INFO] [1791098246.487371542] [gz_ros_control]: 	State:
+[gazebo-1] [INFO] [1791098246.487378400] [gz_ros_control]: 		 position
+[gazebo-1] [INFO] [1791098246.487386423] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.487394505] [gz_ros_control]: 		 velocity
+[gazebo-1] [INFO] [1791098246.487402135] [gz_ros_control]: 			 found initial value: 0.000000
+[gazebo-1] [INFO] [1791098246.487410241] [gz_ros_control]: 	Command:
+[gazebo-1] [INFO] [1791098246.487453855] [controller_manager]: Initialize hardware 'PandaHandFakeSystem' 
+[gazebo-1] [WARN] [1791098246.487467859] [controller_manager.hardware_component.system.PandaHandFakeSystem]: Executor is not available during hardware component initialization for 'PandaHandFakeSystem'. Skipping node creation!
+[gazebo-1] [INFO] [1791098246.487525830] [controller_manager]: Successful initialization of hardware 'PandaHandFakeSystem'
+[gazebo-1] [INFO] [1791098246.487733033] [controller_manager]: Activating component 'PandaHandFakeSystem'.
+[gazebo-1] [INFO] [1791098246.487755363] [resource_manager]: 'configure' hardware 'PandaHandFakeSystem' 
+[gazebo-1] [INFO] [1791098246.487767096] [gz_ros_control]: System Successfully configured!
+[gazebo-1] [INFO] [1791098246.487777054] [resource_manager]: Successful 'configure' of hardware 'PandaHandFakeSystem'
+[gazebo-1] [INFO] [1791098246.487793126] [resource_manager]: 'activate' hardware 'PandaHandFakeSystem' 
+[gazebo-1] [INFO] [1791098246.487826727] [resource_manager]: Successful 'activate' of hardware 'PandaHandFakeSystem'
+[gazebo-1] [INFO] [1791098246.487969364] [controller_manager]: Activating component 'PandaFakeSystem'.
+[gazebo-1] [INFO] [1791098246.487978379] [resource_manager]: 'configure' hardware 'PandaFakeSystem' 
+[gazebo-1] [INFO] [1791098246.487983300] [gz_ros_control]: System Successfully configured!
+[gazebo-1] [INFO] [1791098246.487991459] [resource_manager]: Successful 'configure' of hardware 'PandaFakeSystem'
+[gazebo-1] [INFO] [1791098246.488002165] [resource_manager]: 'activate' hardware 'PandaFakeSystem' 
+[gazebo-1] [INFO] [1791098246.488009492] [resource_manager]: Successful 'activate' of hardware 'PandaFakeSystem'
+[gazebo-1] [WARN] [1791098246.488040892] [controller_manager]: Component 'PandaHandFakeSystem' does not have read or write statistics initialized, skipping registration.
+[gazebo-1] [WARN] [1791098246.488050721] [controller_manager]: Component 'PandaFakeSystem' does not have read or write statistics initialized, skipping registration.
+[gazebo-1] [INFO] [1791098246.488091474] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[gazebo-1] [INFO] [1791098246.635444514] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[gazebo-1] [INFO] [1791098246.635584085] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[gazebo-1] [INFO] [1791098246.644593257] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /workspace/install/robot_panda_gz_sim/share/robot_panda_gz_sim/config/controllers.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[spawner-7] [INFO] [1791098246.650968566] [spawner_joint_state_broadcaster]: Loaded joint_state_broadcaster
+[gazebo-1] [INFO] [1791098246.651473024] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[gazebo-1] [INFO] [1791098246.651606886] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[gazebo-1] [INFO] [1791098246.661774750] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[gazebo-1] [1;31m[Err] [Physics.cc:1906] [0m[1;31mAttempting to create a mimic constraint for joint [[0m[1;31mpanda_finger_joint2[0m[1;31m] but the chosen physics engine does not support [0m[1;31mmimic constraints, so no constraint will be [0m[1;31mcreated.[0m[1;31m[0m
+[gazebo-1] [WARN] [1791098248.318740932] [gz_ros_control]:  Desired controller update period (0.01 s) is slower than the gazebo simulation period (0.001 s).
+[gazebo-1] [INFO] [1791098248.326643190] [controller_manager]: Successfully switched controllers!
+[spawner-7] [INFO] [1791098248.337423698] [spawner_joint_state_broadcaster]: Configured and activated joint_state_broadcaster
+[INFO] [spawner-7]: process has finished cleanly [pid 179]
+[INFO] [spawner-8]: process started with pid [240]
+[spawner-8] [WARN] [1791098248.653367090] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-8] [WARN] [1791098248.653375675] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-8] [INFO] [1791098248.697451455] [spawner_panda_arm_controller]: waiting for service /controller_manager/list_controllers to become available...
+[gazebo-1] [INFO] [1791098250.199029596] [controller_manager]: Loading controller : 'panda_arm_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gazebo-1] [INFO] [1791098250.199064930] [controller_manager]: Loading controller 'panda_arm_controller'
+[gazebo-1] [INFO] [1791098250.203205022] [controller_manager]: Controller 'panda_arm_controller' node arguments: --ros-args --params-file /workspace/install/robot_panda_gz_sim/share/robot_panda_gz_sim/config/controllers.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[spawner-8] [INFO] [1791098250.217726748] [spawner_panda_arm_controller]: Loaded panda_arm_controller
+[gazebo-1] [INFO] [1791098250.218497878] [controller_manager]: Configuring controller: 'panda_arm_controller'
+[gazebo-1] [INFO] [1791098250.218650270] [panda_arm_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gazebo-1] [INFO] [1791098250.218667522] [panda_arm_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gazebo-1] [INFO] [1791098250.218685048] [panda_arm_controller]: Using 'splines' interpolation method.
+[gazebo-1] [INFO] [1791098250.220358487] [panda_arm_controller]: Action status changes will be monitored at 20.00 Hz.
+[gazebo-1] [INFO] [1791098250.224100238] [panda_arm_controller]: Setting initial scaling factor to 1.000000
+[gazebo-1] [INFO] [1791098250.224116004] [panda_arm_controller]: No scaling interface set. This controller will not read speed scaling from the hardware.
+[gazebo-1] [INFO] [1791098250.227542227] [controller_manager]: Activating controllers: [ panda_arm_controller ]
+[gazebo-1] [INFO] [1791098250.236678607] [controller_manager]: Successfully switched controllers!
+[spawner-8] [INFO] [1791098250.247159654] [spawner_panda_arm_controller]: Configured and activated panda_arm_controller
+[INFO] [spawner-8]: process has finished cleanly [pid 240]
+[INFO] [spawner-9]: process started with pid [256]
+[spawner-9] [WARN] [1791098250.567676242] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-9] [WARN] [1791098250.567684714] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-9] [INFO] [1791098250.614014379] [spawner_panda_hand_controller]: waiting for service /controller_manager/list_controllers to become available...
+[gazebo-1] [INFO] [1791098250.865172571] [controller_manager]: Loading controller : 'panda_hand_controller' of type 'parallel_gripper_action_controller/GripperActionController'
+[gazebo-1] [INFO] [1791098250.865203209] [controller_manager]: Loading controller 'panda_hand_controller'
+[gazebo-1] [INFO] [1791098250.866833441] [controller_manager]: Controller 'panda_hand_controller' node arguments: --ros-args --params-file /workspace/install/robot_panda_gz_sim/share/robot_panda_gz_sim/config/controllers.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[spawner-9] [INFO] [1791098250.877314857] [spawner_panda_hand_controller]: Loaded panda_hand_controller
+[gazebo-1] [INFO] [1791098250.877827345] [controller_manager]: Configuring controller: 'panda_hand_controller'
+[gazebo-1] [INFO] [1791098250.877876746] [panda_hand_controller]: Action status changes will be monitored at 20.000000 Hz.
+[gazebo-1] [INFO] [1791098250.877885544] [panda_hand_controller]: Joint name is : panda_finger_joint1
+[gazebo-1] [INFO] [1791098250.887531948] [controller_manager]: Activating controllers: [ panda_hand_controller ]
+[gazebo-1] [INFO] [1791098250.897886763] [controller_manager]: Successfully switched controllers!
+[spawner-9] [INFO] [1791098250.907333746] [spawner_panda_hand_controller]: Configured and activated panda_hand_controller
+[INFO] [spawner-9]: process has finished cleanly [pid 256]
+[INFO] [robot_runtime-10]: process started with pid [271]
+[robot_runtime-10] [WARN] [1791098251.051235320] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_runtime-10] [WARN] [1791098251.051245473] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_runtime-10] [INFO] [1791098251.070180517] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=panda_gz; motion=ros_arm; permitted=true
+[gazebo-1] [INFO] [1791098257.350622303] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-10] [INFO] [1791098257.700982408] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-4] [INFO] [1791098257.910648727] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098257.910847999] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098257.916502519] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098257.916640792] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098257.916858846] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098257.916889703] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098257.916897492] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098257.916914818] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098257.916945834] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098257.917549953] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098257.917691266] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098257.939362713] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098257.939975431] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098257.940115673] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098257.940144339] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098257.940189972] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098257.940198004] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098257.940231472] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098257.946474602] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098257.946508958] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098257.946530881] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098257.946645732] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098257.946848606] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098257.946883653] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098257.946975435] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098257.946985766] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098260.146551672] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098260.147132213] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098260.147193011] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098260.156622404] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[move_group-4] [INFO] [1791098260.390494677] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098260.390650617] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098260.396802913] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098260.396884267] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098260.396997617] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098260.397032414] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098260.397043056] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098260.397068336] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098260.397095201] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098260.397466046] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098260.397548470] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098260.419311469] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098260.419584430] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098260.419678293] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098260.419700877] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098260.419737948] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098260.419746367] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098260.419764992] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098260.426616674] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098260.426665484] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098260.426687541] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098260.426783538] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098260.426918250] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098260.426941294] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098260.427009771] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098260.427016548] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098261.736416807] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098261.777143490] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098261.777192275] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098261.786679676] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[gazebo-1] [INFO] [1791098261.970420415] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-10] [INFO] [1791098263.920643669] [robot_runtime]: Panda gripper action result: code=4 reached_goal=false stalled=true
+[move_group-4] [INFO] [1791098263.950446255] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098263.950609764] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098263.956918272] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098263.956982180] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098263.957072794] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098263.957096897] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098263.957104868] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098263.957121871] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098263.957140385] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098263.957338375] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098263.957387243] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098263.979687250] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098263.979996256] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098263.980090886] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098263.980107772] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098263.980141371] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098263.980149540] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098263.980165050] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098263.986923912] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098263.986965557] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098263.986986497] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098263.987067716] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098263.987172608] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098263.987196773] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098263.987245977] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098263.987252945] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098265.546642600] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098265.587399091] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098265.596709451] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098265.597024432] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[move_group-4] [INFO] [1791098266.270460451] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098266.270577284] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098266.276735660] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098266.276801919] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098266.276893441] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098266.276916919] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098266.276923789] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098266.276940983] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098266.276959048] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098266.277155313] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098266.277204732] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098266.299433347] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098266.300662082] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098266.300904416] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098266.300955625] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098266.301015180] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098266.301031398] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098266.301057186] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098266.306797724] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098266.306827354] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098266.306848062] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098266.306932670] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098266.307045541] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098266.307062394] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098266.307136880] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098266.307147560] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098268.909221366] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098268.957260229] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098268.959313627] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098268.966913289] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[move_group-4] [INFO] [1791098269.150460163] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098269.150628927] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098269.159489846] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098269.159552363] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098269.159647126] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098269.159670898] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098269.159677791] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098269.159694601] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098269.159712750] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098269.159912116] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098269.159961539] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098269.181244228] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098269.181659596] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098269.181787353] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098269.181821185] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098269.181874724] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098269.181891132] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098269.181915293] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098269.189336479] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098269.189375167] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098269.189402852] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098269.189484634] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098269.189572487] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098269.189589741] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098269.189663831] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098269.189672843] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098270.449190615] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098270.489820713] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098270.489866788] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098270.499444425] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[gazebo-1] [INFO] [1791098270.690375400] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-10] [INFO] [1791098270.940568623] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-4] [INFO] [1791098271.150483476] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-4] [INFO] [1791098271.150600666] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-4] [INFO] [1791098271.159223749] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-4] [INFO] [1791098271.159290750] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-4] [INFO] [1791098271.159383693] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-4] [INFO] [1791098271.159407370] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-4] [WARN] [1791098271.159433315] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-4] [INFO] [1791098271.159452944] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-4] [INFO] [1791098271.159471381] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-4] [INFO] [1791098271.159677647] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-4] [INFO] [1791098271.159725666] [move_group]: Calling Planner 'OMPL'
+[move_group-4] [INFO] [1791098271.182045984] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-4] [INFO] [1791098271.182399178] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-4] [INFO] [1791098271.182509435] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-4] [WARN] [1791098271.182526835] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-4] [INFO] [1791098271.182562651] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098271.182570639] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098271.182586298] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-4] [INFO] [1791098271.189112011] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-4] [INFO] [1791098271.189146897] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098271.189172136] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-4] [INFO] [1791098271.189254413] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[gazebo-1] [INFO] [1791098271.189350592] [panda_arm_controller]: Received new action goal
+[gazebo-1] [INFO] [1791098271.189366562] [panda_arm_controller]: Accepted new action goal
+[move_group-4] [INFO] [1791098271.189432159] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-4] [INFO] [1791098271.189440696] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[gazebo-1] [INFO] [1791098272.749095704] [panda_arm_controller]: Goal reached, success!
+[move_group-4] [INFO] [1791098272.789566705] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-4] [INFO] [1791098272.789607204] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-4] [INFO] [1791098272.799216795] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[robot_runtime-10] [INFO] [1791098273.490333972] [robot_runtime]: Task succeeded:  Gazebo object-state and contact evidence verified over the configured window
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [robot_runtime-10]: sending signal 'SIGINT' to process[robot_runtime-10]
+[INFO] [gz_scene_sync-5]: sending signal 'SIGINT' to process[gz_scene_sync-5]
+[INFO] [move_group-4]: sending signal 'SIGINT' to process[move_group-4]
+[INFO] [robot_state_publisher-3]: sending signal 'SIGINT' to process[robot_state_publisher-3]
+[INFO] [parameter_bridge-2]: sending signal 'SIGINT' to process[parameter_bridge-2]
+[INFO] [gazebo-1]: sending signal 'SIGINT' to process[gazebo-1]
+[robot_state_publisher-3] [INFO] [1791098273.995779594] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [robot_state_publisher-3]: process has died [pid 59, exit code -2, cmd '/opt/ros/jazzy/lib/robot_state_publisher/robot_state_publisher --ros-args --params-file /tmp/launch_params_sqi1pey7'].
+[move_group-4] [INFO] [1791098273.995786543] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_runtime-10] [INFO] [1791098273.995779725] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[parameter_bridge-2] [INFO] [1791098273.995781343] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_runtime-10] [INFO] [1791098273.998806053] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[gz_scene_sync-5] Traceback (most recent call last):
+[gz_scene_sync-5]   File "/workspace/install/robot_panda_gz_sim/lib/robot_panda_gz_sim/gz_scene_sync", line 332, in main
+[gz_scene_sync-5]     rclpy.spin(node)
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/__init__.py", line 247, in spin
+[gz_scene_sync-5]     executor.spin_once()
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 926, in spin_once
+[gz_scene_sync-5]     self._spin_once_impl(timeout_sec)
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 907, in _spin_once_impl
+[gz_scene_sync-5]     handler, entity, node = self.wait_for_ready_callbacks(
+[gz_scene_sync-5]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 877, in wait_for_ready_callbacks
+[gz_scene_sync-5]     return next(self._cb_iter)
+[gz_scene_sync-5]            ^^^^^^^^^^^^^^^^^^^
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/executors.py", line 781, in _wait_for_ready_callbacks
+[gz_scene_sync-5]     wait_set.wait(timeout_nsec)
+[gz_scene_sync-5] KeyboardInterrupt
+[gz_scene_sync-5] 
+[gz_scene_sync-5] During handling of the above exception, another exception occurred:
+[gz_scene_sync-5] 
+[gz_scene_sync-5] Traceback (most recent call last):
+[gz_scene_sync-5]   File "/workspace/install/robot_panda_gz_sim/lib/robot_panda_gz_sim/gz_scene_sync", line 339, in <module>
+[gz_scene_sync-5]     main()
+[gz_scene_sync-5]   File "/workspace/install/robot_panda_gz_sim/lib/robot_panda_gz_sim/gz_scene_sync", line 334, in main
+[gz_scene_sync-5]     node.destroy_node()
+[gz_scene_sync-5]   File "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/node.py", line 1968, in destroy_node
+[gz_scene_sync-5]     self.__node.destroy_when_not_in_use()
+[gz_scene_sync-5] KeyboardInterrupt
+[parameter_bridge-2] [INFO] [1791098274.003595127] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [move_group-4]: process has died [pid 60, exit code -2, cmd '/opt/ros/jazzy/lib/moveit_ros_move_group/move_group --ros-args --params-file /tmp/launch_params_9ku9i2tn --params-file /tmp/launch_params_nxn074jc'].
+[gazebo-1] [INFO] [1791098274.022748750] [controller_manager.pal_statistics]: Async messages lost 0
+[gazebo-1] [INFO] [1791098274.022791165] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[gazebo-1] [INFO] [1791098274.023921690] [controller_manager.pal_statistics]: Async messages lost 0
+[gazebo-1] [INFO] [1791098274.023930707] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[ERROR] [gz_scene_sync-5]: process has died [pid 61, exit code -2, cmd '/workspace/install/robot_panda_gz_sim/lib/robot_panda_gz_sim/gz_scene_sync --ros-args --params-file /tmp/launch_params_0x2unswc'].
+[INFO] [parameter_bridge-2]: process has finished cleanly [pid 57]
+[INFO] [robot_runtime-10]: process has finished cleanly [pid 271]
+[ERROR] [gazebo-1]: process has died [pid 56, exit code -2, cmd 'ruby /opt/ros/jazzy/opt/gz_tools_vendor/bin/gz sim -s -r -v 2 --seed 117 /workspace/src/robot_panda_gz_sim/worlds/panda_pick_place.sdf --force-version 8'].
+[INFO] [launch]: process[gazebo-1] was required: shutting down launched system

@@ -1,0 +1,1373 @@
+{
+  "all_recomputations_match": true,
+  "audit_program_version": "2.0.0",
+  "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+  "format_version": "robot-codex-gazebo-audit-jsonl-gzip-v1",
+  "outcomes": [
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8359,
+        "final_epoch": 0,
+        "final_sim_time_ns": 28256000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5995182521687102,
+          -0.1831092852070644,
+          0.37099994590626173
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0031463845079427177,
+        "placement_z_error_m": 0.0009999459062617344,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 25453000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3657
+      },
+      "run_id": "trial-001-seed-200-2725f7788d71"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 7750,
+        "final_epoch": 0,
+        "final_sim_time_ns": 24889000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5912527411484485,
+          -0.18246692355640198,
+          0.3709999748848485
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.009088467926398634,
+        "placement_z_error_m": 0.0009999748848484868,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 22046000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3477
+      },
+      "run_id": "trial-002-seed-201-cfff6b566cea"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 26079,
+        "final_epoch": 0,
+        "final_sim_time_ns": 36861000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.44034360300779446,
+          0.04782178675563351,
+          0.3700782288168816
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.2781958511931155,
+        "placement_z_error_m": 7.822881688163141e-05,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 0
+      },
+      "run_id": "trial-003-seed-202-25c5122c4281"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 10636,
+        "final_epoch": 0,
+        "final_sim_time_ns": 26482000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5983046169476113,
+          -0.18450874038328785,
+          0.3709998687528235
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.004816955837270833,
+        "placement_z_error_m": 0.000999868752823485,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 2057
+      },
+      "run_id": "trial-004-seed-203-e72ccecdb976"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8116,
+        "final_epoch": 0,
+        "final_sim_time_ns": 22376000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6045642674414564,
+          -0.18221394108714498,
+          0.370999977665556
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.005072876148151855,
+        "placement_z_error_m": 0.0009999776655559844,
+        "post_release_no_contact_sample_count": 85,
+        "release_event_sim_time_ns": 19493000000,
+        "stable_pose_sample_count": 85,
+        "stable_window_observed_ms": 2856.0,
+        "tray_floor_contact_sample_count": 3261
+      },
+      "run_id": "trial-005-seed-204-d76849cdefb1"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8055,
+        "final_epoch": 0,
+        "final_sim_time_ns": 22609000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5964954640828342,
+          -0.17668907600318587,
+          0.3709999420847907
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.004821202101902064,
+        "placement_z_error_m": 0.000999942084790706,
+        "post_release_no_contact_sample_count": 15,
+        "release_event_sim_time_ns": 22066000000,
+        "stable_pose_sample_count": 15,
+        "stable_window_observed_ms": 476.0,
+        "tray_floor_contact_sample_count": 1520
+      },
+      "run_id": "trial-006-seed-205-91b1d771739e"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 7717,
+        "final_epoch": 0,
+        "final_sim_time_ns": 24690000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6008481633234425,
+          -0.18057235402575636,
+          0.37099955085075625
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0010232155950886204,
+        "placement_z_error_m": 0.000999550850756259,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 21866000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3225
+      },
+      "run_id": "trial-007-seed-206-5d1325c163ce"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8384,
+        "final_epoch": 0,
+        "final_sim_time_ns": 23113000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.595679184513528,
+          -0.1845545520446121,
+          0.37099991163048
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.006278008505506876,
+        "placement_z_error_m": 0.0009999116304800215,
+        "post_release_no_contact_sample_count": 16,
+        "release_event_sim_time_ns": 22549000000,
+        "stable_pose_sample_count": 16,
+        "stable_window_observed_ms": 510.0,
+        "tray_floor_contact_sample_count": 1244
+      },
+      "run_id": "trial-008-seed-207-861e8229ef47"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 9868,
+        "final_epoch": 0,
+        "final_sim_time_ns": 27199000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5978466939448562,
+          -0.17760425604293564,
+          0.3709999308865343
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0032212289696525865,
+        "placement_z_error_m": 0.0009999308865343282,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 24337000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3704
+      },
+      "run_id": "trial-009-seed-208-502de9f41b5f"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 9532,
+        "final_epoch": 0,
+        "final_sim_time_ns": 24076000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5989060687695176,
+          -0.18399212150012734,
+          0.3709999404196744
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0041392897469014825,
+        "placement_z_error_m": 0.0009999404196743833,
+        "post_release_no_contact_sample_count": 16,
+        "release_event_sim_time_ns": 23533000000,
+        "stable_pose_sample_count": 16,
+        "stable_window_observed_ms": 510.0,
+        "tray_floor_contact_sample_count": 1363
+      },
+      "run_id": "trial-010-seed-209-9d731c06ce99"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8189,
+        "final_epoch": 0,
+        "final_sim_time_ns": 28130000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6034383195344487,
+          -0.17930370688588282,
+          0.3709999455257029
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0035081142116155126,
+        "placement_z_error_m": 0.0009999455257029277,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 25287000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3850
+      },
+      "run_id": "trial-011-seed-210-f4d6143c64a6"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 9470,
+        "final_epoch": 0,
+        "final_sim_time_ns": 29417000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.601808039017693,
+          -0.18182326815445934,
+          0.3709999509053079
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.002567744506870936,
+        "placement_z_error_m": 0.0009999509053079114,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 26614000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3654
+      },
+      "run_id": "trial-012-seed-211-1ed1796805c6"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8183,
+        "final_epoch": 0,
+        "final_sim_time_ns": 22230000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6016550980752406,
+          -0.18229183004785446,
+          0.370999944464711
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0028269833050292258,
+        "placement_z_error_m": 0.0009999444647110223,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 19368000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3334
+      },
+      "run_id": "trial-013-seed-212-5b9e4614f282"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 10085,
+        "final_epoch": 0,
+        "final_sim_time_ns": 27006000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.600150640344109,
+          -0.17806515766095538,
+          0.37099991134504345
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0019406976555437331,
+        "placement_z_error_m": 0.0009999113450434582,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 24163000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3689
+      },
+      "run_id": "trial-014-seed-213-7e4a515d6f55"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8692,
+        "final_epoch": 0,
+        "final_sim_time_ns": 25747000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6032989660908183,
+          -0.1772400807878715,
+          0.37099991590108555
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.004301201149196038,
+        "placement_z_error_m": 0.0009999159010855574,
+        "post_release_no_contact_sample_count": 89,
+        "release_event_sim_time_ns": 22745000000,
+        "stable_pose_sample_count": 89,
+        "stable_window_observed_ms": 2992.0,
+        "tray_floor_contact_sample_count": 3954
+      },
+      "run_id": "trial-015-seed-214-a4de32f2d88a"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8954,
+        "final_epoch": 0,
+        "final_sim_time_ns": 25872000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6030942555489134,
+          -0.17711386494853787,
+          0.37099996408351193
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.004231334652005166,
+        "placement_z_error_m": 0.0009999640835119394,
+        "post_release_no_contact_sample_count": 85,
+        "release_event_sim_time_ns": 22970000000,
+        "stable_pose_sample_count": 85,
+        "stable_window_observed_ms": 2856.0,
+        "tray_floor_contact_sample_count": 3678
+      },
+      "run_id": "trial-016-seed-215-ce38cc40e36b"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8875,
+        "final_epoch": 0,
+        "final_sim_time_ns": 27348000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5995004169128587,
+          -0.18076136011869803,
+          0.3709999545954842
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0009106330168083572,
+        "placement_z_error_m": 0.000999954595484187,
+        "post_release_no_contact_sample_count": 87,
+        "release_event_sim_time_ns": 24405000000,
+        "stable_pose_sample_count": 87,
+        "stable_window_observed_ms": 2924.0,
+        "tray_floor_contact_sample_count": 3812
+      },
+      "run_id": "trial-017-seed-216-9ce11b3f361f"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8495,
+        "final_epoch": 0,
+        "final_sim_time_ns": 23340000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6003112781008921,
+          -0.17634406170924502,
+          0.37099992854304437
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0036691659599837425,
+        "placement_z_error_m": 0.0009999285430443705,
+        "post_release_no_contact_sample_count": 16,
+        "release_event_sim_time_ns": 22797000000,
+        "stable_pose_sample_count": 16,
+        "stable_window_observed_ms": 510.0,
+        "tray_floor_contact_sample_count": 1410
+      },
+      "run_id": "trial-018-seed-217-7fcfc429566e"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 7803,
+        "final_epoch": 0,
+        "final_sim_time_ns": 24865000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6004989414626221,
+          -0.17916268449188152,
+          0.37099994275713605
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0009746998734272785,
+        "placement_z_error_m": 0.000999942757136052,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 22062000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3565
+      },
+      "run_id": "trial-019-seed-218-2e6862b2a3d8"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8395,
+        "final_epoch": 0,
+        "final_sim_time_ns": 25358000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6026094595856307,
+          -0.17919193710853515,
+          0.3709999296112158
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.002731710995988176,
+        "placement_z_error_m": 0.0009999296112158107,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 22495000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3722
+      },
+      "run_id": "trial-020-seed-219-14d24b15f8dd"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8005,
+        "final_epoch": 0,
+        "final_sim_time_ns": 28226000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6038176528919657,
+          -0.18201501310255058,
+          0.3709999635471991
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.004316798745249125,
+        "placement_z_error_m": 0.000999963547199112,
+        "post_release_no_contact_sample_count": 86,
+        "release_event_sim_time_ns": 25323000000,
+        "stable_pose_sample_count": 86,
+        "stable_window_observed_ms": 2890.0,
+        "tray_floor_contact_sample_count": 3666
+      },
+      "run_id": "trial-001-seed-700-0a6a7238739a"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8741,
+        "final_epoch": 0,
+        "final_sim_time_ns": 22877000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6052188159291564,
+          -0.18100763849656457,
+          0.37099997836566984
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.005315202257880273,
+        "placement_z_error_m": 0.0009999783656698402,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 20034000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3243
+      },
+      "run_id": "trial-002-seed-708-b6646339a296"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 9031,
+        "final_epoch": 0,
+        "final_sim_time_ns": 25904000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.7999999999684948,
+          -0.17999999999953054,
+          0.3699998895829898
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.19999999996849482,
+        "placement_z_error_m": 1.1041701020175765e-07,
+        "post_release_no_contact_sample_count": 67,
+        "release_event_sim_time_ns": 23600000000,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 805
+      },
+      "run_id": "trial-003-seed-701-8e52d37eb1b4"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 1393,
+        "final_epoch": 0,
+        "final_sim_time_ns": 14624000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.44470816184016615,
+          0.012781273504554706,
+          0.36999992046956837
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.24754832742940913,
+        "placement_z_error_m": 7.953043162922668e-08,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 0
+      },
+      "run_id": "trial-004-seed-702-6239b3c53d47"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 9026,
+        "final_epoch": 0,
+        "final_sim_time_ns": 28366000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5954338957742862,
+          -0.18151461971960106,
+          0.37099993465905673
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.004810756769478769,
+        "placement_z_error_m": 0.0009999346590567337,
+        "post_release_no_contact_sample_count": 68,
+        "release_event_sim_time_ns": 26063000000,
+        "stable_pose_sample_count": 68,
+        "stable_window_observed_ms": 2278.0,
+        "tray_floor_contact_sample_count": 3059
+      },
+      "run_id": "trial-005-seed-703-e24b8691d908"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 0,
+        "final_epoch": 0,
+        "final_sim_time_ns": 10786000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.44,
+          0.05,
+          0.3699999998283326
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 1.7166740251539636e-10,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 0
+      },
+      "run_id": "trial-006-seed-704-be26e895eab1"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 0,
+        "final_epoch": 0,
+        "final_sim_time_ns": 15586000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.44,
+          0.05,
+          0.3699999998283326
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 1.7166740251539636e-10,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 0
+      },
+      "run_id": "trial-007-seed-705-4778408e05b6"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 7696,
+        "final_epoch": 0,
+        "final_sim_time_ns": 24917000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5922381965754978,
+          -0.1801160878567325,
+          0.37099996172278527
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.007762671498337046,
+        "placement_z_error_m": 0.0009999617227852697,
+        "post_release_no_contact_sample_count": 84,
+        "release_event_sim_time_ns": 22054000000,
+        "stable_pose_sample_count": 84,
+        "stable_window_observed_ms": 2822.0,
+        "tray_floor_contact_sample_count": 3261
+      },
+      "run_id": "trial-008-seed-706-1f04b3e4f480"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": false,
+          "final_contact_matches_pose_time": false,
+          "final_tray_floor_contact": false,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": false,
+          "object_lifted_after_grasp": false,
+          "placement_xy_within_tolerance": false,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": false,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": false,
+          "stable_window_observed": false,
+          "tray_contact_during_stable_window": false
+        },
+        "dual_finger_contact_sample_count": 0,
+        "final_epoch": 1,
+        "final_sim_time_ns": 32184000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.44,
+          0.05,
+          0.37
+        ],
+        "independently_valid_physical_outcome": false,
+        "placement_xy_error_m": 0.28017851452243797,
+        "placement_z_error_m": 0.0,
+        "post_release_no_contact_sample_count": 0,
+        "release_event_sim_time_ns": null,
+        "stable_pose_sample_count": 0,
+        "stable_window_observed_ms": 0.0,
+        "tray_floor_contact_sample_count": 0
+      },
+      "run_id": "trial-009-seed-707-89a292d8940d"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 8781,
+        "final_epoch": 0,
+        "final_sim_time_ns": 29168000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.5930693483001517,
+          -0.18274557683552942,
+          0.3709999443171455
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0074546713639439465,
+        "placement_z_error_m": 0.000999944317145507,
+        "post_release_no_contact_sample_count": 87,
+        "release_event_sim_time_ns": 26186000000,
+        "stable_pose_sample_count": 87,
+        "stable_window_observed_ms": 2924.0,
+        "tray_floor_contact_sample_count": 3883
+      },
+      "run_id": "trial-001-seed-202-c68e4fe322f4"
+    },
+    {
+      "matches_raw": true,
+      "recomputed_audit": {
+        "audit_version": "2.0.0",
+        "checks": {
+          "dual_finger_contact_same_sample": true,
+          "final_contact_matches_pose_time": true,
+          "final_tray_floor_contact": true,
+          "fresh_final_object_pose": true,
+          "fresh_final_target_pose": true,
+          "fresh_post_release_no_finger_contact": true,
+          "object_lifted_after_grasp": true,
+          "placement_xy_within_tolerance": true,
+          "placement_z_within_tolerance": true,
+          "release_identity_matches": true,
+          "same_epoch_world_poses": true,
+          "stable_pose_samples_fresh": true,
+          "stable_window_observed": true,
+          "tray_contact_during_stable_window": true
+        },
+        "dual_finger_contact_sample_count": 7947,
+        "final_epoch": 0,
+        "final_sim_time_ns": 21822000000,
+        "final_tray_xyz_m": [
+          0.6,
+          -0.18,
+          0.37
+        ],
+        "final_workpiece_xyz_m": [
+          0.6032843963056619,
+          -0.17919303803303768,
+          0.3709997841520421
+        ],
+        "independently_valid_physical_outcome": true,
+        "placement_xy_error_m": 0.0033820772771729016,
+        "placement_z_error_m": 0.0009997841520421047,
+        "post_release_no_contact_sample_count": 83,
+        "release_event_sim_time_ns": 18999000000,
+        "stable_pose_sample_count": 83,
+        "stable_window_observed_ms": 2788.0,
+        "tray_floor_contact_sample_count": 3813
+      },
+      "run_id": "trial-002-seed-207-99338621e577"
+    }
+  ],
+  "run_count": 31
+}

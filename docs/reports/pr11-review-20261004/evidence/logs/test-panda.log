@@ -1,0 +1,1317 @@
+[WARN] [1791114071.430255321] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114071.430277154] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+test_01_repeatable_pick_place_with_actual_ros_stack (__main__.NativePandaTests.test_01_repeatable_pick_place_with_actual_ros_stack) ... ok
+test_02_task_timeout_stops_and_releases_for_next_task (__main__.NativePandaTests.test_02_task_timeout_stops_and_releases_for_next_task) ... ok
+test_03_second_configured_object_target_and_alias (__main__.NativePandaTests.test_03_second_configured_object_target_and_alias) ... ok
+test_04_structured_plan_uses_actual_moveit_and_controllers (__main__.NativePandaTests.test_04_structured_plan_uses_actual_moveit_and_controllers) ... ok
+test_05_verified_template_marks_synthetic_outcome_proofs (__main__.NativePandaTests.test_05_verified_template_marks_synthetic_outcome_proofs) ... ok
+test_06_native_observation_is_not_a_precomputed_motion_target (__main__.NativePandaTests.test_06_native_observation_is_not_a_precomputed_motion_target) ... ok
+[INFO] [launch]: All log files can be found below /home/ubuntu/.ros/log/2026-10-04-11-41-11-579621-LOONG-1472
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [static_transform_publisher-1]: process started with pid [1484]
+[INFO] [robot_state_publisher-2]: process started with pid [1485]
+[INFO] [move_group-3]: process started with pid [1486]
+[INFO] [ros2_control_node-4]: process started with pid [1487]
+[INFO] [spawner-5]: process started with pid [1488]
+[INFO] [spawner-6]: process started with pid [1489]
+[INFO] [spawner-7]: process started with pid [1490]
+[INFO] [robot_runtime-8]: process started with pid [1491]
+[robot_state_publisher-2] [WARN] [1791114071.689820180] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_state_publisher-2] [WARN] [1791114071.689828282] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_runtime-8] [WARN] [1791114071.697680807] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_runtime-8] [WARN] [1791114071.697690239] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[static_transform_publisher-1] [WARN] [1791114071.697993943] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[static_transform_publisher-1] [WARN] [1791114071.698007785] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_state_publisher-2] [WARN] [1791114071.701179749] [kdl_parser]: The root link panda_link0 has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[robot_state_publisher-2] [INFO] [1791114071.701242443] [robot_state_publisher]: Robot initialized
+[ros2_control_node-4] [WARN] [1791114071.703967303] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[ros2_control_node-4] [WARN] [1791114071.703975147] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[static_transform_publisher-1] [INFO] [1791114071.712936732] [static_transform_publisher_xQQW4g59L5QrFP1P]: Spinning until stopped - publishing transform
+[static_transform_publisher-1] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-1] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-1] from 'world' to 'panda_link0'
+[ros2_control_node-4] [INFO] [1791114071.713654786] [controller_manager]: Using Steady (Monotonic) clock for triggering controller manager cycles.
+[ros2_control_node-4] [INFO] [1791114071.716143281] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[ros2_control_node-4] [INFO] [1791114071.716181546] [controller_manager]: update rate is 100 Hz
+[ros2_control_node-4] [INFO] [1791114071.716184668] [controller_manager]: Overruns handling is : enabled
+[ros2_control_node-4] [INFO] [1791114071.716187241] [controller_manager]: Spawning controller_manager RT thread with scheduler priority: 50
+[ros2_control_node-4] [WARN] [1791114071.716232712] [controller_manager]: Could not enable FIFO RT scheduling policy: with error number <1>(Operation not permitted). See [https://control.ros.org/master/doc/ros2_control/controller_manager/doc/userdoc.html] for details on how to enable realtime scheduling.
+[move_group-3] [WARN] [1791114071.716937343] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[move_group-3] [WARN] [1791114071.716945678] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_runtime-8] [INFO] [1791114071.717452425] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=panda_ros; motion=ros_arm; permitted=true
+[move_group-3] [INFO] [1791114071.731085894] [move_group.moveit.moveit.ros.rdf_loader]: Loaded robot model in 0.00137691 seconds
+[move_group-3] [INFO] [1791114071.731150186] [move_group.moveit.moveit.core.robot_model]: Loading robot model 'panda'...
+[move_group-3] [WARN] [1791114071.734301438] [kdl_parser]: The root link panda_link0 has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[move_group-3] [INFO] [1791114071.734355959] [move_group.moveit.moveit.kinematics.kdl_kinematics_plugin]: Joint weights for group 'panda_arm': 1 1 1 1 1 1 1
+[move_group-3] [INFO] [1791114071.748632123] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-3] [INFO] [1791114071.748726409] [move_group.moveit.moveit.ros.moveit_cpp]: Listening to 'joint_states' for joint states
+[move_group-3] [INFO] [1791114071.749355061] [move_group.moveit.moveit.ros.current_state_monitor]: Listening to joint states on topic 'joint_states'
+[move_group-3] [INFO] [1791114071.749585914] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/attached_collision_object' for attached collision objects
+[move_group-3] [INFO] [1791114071.749596437] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping existing planning scene publisher.
+[move_group-3] [INFO] [1791114071.749686672] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[move_group-3] [INFO] [1791114071.749925965] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-3] [INFO] [1791114071.749970557] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting planning scene monitor
+[move_group-3] [INFO] [1791114071.750404918] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/planning_scene'
+[move_group-3] [INFO] [1791114071.750417973] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting world geometry update monitor for collision objects, attached objects, octomap updates.
+[move_group-3] [INFO] [1791114071.750685013] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'collision_object'
+[move_group-3] [INFO] [1791114071.750892875] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'planning_scene_world' for planning scene world geometry
+[move_group-3] [WARN] [1791114071.751019542] [move_group.moveit.moveit.ros.occupancy_map_monitor]: Resolution not specified for Octomap. Assuming resolution = 0.1 instead
+[move_group-3] [ERROR] [1791114071.751030953] [move_group.moveit.moveit.ros.occupancy_map_monitor]: No 3D sensor plugin(s) defined for octomap updates
+[move_group-3] [INFO] [1791114071.759244155] [move_group.moveit.moveit.ros.planning_pipeline]: Successfully loaded planner 'OMPL'
+[move_group-3] [INFO] [1791114071.759819413] [move_group]: Try loading adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114071.760354288] [move_group]: Loaded adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114071.760366215] [move_group]: Try loading adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-3] [INFO] [1791114071.760470874] [move_group]: Loaded adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-3] [INFO] [1791114071.760475691] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-3] [INFO] [1791114071.760491708] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-3] [INFO] [1791114071.760494474] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-3] [INFO] [1791114071.760502129] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-3] [INFO] [1791114071.761015476] [move_group]: Try loading adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114071.762083826] [move_group]: Loaded adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114071.762092893] [move_group]: Try loading adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-3] [INFO] [1791114071.763210339] [move_group]: Loaded adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-3] [INFO] [1791114071.763219530] [move_group]: Try loading adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-3] [INFO] [1791114071.763515795] [move_group]: Loaded adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-3] [INFO] [1791114071.773481705] [move_group.moveit.moveit.plugins.simple_controller_manager]: Added FollowJointTrajectory controller for panda_arm_controller
+[move_group-3] [INFO] [1791114071.773603090] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114071.773619435] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114071.773940889] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Trajectory execution is managing controllers
+[move_group-3] [INFO] [1791114071.773952454] [move_group]: MoveGroup debug mode is ON
+[move_group-3] [INFO] [1791114071.780163375] [move_group.moveit.moveit.ros.move_group.executable]: 
+[move_group-3] 
+[move_group-3] ********************************************************
+[move_group-3] * MoveGroup using: 
+[move_group-3] *     - apply_planning_scene_service
+[move_group-3] *     - clear_octomap_service
+[move_group-3] *     - get_group_urdf
+[move_group-3] *     - load_geometry_from_file
+[move_group-3] *     - CartesianPathService
+[move_group-3] *     - execute_trajectory_action
+[move_group-3] *     - get_planning_scene_service
+[move_group-3] *     - kinematics_service
+[move_group-3] *     - move_action
+[move_group-3] *     - motion_plan_service
+[move_group-3] *     - query_planners_service
+[move_group-3] *     - state_validation_service
+[move_group-3] *     - save_geometry_to_file
+[move_group-3] ********************************************************
+[move_group-3] 
+[move_group-3] [INFO] [1791114071.780191947] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context using pipeline ompl
+[move_group-3] [INFO] [1791114071.780199535] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context initialization complete
+[move_group-3] [96mLoading 'move_group/ApplyPlanningSceneService'...[0m
+[move_group-3] [96mLoading 'move_group/ClearOctomapService'...[0m
+[move_group-3] [96mLoading 'move_group/GetUrdfService'...[0m
+[move_group-3] [96mLoading 'move_group/LoadGeometryFromFileService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupCartesianPathService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupExecuteTrajectoryAction'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupGetPlanningSceneService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupKinematicsService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupMoveAction'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupPlanService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupQueryPlannersService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupStateValidationService'...[0m
+[move_group-3] [96mLoading 'move_group/SaveGeometryToFileService'...[0m
+[move_group-3] 
+[move_group-3] [92mYou can start planning now![0m
+[move_group-3] 
+[spawner-5] [WARN] [1791114071.868214486] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-5] [WARN] [1791114071.868223528] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-7] [WARN] [1791114071.868214498] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-7] [WARN] [1791114071.868223449] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-6] [WARN] [1791114071.875252500] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-6] [WARN] [1791114071.875259204] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-5] [INFO] [1791114071.910896617] [spawner_joint_state_broadcaster]: waiting for service /controller_manager/list_controllers to become available...
+[ros2_control_node-4] [INFO] [1791114072.057261080] [controller_manager]: Received robot description from topic.
+[ros2_control_node-4] [INFO] [1791114072.057426254] [controller_manager]: Enforcing command limits is disabled. Command limits from URDF will be ignored.
+[move_group-3] [WARN] [1791114072.058982195] [move_group.moveit.moveit.ros.current_state_monitor]: Unable to update multi-DOF joint 'virtual_joint':Failure to lookup transform between 'world'and 'panda_link0' with TF exception: "world" passed to lookupTransform argument target_frame does not exist. 
+[ros2_control_node-4] [INFO] [1791114072.064095519] [controller_manager]: Loading hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.064511252] [controller_manager]: Loaded hardware 'PandaFakeSystem' from plugin 'mock_components/GenericSystem'
+[ros2_control_node-4] [INFO] [1791114072.064574385] [controller_manager]: Initialize hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.067548484] [controller_manager]: Successful initialization of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.067633550] [controller_manager]: Loading hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.067644288] [controller_manager]: Loaded hardware 'PandaHandFakeSystem' from plugin 'mock_components/GenericSystem'
+[ros2_control_node-4] [INFO] [1791114072.067658205] [controller_manager]: Initialize hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.081098093] [controller_manager]: Successful initialization of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.081356018] [controller_manager]: Activating component 'PandaHandFakeSystem'.
+[ros2_control_node-4] [INFO] [1791114072.081376157] [resource_manager]: 'configure' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.081396508] [resource_manager]: Successful 'configure' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.081407862] [resource_manager]: 'activate' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.081422270] [resource_manager]: Successful 'activate' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.081531201] [controller_manager]: Activating component 'PandaFakeSystem'.
+[ros2_control_node-4] [INFO] [1791114072.081541305] [resource_manager]: 'configure' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.081555909] [resource_manager]: Successful 'configure' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.081567889] [resource_manager]: 'activate' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114072.081575290] [resource_manager]: Successful 'activate' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114072.081605044] [controller_manager]: Registering statistics for : PandaHandFakeSystem
+[ros2_control_node-4] [INFO] [1791114072.081732558] [controller_manager]: Registering statistics for : PandaFakeSystem
+[ros2_control_node-4] [INFO] [1791114072.081871528] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[ros2_control_node-4] [INFO] [1791114072.164823540] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[ros2_control_node-4] [INFO] [1791114072.164947898] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114072.172333212] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /tmp/launch_params_0j9xz8lt --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-5] [INFO] [1791114072.190004862] [spawner_joint_state_broadcaster]: Loaded joint_state_broadcaster
+[ros2_control_node-4] [INFO] [1791114072.191864804] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114072.192097760] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[ros2_control_node-4] [INFO] [1791114072.209222786] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[ros2_control_node-4] [INFO] [1791114072.216912448] [controller_manager]: Successfully switched controllers!
+[spawner-5] [INFO] [1791114072.229304352] [spawner_joint_state_broadcaster]: Configured and activated joint_state_broadcaster
+[spawner-7] [INFO] [1791114072.321264972] [spawner_panda_hand_controller]: waiting for service /controller_manager/list_controllers to become available...
+[INFO] [spawner-5]: process has finished cleanly [pid 1488]
+[ros2_control_node-4] [INFO] [1791114072.572529749] [controller_manager]: Loading controller : 'panda_hand_controller' of type 'parallel_gripper_action_controller/GripperActionController'
+[ros2_control_node-4] [INFO] [1791114072.572566993] [controller_manager]: Loading controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114072.573780878] [controller_manager]: Controller 'panda_hand_controller' node arguments: --ros-args --params-file /tmp/launch_params_0j9xz8lt --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-7] [INFO] [1791114072.588225728] [spawner_panda_hand_controller]: Loaded panda_hand_controller
+[ros2_control_node-4] [INFO] [1791114072.589199424] [controller_manager]: Configuring controller: 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114072.589286096] [panda_hand_controller]: Action status changes will be monitored at 20.000000 Hz.
+[ros2_control_node-4] [INFO] [1791114072.589302664] [panda_hand_controller]: Joint name is : panda_finger_joint1
+[ros2_control_node-4] [INFO] [1791114072.598891796] [controller_manager]: Activating controllers: [ panda_hand_controller ]
+[ros2_control_node-4] [INFO] [1791114072.615530969] [controller_manager]: Successfully switched controllers!
+[spawner-7] [INFO] [1791114072.619826556] [spawner_panda_hand_controller]: Configured and activated panda_hand_controller
+[spawner-6] [INFO] [1791114072.681131689] [spawner_panda_arm_controller]: waiting for service /controller_manager/list_controllers to become available...
+[INFO] [spawner-7]: process has finished cleanly [pid 1490]
+[ros2_control_node-4] [INFO] [1791114075.686422134] [controller_manager]: Loading controller : 'panda_arm_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[ros2_control_node-4] [INFO] [1791114075.686513185] [controller_manager]: Loading controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114075.690901740] [controller_manager]: Controller 'panda_arm_controller' node arguments: --ros-args --params-file /tmp/launch_params_0j9xz8lt --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-6] [INFO] [1791114075.708275685] [spawner_panda_arm_controller]: Loaded panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114075.709479790] [controller_manager]: Configuring controller: 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114075.709808129] [panda_arm_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[ros2_control_node-4] [INFO] [1791114075.709840974] [panda_arm_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[ros2_control_node-4] [INFO] [1791114075.709869391] [panda_arm_controller]: Using 'splines' interpolation method.
+[ros2_control_node-4] [INFO] [1791114075.712970915] [panda_arm_controller]: Action status changes will be monitored at 20.00 Hz.
+[ros2_control_node-4] [INFO] [1791114075.719891718] [panda_arm_controller]: Setting initial scaling factor to 1.000000
+[ros2_control_node-4] [INFO] [1791114075.719919999] [panda_arm_controller]: No scaling interface set. This controller will not read speed scaling from the hardware.
+[ros2_control_node-4] [INFO] [1791114075.728856981] [controller_manager]: Activating controllers: [ panda_arm_controller ]
+[ros2_control_node-4] [INFO] [1791114075.737598470] [controller_manager]: Successfully switched controllers!
+[spawner-6] [INFO] [1791114075.749124762] [spawner_panda_arm_controller]: Configured and activated panda_arm_controller
+[INFO] [spawner-6]: process has finished cleanly [pid 1489]
+[ros2_control_node-4] [INFO] [1791114075.978571148] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114076.029715330] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114076.058899329] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114076.059611782] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114076.067229939] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114076.067743269] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114076.068734901] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114076.068916322] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114076.068930182] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114076.068958341] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114076.069013961] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114076.070378255] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114076.070679445] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114076.087208319] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114076.090032376] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114076.090671721] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114076.090789775] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114076.090962270] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114076.091001867] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114076.091119903] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114076.097063617] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114076.097224208] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114076.097322308] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114076.097735168] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114076.098511025] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114076.098605775] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114076.099199526] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114076.099258894] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114078.206782491] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114078.249427185] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114078.277019335] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114078.277427536] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114078.358135033] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114078.408736060] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114078.438394910] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114078.438758977] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114078.446986342] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114078.447239401] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114078.447618938] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114078.447741393] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114078.447773784] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114078.447851364] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114078.447933789] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114078.448991000] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114078.449228611] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114078.481291063] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114078.484647776] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114078.485230583] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114078.485387912] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114078.485581849] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114078.485652121] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114078.485739899] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114078.486931985] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114078.487049705] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114078.487114462] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114078.487297612] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114078.487619413] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114078.487665547] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114078.487890510] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114078.487914580] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114080.146578866] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114080.188380650] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114080.216902501] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114080.227104117] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114080.258041164] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114080.308891037] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114080.337824609] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114080.358510724] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114080.359105702] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114080.366871397] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114080.367080570] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114080.367427226] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114080.367530704] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114080.367563334] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114080.367663221] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114080.367751608] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114080.368503222] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114080.368817800] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114080.386942752] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114080.388434475] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114080.388715164] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114080.388756301] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114080.388846047] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114080.388870503] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114080.388922018] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114080.396958440] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114080.397135217] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114080.397251573] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114080.397523766] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114080.398013929] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114080.398081809] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114080.398438084] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114080.398488431] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114082.006545213] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114082.049090934] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114082.076980083] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114082.087167604] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114082.117862587] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114082.168287727] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114082.198492613] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114082.198802266] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114082.206963477] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114082.207091180] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114082.207300075] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114082.207331789] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114082.207340461] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114082.207365691] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114082.207396586] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114082.207871931] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114082.207986387] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114082.224424158] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114082.225129396] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114082.225223569] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114082.225248257] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114082.225281504] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114082.225289184] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114082.225303711] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114082.226838892] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114082.226874728] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114082.226893471] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114082.226976266] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114082.227236388] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114082.227312413] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114082.227550790] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114082.227587966] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114083.946546378] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114083.977912775] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114084.006876955] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114084.017086680] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114084.098279764] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114084.148879076] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114084.177945284] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114084.478689614] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114084.479098344] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114084.486852649] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114084.487104218] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114084.487482791] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114084.487587442] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114084.487619798] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114084.487723855] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114084.487807302] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114084.488573090] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114084.488873731] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114084.505830814] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114084.507631539] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114084.508061279] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114084.508137649] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114084.508278199] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.508310610] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.508373157] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114084.517124865] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114084.517243409] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.517288450] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.517467736] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114084.517845640] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114084.517909747] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114084.518158613] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114084.518192908] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[move_group-3] [INFO] [1791114084.577995299] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request to cancel goal
+[move_group-3] [INFO] [1791114084.587171456] [move_group.moveit.moveit.ros.plan_execution]: Stopping execution due to preempt request
+[move_group-3] [INFO] [1791114084.587255684] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Cancelling execution for panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114084.587837666] [panda_arm_controller]: Got request to cancel goal
+[ros2_control_node-4] [INFO] [1791114084.587949784] [panda_arm_controller]: Canceling active action goal because cancel callback received.
+[move_group-3] [INFO] [1791114084.588257776] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Stopped trajectory execution.
+[move_group-3] [INFO] [1791114084.618340983] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114084.618381221] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status PREEMPTED ...
+[move_group-3] [INFO] [1791114084.618519278] [move_group.moveit.moveit.ros.move_group.move_action]: PREEMPTED
+[robot_runtime-8] [INFO] [1791114084.697617735] [robot_runtime]: Task timed_out: TIMEOUT all active actions confirmed stopped by measured feedback
+[move_group-3] [INFO] [1791114084.718379137] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114084.718744191] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114084.726871373] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114084.727049042] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114084.727320547] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114084.727395323] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114084.727416028] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114084.727464451] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114084.727517608] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114084.728031830] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114084.728186676] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114084.752678253] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114084.753066523] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114084.753155105] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114084.753171600] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114084.753225291] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.753234004] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.753253890] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114084.756719253] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114084.756768519] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.756790770] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114084.756886143] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114084.757014868] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114084.757034532] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114084.757088269] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114084.757095461] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114086.346587188] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114086.357845881] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114086.386961211] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114086.396978981] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114086.418085832] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114086.468845573] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114086.498676000] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114086.499044243] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114086.506905901] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114086.507131340] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114086.507369442] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114086.507414907] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114086.507424256] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114086.507449247] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114086.507480165] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114086.508001741] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114086.508120129] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114086.535007274] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114086.536910238] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114086.537392357] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114086.537466569] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114086.537621517] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114086.537666466] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114086.537726509] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114086.546917099] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114086.547094148] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114086.547195779] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114086.547461491] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114086.547882436] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114086.547942269] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114086.548229742] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114086.548260081] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114088.266541857] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114088.298586880] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114088.327059692] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114088.337115535] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114088.358068763] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114088.408941349] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114088.437834453] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114088.738836857] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114088.739480239] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114088.747276348] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114088.747480232] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114088.747756036] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114088.747789530] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114088.747797549] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114088.747822650] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114088.747855007] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114088.748317288] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114088.748431176] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114088.765315252] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114088.767310628] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114088.767849222] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114088.767945453] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114088.768109398] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114088.768142298] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114088.768205312] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114088.777395012] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114088.777601497] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114088.777731294] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114088.778016226] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114088.778648835] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114088.778737261] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114088.779035659] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114088.779077346] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114090.836503307] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114090.879613329] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114090.907081565] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114090.907696792] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114090.958187734] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114091.009038566] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114091.038026687] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114091.038291229] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114091.046857553] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114091.046993859] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114091.047187641] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114091.047215888] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114091.047223437] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114091.047241784] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114091.047262562] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114091.047553742] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114091.047611607] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114091.069778381] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114091.070198040] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114091.070363062] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114091.070394689] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114091.070493699] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114091.070511910] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114091.070543311] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114091.076893330] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114091.076959465] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114091.076983174] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114091.077085339] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114091.077330580] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114091.077361111] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114091.077499985] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114091.077511237] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114092.486507545] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114092.528110317] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114092.556893253] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114092.557246967] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114092.618069589] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114092.668955263] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114092.697843712] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114092.918522321] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114092.919077808] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114092.926986512] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114092.927229830] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114092.927611605] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114092.927831086] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114092.927860354] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114092.927891877] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114092.927935073] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114092.928482096] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114092.928590692] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114092.944508206] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114092.946047136] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114092.946447448] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114092.946518719] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114092.946690567] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114092.946724248] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114092.946791180] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114092.956954496] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114092.957144559] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114092.957245171] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114092.957510094] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114092.957953596] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114092.958011956] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114092.958248902] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114092.958281005] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114094.466518288] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114094.508687303] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114094.536827984] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114094.537066763] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114094.578057565] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114094.628799224] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114094.658529180] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114094.659142605] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114094.667032712] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114094.667250439] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114094.667611670] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114094.667746166] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114094.667778344] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114094.667856895] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114094.667940257] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114094.668708986] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114094.668921605] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114094.698091703] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114094.699876448] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114094.700302048] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114094.700372986] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114094.700533100] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114094.700567185] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114094.700638568] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114094.706926385] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114094.707088564] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114094.707196260] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114094.707465785] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114094.707900885] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114094.707963982] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114094.708300748] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114094.708349476] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114096.406501895] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114096.408880861] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114096.436977412] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114096.447181810] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114096.498135818] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114096.549187794] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114096.577717818] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[move_group-3] [INFO] [1791114096.798565444] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114096.798938123] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114096.806856765] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114096.806986035] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114096.807173499] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114096.807225606] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114096.807241189] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114096.807278272] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114096.807317657] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114096.807716028] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114096.807808243] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114096.830586081] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114096.831389045] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114096.831548330] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114096.831586219] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114096.831663976] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114096.831682912] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114096.831708773] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114096.836670738] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114096.836714797] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114096.836736688] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114096.836830360] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114096.837043191] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114096.837067425] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114096.837222387] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114096.837229779] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114098.456486048] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114098.487394188] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114098.516606354] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114098.516773165] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114098.578099362] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114098.628464737] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114098.798497605] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114098.798836854] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114098.807093080] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114098.807300093] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114098.807748711] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114098.807852105] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114098.807891689] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114098.807970616] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114098.808051675] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114098.808817743] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114098.808981290] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114098.834062737] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114098.835884007] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114098.836329543] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114098.836403839] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114098.836566951] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114098.836599769] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114098.836670693] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114098.847050499] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114098.847237799] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114098.847344493] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114098.847655681] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114098.848016408] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114098.848077953] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114098.848402965] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114098.848453390] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114100.586526499] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114100.598771749] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114100.626812275] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114100.627217297] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114100.678155195] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114100.729063897] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114100.897844507] [robot_runtime]: Task succeeded:  synthetic grasp and placement evidence verified; no physical object/contact sensing
+[robot_runtime-8] [INFO] [1791114101.117790760] [robot_runtime]: Task succeeded:  fresh configured demo object pose obtained
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [robot_runtime-8]: sending signal 'SIGINT' to process[robot_runtime-8]
+[INFO] [ros2_control_node-4]: sending signal 'SIGINT' to process[ros2_control_node-4]
+[INFO] [move_group-3]: sending signal 'SIGINT' to process[move_group-3]
+[INFO] [robot_state_publisher-2]: sending signal 'SIGINT' to process[robot_state_publisher-2]
+[INFO] [static_transform_publisher-1]: sending signal 'SIGINT' to process[static_transform_publisher-1]
+[robot_runtime-8] [INFO] [1791114101.146116229] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114101.147010658] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114101.147091073] [controller_manager]: Shutdown request received....
+[ros2_control_node-4] [INFO] [1791114101.147121240] [controller_manager]: Shutting down all controllers in the controller manager.
+[ros2_control_node-4] [INFO] [1791114101.147148638] [controller_manager]: Deactivating controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114101.147192652] [controller_manager]: Shutting down controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114101.147395774] [controller_manager]: Deactivating controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114101.147424742] [controller_manager]: Shutting down controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114101.147479926] [controller_manager]: Deactivating controller 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114101.147513950] [controller_manager]: Shutting down controller 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114101.147563292] [resource_manager]: 'deactivate' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114101.147577738] [resource_manager]: Successful 'deactivate' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114101.147581859] [resource_manager]: 'shutdown' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114101.147585407] [resource_manager]: Successful 'shutdown' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114101.147615424] [resource_manager]: 'deactivate' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114101.147620539] [resource_manager]: Successful 'deactivate' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114101.147623725] [resource_manager]: 'shutdown' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114101.147632421] [resource_manager]: Successful 'shutdown' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114101.147648208] [controller_manager]: Shutting down the controller manager.
+[ros2_control_node-4] [ERROR] [1791114101.147721442] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!. Aborting!
+[ros2_control_node-4] [ERROR] [1791114101.147721648] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!. Aborting!
+[move_group-3] [INFO] [1791114101.147771410] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-2] [INFO] [1791114101.148368951] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-1] [INFO] [1791114101.148945124] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114101.156834361] [controller_manager.pal_statistics]: Async messages lost 0
+[ros2_control_node-4] [INFO] [1791114101.156860368] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[ros2_control_node-4] [INFO] [1791114101.160195060] [controller_manager.pal_statistics]: Async messages lost 0
+[ros2_control_node-4] [INFO] [1791114101.160215093] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[move_group-3] [INFO] [1791114101.169101708] [move_group.moveit.moveit.ros.moveit_cpp]: Deleting MoveItCpp
+[move_group-3] [INFO] [1791114101.173543074] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[move_group-3] [INFO] [1791114101.174194409] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping world geometry monitor
+[move_group-3] [INFO] [1791114101.174340213] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping planning scene monitor
+[INFO] [static_transform_publisher-1]: process has finished cleanly [pid 1484]
+[INFO] [robot_state_publisher-2]: process has finished cleanly [pid 1485]
+[INFO] [robot_runtime-8]: process has finished cleanly [pid 1491]
+[INFO] [move_group-3]: process has finished cleanly [pid 1486]
+[INFO] [ros2_control_node-4]: process has finished cleanly [pid 1487]
+[WARN] [1791114101.354815835] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114101.354833227] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+test_01_repeatable_pick_place_with_actual_ros_stack (__main__.PandaTests.test_01_repeatable_pick_place_with_actual_ros_stack) ... ok
+test_02_task_timeout_stops_and_releases_for_next_task (__main__.PandaTests.test_02_task_timeout_stops_and_releases_for_next_task) ... ok
+test_03_second_configured_object_target_and_alias (__main__.PandaTests.test_03_second_configured_object_target_and_alias) ... ok
+test_04_structured_plan_uses_actual_moveit_and_controllers (__main__.PandaTests.test_04_structured_plan_uses_actual_moveit_and_controllers) ... ok
+test_05_verified_template_marks_synthetic_outcome_proofs (__main__.PandaTests.test_05_verified_template_marks_synthetic_outcome_proofs) ... ok
+
+[INFO] [launch]: All log files can be found below /home/ubuntu/.ros/log/2026-10-04-11-41-41-507561-LOONG-1687
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [static_transform_publisher-1]: process started with pid [1698]
+[INFO] [robot_state_publisher-2]: process started with pid [1699]
+[INFO] [move_group-3]: process started with pid [1700]
+[INFO] [ros2_control_node-4]: process started with pid [1701]
+[INFO] [spawner-5]: process started with pid [1702]
+[INFO] [spawner-6]: process started with pid [1703]
+[INFO] [spawner-7]: process started with pid [1704]
+[INFO] [robot_runtime-8]: process started with pid [1705]
+[robot_state_publisher-2] [WARN] [1791114101.626177312] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_state_publisher-2] [WARN] [1791114101.626193063] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[static_transform_publisher-1] [WARN] [1791114101.627581355] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[static_transform_publisher-1] [WARN] [1791114101.627595167] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[robot_runtime-8] [WARN] [1791114101.633238651] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[robot_runtime-8] [WARN] [1791114101.633250724] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ros2_control_node-4] [WARN] [1791114101.633751899] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[ros2_control_node-4] [WARN] [1791114101.633765421] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[move_group-3] [WARN] [1791114101.638203543] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[move_group-3] [WARN] [1791114101.638214342] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[static_transform_publisher-1] [INFO] [1791114101.642720381] [static_transform_publisher_cokTOPfqLk7qkfeJ]: Spinning until stopped - publishing transform
+[static_transform_publisher-1] translation: ('0.000000', '0.000000', '0.000000')
+[static_transform_publisher-1] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-1] from 'world' to 'panda_link0'
+[robot_state_publisher-2] [WARN] [1791114101.646811935] [kdl_parser]: The root link panda_link0 has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[robot_state_publisher-2] [INFO] [1791114101.646903019] [robot_state_publisher]: Robot initialized
+[ros2_control_node-4] [INFO] [1791114101.647375132] [controller_manager]: Using Steady (Monotonic) clock for triggering controller manager cycles.
+[ros2_control_node-4] [INFO] [1791114101.649910514] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[ros2_control_node-4] [INFO] [1791114101.649951932] [controller_manager]: update rate is 100 Hz
+[ros2_control_node-4] [INFO] [1791114101.649955288] [controller_manager]: Overruns handling is : enabled
+[ros2_control_node-4] [INFO] [1791114101.649957611] [controller_manager]: Spawning controller_manager RT thread with scheduler priority: 50
+[ros2_control_node-4] [WARN] [1791114101.650004317] [controller_manager]: Could not enable FIFO RT scheduling policy: with error number <1>(Operation not permitted). See [https://control.ros.org/master/doc/ros2_control/controller_manager/doc/userdoc.html] for details on how to enable realtime scheduling.
+[move_group-3] [INFO] [1791114101.654681785] [move_group.moveit.moveit.ros.rdf_loader]: Loaded robot model in 0.00145248 seconds
+[move_group-3] [INFO] [1791114101.654748202] [move_group.moveit.moveit.core.robot_model]: Loading robot model 'panda'...
+[move_group-3] [WARN] [1791114101.658097644] [kdl_parser]: The root link panda_link0 has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF.
+[move_group-3] [INFO] [1791114101.658153727] [move_group.moveit.moveit.kinematics.kdl_kinematics_plugin]: Joint weights for group 'panda_arm': 1 1 1 1 1 1 1
+[robot_runtime-8] [INFO] [1791114101.663233722] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=panda_ros; motion=ros_arm; permitted=true
+[move_group-3] [INFO] [1791114101.673018164] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-3] [INFO] [1791114101.673107414] [move_group.moveit.moveit.ros.moveit_cpp]: Listening to 'joint_states' for joint states
+[move_group-3] [INFO] [1791114101.673717526] [move_group.moveit.moveit.ros.current_state_monitor]: Listening to joint states on topic 'joint_states'
+[move_group-3] [INFO] [1791114101.673901371] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/attached_collision_object' for attached collision objects
+[move_group-3] [INFO] [1791114101.673908683] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping existing planning scene publisher.
+[move_group-3] [INFO] [1791114101.673962315] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[move_group-3] [INFO] [1791114101.674082603] [move_group.moveit.moveit.ros.planning_scene_monitor]: Publishing maintained planning scene on 'monitored_planning_scene'
+[move_group-3] [INFO] [1791114101.674114438] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting planning scene monitor
+[move_group-3] [INFO] [1791114101.674244701] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to '/planning_scene'
+[move_group-3] [INFO] [1791114101.674256416] [move_group.moveit.moveit.ros.planning_scene_monitor]: Starting world geometry update monitor for collision objects, attached objects, octomap updates.
+[move_group-3] [INFO] [1791114101.674652050] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'collision_object'
+[move_group-3] [INFO] [1791114101.674962209] [move_group.moveit.moveit.ros.planning_scene_monitor]: Listening to 'planning_scene_world' for planning scene world geometry
+[move_group-3] [WARN] [1791114101.675159542] [move_group.moveit.moveit.ros.occupancy_map_monitor]: Resolution not specified for Octomap. Assuming resolution = 0.1 instead
+[move_group-3] [ERROR] [1791114101.675176839] [move_group.moveit.moveit.ros.occupancy_map_monitor]: No 3D sensor plugin(s) defined for octomap updates
+[move_group-3] [INFO] [1791114101.684186356] [move_group.moveit.moveit.ros.planning_pipeline]: Successfully loaded planner 'OMPL'
+[move_group-3] [INFO] [1791114101.684669882] [move_group]: Try loading adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114101.685159818] [move_group]: Loaded adapter 'default_planning_request_adapters/ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114101.685165868] [move_group]: Try loading adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-3] [INFO] [1791114101.685260281] [move_group]: Loaded adapter 'default_planning_request_adapters/ValidateWorkspaceBounds'
+[move_group-3] [INFO] [1791114101.685263163] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-3] [INFO] [1791114101.685273324] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateBounds'
+[move_group-3] [INFO] [1791114101.685275295] [move_group]: Try loading adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-3] [INFO] [1791114101.685280477] [move_group]: Loaded adapter 'default_planning_request_adapters/CheckStartStateCollision'
+[move_group-3] [INFO] [1791114101.685727636] [move_group]: Try loading adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114101.686757683] [move_group]: Loaded adapter 'default_planning_response_adapters/AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114101.686764362] [move_group]: Try loading adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-3] [INFO] [1791114101.687776314] [move_group]: Loaded adapter 'default_planning_response_adapters/ValidateSolution'
+[move_group-3] [INFO] [1791114101.687784637] [move_group]: Try loading adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-3] [INFO] [1791114101.688028084] [move_group]: Loaded adapter 'default_planning_response_adapters/DisplayMotionPath'
+[move_group-3] [INFO] [1791114101.700107330] [move_group.moveit.moveit.plugins.simple_controller_manager]: Added FollowJointTrajectory controller for panda_arm_controller
+[move_group-3] [INFO] [1791114101.700211032] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114101.700223613] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114101.700565133] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Trajectory execution is managing controllers
+[move_group-3] [INFO] [1791114101.700577169] [move_group]: MoveGroup debug mode is ON
+[move_group-3] [INFO] [1791114101.708025262] [move_group.moveit.moveit.ros.move_group.executable]: 
+[move_group-3] 
+[move_group-3] ********************************************************
+[move_group-3] * MoveGroup using: 
+[move_group-3] *     - apply_planning_scene_service
+[move_group-3] *     - clear_octomap_service
+[move_group-3] *     - get_group_urdf
+[move_group-3] *     - load_geometry_from_file
+[move_group-3] *     - CartesianPathService
+[move_group-3] *     - execute_trajectory_action
+[move_group-3] *     - get_planning_scene_service
+[move_group-3] *     - kinematics_service
+[move_group-3] *     - move_action
+[move_group-3] *     - motion_plan_service
+[move_group-3] *     - query_planners_service
+[move_group-3] *     - state_validation_service
+[move_group-3] *     - save_geometry_to_file
+[move_group-3] ********************************************************
+[move_group-3] 
+[move_group-3] [INFO] [1791114101.708058776] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context using pipeline ompl
+[move_group-3] [INFO] [1791114101.708064899] [move_group.moveit.moveit.ros.move_group.context]: MoveGroup context initialization complete
+[move_group-3] [96mLoading 'move_group/ApplyPlanningSceneService'...[0m
+[move_group-3] [96mLoading 'move_group/ClearOctomapService'...[0m
+[move_group-3] [96mLoading 'move_group/GetUrdfService'...[0m
+[move_group-3] [96mLoading 'move_group/LoadGeometryFromFileService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupCartesianPathService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupExecuteTrajectoryAction'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupGetPlanningSceneService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupKinematicsService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupMoveAction'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupPlanService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupQueryPlannersService'...[0m
+[move_group-3] [96mLoading 'move_group/MoveGroupStateValidationService'...[0m
+[move_group-3] [96mLoading 'move_group/SaveGeometryToFileService'...[0m
+[move_group-3] 
+[move_group-3] [92mYou can start planning now![0m
+[move_group-3] 
+[spawner-6] [WARN] [1791114101.807351861] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-6] [WARN] [1791114101.807360237] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-7] [WARN] [1791114101.807405278] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-7] [WARN] [1791114101.807410624] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-5] [WARN] [1791114101.807405958] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[spawner-5] [WARN] [1791114101.807411001] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[spawner-6] [INFO] [1791114101.851696316] [spawner_panda_arm_controller]: waiting for service /controller_manager/list_controllers to become available...
+[ros2_control_node-4] [INFO] [1791114101.995739729] [controller_manager]: Received robot description from topic.
+[ros2_control_node-4] [INFO] [1791114101.995919787] [controller_manager]: Enforcing command limits is disabled. Command limits from URDF will be ignored.
+[ros2_control_node-4] [INFO] [1791114102.004707672] [controller_manager]: Loading hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.005823309] [controller_manager]: Loaded hardware 'PandaFakeSystem' from plugin 'mock_components/GenericSystem'
+[ros2_control_node-4] [INFO] [1791114102.005961523] [controller_manager]: Initialize hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.021002296] [controller_manager]: Successful initialization of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.021328492] [controller_manager]: Loading hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.021367499] [controller_manager]: Loaded hardware 'PandaHandFakeSystem' from plugin 'mock_components/GenericSystem'
+[ros2_control_node-4] [INFO] [1791114102.021431522] [controller_manager]: Initialize hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.030505412] [controller_manager]: Successful initialization of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.030661225] [controller_manager]: Activating component 'PandaHandFakeSystem'.
+[ros2_control_node-4] [INFO] [1791114102.030672018] [resource_manager]: 'configure' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.030681697] [resource_manager]: Successful 'configure' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.030686917] [resource_manager]: 'activate' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.030694115] [resource_manager]: Successful 'activate' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.030751705] [controller_manager]: Activating component 'PandaFakeSystem'.
+[ros2_control_node-4] [INFO] [1791114102.030756267] [resource_manager]: 'configure' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.030763412] [resource_manager]: Successful 'configure' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.030768519] [resource_manager]: 'activate' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114102.030771561] [resource_manager]: Successful 'activate' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114102.030792608] [controller_manager]: Registering statistics for : PandaHandFakeSystem
+[ros2_control_node-4] [INFO] [1791114102.030845734] [controller_manager]: Registering statistics for : PandaFakeSystem
+[ros2_control_node-4] [INFO] [1791114102.030906708] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[ros2_control_node-4] [INFO] [1791114102.104003316] [controller_manager]: Loading controller : 'panda_arm_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[ros2_control_node-4] [INFO] [1791114102.104055369] [controller_manager]: Loading controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114102.109022733] [controller_manager]: Controller 'panda_arm_controller' node arguments: --ros-args --params-file /tmp/launch_params_724qsil2 --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-6] [INFO] [1791114102.121337238] [spawner_panda_arm_controller]: Loaded panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114102.121929691] [controller_manager]: Configuring controller: 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114102.122067823] [panda_arm_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[ros2_control_node-4] [INFO] [1791114102.122079470] [panda_arm_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[ros2_control_node-4] [INFO] [1791114102.122090234] [panda_arm_controller]: Using 'splines' interpolation method.
+[ros2_control_node-4] [INFO] [1791114102.125297354] [panda_arm_controller]: Action status changes will be monitored at 20.00 Hz.
+[ros2_control_node-4] [INFO] [1791114102.127803838] [panda_arm_controller]: Setting initial scaling factor to 1.000000
+[ros2_control_node-4] [INFO] [1791114102.127816913] [panda_arm_controller]: No scaling interface set. This controller will not read speed scaling from the hardware.
+[ros2_control_node-4] [INFO] [1791114102.131150875] [controller_manager]: Activating controllers: [ panda_arm_controller ]
+[ros2_control_node-4] [INFO] [1791114102.140409864] [controller_manager]: Successfully switched controllers!
+[spawner-6] [INFO] [1791114102.152038459] [spawner_panda_arm_controller]: Configured and activated panda_arm_controller
+[spawner-5] [INFO] [1791114102.206542857] [spawner_joint_state_broadcaster]: waiting for service /controller_manager/list_controllers to become available...
+[INFO] [spawner-6]: process has finished cleanly [pid 1703]
+[ros2_control_node-4] [INFO] [1791114105.459553480] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[ros2_control_node-4] [INFO] [1791114105.459583834] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114105.460471559] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /tmp/launch_params_724qsil2 --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-5] [INFO] [1791114105.470994243] [spawner_joint_state_broadcaster]: Loaded joint_state_broadcaster
+[ros2_control_node-4] [INFO] [1791114105.471621511] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114105.471673508] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[ros2_control_node-4] [INFO] [1791114105.481230004] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[ros2_control_node-4] [INFO] [1791114105.490354181] [controller_manager]: Successfully switched controllers!
+[spawner-5] [INFO] [1791114105.501239667] [spawner_joint_state_broadcaster]: Configured and activated joint_state_broadcaster
+[spawner-7] [INFO] [1791114105.578185092] [spawner_panda_hand_controller]: waiting for service /controller_manager/list_controllers to become available...
+[INFO] [spawner-5]: process has finished cleanly [pid 1702]
+[ros2_control_node-4] [INFO] [1791114106.332661599] [controller_manager]: Loading controller : 'panda_hand_controller' of type 'parallel_gripper_action_controller/GripperActionController'
+[ros2_control_node-4] [INFO] [1791114106.332766434] [controller_manager]: Loading controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114106.335424380] [controller_manager]: Controller 'panda_hand_controller' node arguments: --ros-args --params-file /tmp/launch_params_724qsil2 --params-file /workspace/install/robot_panda_demo/share/robot_panda_demo/config/controllers.yaml 
+[spawner-7] [INFO] [1791114106.364989616] [spawner_panda_hand_controller]: Loaded panda_hand_controller
+[ros2_control_node-4] [INFO] [1791114106.367890015] [controller_manager]: Configuring controller: 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114106.368018498] [panda_hand_controller]: Action status changes will be monitored at 20.000000 Hz.
+[ros2_control_node-4] [INFO] [1791114106.368057037] [panda_hand_controller]: Joint name is : panda_finger_joint1
+[ros2_control_node-4] [INFO] [1791114106.373485645] [controller_manager]: Activating controllers: [ panda_hand_controller ]
+[ros2_control_node-4] [INFO] [1791114106.389666413] [controller_manager]: Successfully switched controllers!
+[spawner-7] [INFO] [1791114106.392498645] [spawner_panda_hand_controller]: Configured and activated panda_hand_controller
+[INFO] [spawner-7]: process has finished cleanly [pid 1704]
+[ros2_control_node-4] [INFO] [1791114106.743879462] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114106.794412004] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114106.825271803] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114106.826069196] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114106.830965512] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114106.831531151] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114106.832508639] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114106.832668133] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114106.832707405] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114106.832793235] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114106.832917677] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114106.835398153] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114106.835997422] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114106.862368348] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114106.864254422] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114106.864648704] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114106.864730494] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114106.864871031] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114106.864893204] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114106.864980651] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114106.870983069] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114106.871188339] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114106.871286211] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114106.871713895] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114106.872456732] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114106.872542170] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114106.872836570] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114106.872880075] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114108.960315904] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114108.973687709] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114109.000714408] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114109.001357586] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114109.023958550] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114109.074735213] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114109.104472700] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114109.104955135] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114109.110605808] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114109.110707658] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114109.110880331] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114109.110905841] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114109.110913449] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114109.110930569] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114109.110949992] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114109.111268189] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114109.111321308] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114109.134316127] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114109.135752755] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114109.135939280] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114109.135993785] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114109.136104671] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114109.136128541] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114109.136171009] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114109.140582762] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114109.140642713] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114109.140667213] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114109.140774305] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114109.141007608] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114109.141037676] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114109.141172450] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114109.141186317] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114110.830294655] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114110.841569106] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114110.870397880] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114110.870681344] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114110.923844529] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114110.974824443] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114111.003607409] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114111.024268630] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114111.024799269] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114111.030795847] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114111.031000063] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114111.031335064] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114111.031435733] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114111.031467244] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114111.031693474] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114111.031826576] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114111.032353114] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114111.032495331] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114111.047855774] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114111.049530320] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114111.049939000] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114111.050008613] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114111.050149212] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114111.050297878] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114111.050358712] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114111.060701632] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114111.060871779] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114111.060965259] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114111.061223393] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114111.061675046] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114111.061741013] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114111.061996094] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114111.062026352] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114112.640284513] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114112.662287216] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114112.690640152] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114112.690945428] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114112.723886217] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114112.774547987] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114112.804415382] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114112.804966867] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114112.810589100] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114112.810740620] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114112.810945215] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114112.810996975] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114112.811013145] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114112.811051402] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114112.811092114] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114112.811485976] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114112.811588519] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114112.839897046] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114112.841787385] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114112.842257909] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114112.842358700] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114112.842548081] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114112.842591351] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114112.842686061] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114112.850684828] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114112.850801148] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114112.850855909] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114112.851026609] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114112.851419223] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114112.851475714] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114112.851617876] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114112.851645771] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114114.560335198] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114114.602120564] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114114.630674725] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114114.640923935] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114114.683987099] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114114.734999326] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114114.763615380] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114114.964141933] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114114.964609410] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114114.970697509] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114114.970836494] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114114.971063289] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114114.971095393] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114114.971104004] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114114.971130292] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114114.971162389] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114114.971586945] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114114.971742845] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114114.988515366] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114114.990250989] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114114.990705726] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114114.990781974] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114114.990940977] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114114.990974414] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114114.991035663] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114115.000692838] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114115.000865044] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.000967632] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.001234999] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114115.001640575] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114115.001712253] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114115.002064406] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114115.002098602] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[move_group-3] [INFO] [1791114115.063812988] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request to cancel goal
+[move_group-3] [INFO] [1791114115.070733911] [move_group.moveit.moveit.ros.plan_execution]: Stopping execution due to preempt request
+[move_group-3] [INFO] [1791114115.070805826] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Cancelling execution for panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114115.071373442] [panda_arm_controller]: Got request to cancel goal
+[ros2_control_node-4] [INFO] [1791114115.071446296] [panda_arm_controller]: Canceling active action goal because cancel callback received.
+[move_group-3] [INFO] [1791114115.071835093] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Stopped trajectory execution.
+[move_group-3] [INFO] [1791114115.102772738] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114115.102859062] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status PREEMPTED ...
+[move_group-3] [INFO] [1791114115.103208535] [move_group.moveit.moveit.ros.move_group.move_action]: PREEMPTED
+[robot_runtime-8] [INFO] [1791114115.183554917] [robot_runtime]: Task timed_out: TIMEOUT all active actions confirmed stopped by measured feedback
+[move_group-3] [INFO] [1791114115.204066383] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114115.204454419] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114115.210553719] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114115.210763864] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114115.211005416] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114115.211038000] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114115.211046977] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114115.211071234] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114115.211101638] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114115.211543495] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114115.211701561] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114115.229743782] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114115.231532701] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114115.231952114] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114115.232021012] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114115.232163548] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.232209390] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.232269737] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114115.240889258] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114115.241061995] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.241193646] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114115.241463851] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114115.241844737] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114115.241909206] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114115.242288839] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114115.242323738] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114116.830304399] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114116.842652400] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114116.870648863] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114116.871020698] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114116.923490946] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114116.973884132] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114117.004279090] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114117.004728788] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114117.010852336] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114117.010980528] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114117.011189021] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114117.011221634] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114117.011230621] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114117.011256239] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114117.011287241] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114117.011739205] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114117.011849986] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114117.029679975] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114117.031566588] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114117.032030465] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114117.032108072] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114117.032252464] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114117.032284373] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114117.032344587] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114117.040703851] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114117.040880554] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114117.040977209] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114117.041241442] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114117.041822428] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114117.041919166] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114117.042176529] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114117.042210757] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114118.750325480] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114118.792618823] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114118.820818531] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114118.830844880] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114118.903841862] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114118.954516517] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114118.983560863] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114119.284223683] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114119.284909930] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114119.290689413] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114119.290924652] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114119.291280618] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114119.291382012] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114119.291412499] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114119.291488415] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114119.291570887] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114119.292350670] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114119.292572041] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114119.324783313] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114119.326802518] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114119.327330915] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114119.327433685] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114119.327603032] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114119.327647920] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114119.327720945] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114119.330651668] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114119.330840696] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114119.330943392] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114119.331207761] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114119.331616963] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114119.331690174] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114119.331965805] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114119.331989384] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114121.380334154] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114121.382400656] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114121.410681966] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114121.420785225] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114121.443871964] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114121.494738097] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114121.524454734] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114121.524968720] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114121.530784451] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114121.531004242] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114121.531434682] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114121.531539959] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114121.531572810] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114121.531671881] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114121.531759678] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114121.532541901] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114121.532771310] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114121.561426569] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114121.562774891] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114121.563149752] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114121.563215340] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114121.563359487] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114121.563390836] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114121.563450030] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114121.570883680] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114121.571045811] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114121.571142786] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114121.571404125] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114121.571814189] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114121.571880019] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114121.572234903] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114121.572293100] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114123.010332826] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114123.022577179] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114123.050765967] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114123.061117460] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114123.104176747] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114123.154823413] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114123.183972906] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[move_group-3] [INFO] [1791114123.384348399] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114123.384725791] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114123.390921178] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114123.391158846] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114123.391545710] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114123.391672364] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114123.391705626] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114123.391785428] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114123.391868356] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114123.392649751] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114123.392901326] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114123.410955859] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114123.412518059] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114123.412923223] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114123.412993325] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114123.413138705] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114123.413170683] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114123.413230241] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114123.420894644] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114123.421055731] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114123.421175676] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114123.421456392] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114123.421964791] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114123.422035733] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114123.422323950] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114123.422362377] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114124.960265741] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114124.972413755] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114125.000347300] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114125.000992547] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114125.023475154] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114125.074275630] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114125.104220429] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114125.104622561] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114125.110510195] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114125.110580426] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114125.110692202] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114125.110717181] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114125.110724290] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114125.110741586] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114125.110760573] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114125.110974523] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114125.111024301] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114125.133247986] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114125.133649925] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114125.133744587] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114125.133761972] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114125.133816698] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114125.133825578] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114125.133842300] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114125.140582613] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114125.140646241] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114125.140672682] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114125.140800456] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114125.140966808] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114125.140989826] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114125.141146496] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114125.141156222] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114126.870428023] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114126.891606330] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114126.920690212] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114126.930785452] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114127.004085823] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114127.054797641] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114127.083564600] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[move_group-3] [INFO] [1791114127.304776989] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114127.305342728] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114127.310747099] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114127.310914375] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114127.311150518] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114127.311182309] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114127.311190374] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114127.311214408] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114127.311243646] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114127.311701031] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114127.311843595] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114127.328094039] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114127.329848109] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114127.330256360] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114127.330326581] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114127.330492507] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114127.330532681] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114127.330734410] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114127.340492588] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114127.340578155] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114127.340620841] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114127.340791056] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114127.341013060] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114127.341043164] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114127.341162890] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114127.341177002] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114128.920332091] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114128.941767671] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114128.970748959] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114128.980712158] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114129.024113078] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114129.075056082] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[move_group-3] [INFO] [1791114129.264701189] [move_group.moveit.moveit.ros.move_group.move_action]: MoveGroupMoveAction: Received request
+[move_group-3] [INFO] [1791114129.265341759] [move_group.moveit.moveit.ros.move_group.move_action]: executing..
+[move_group-3] [INFO] [1791114129.270767597] [move_group.moveit.moveit.ros.move_group.move_action]: Combined planning and execution request received for MoveGroup action. Forwarding to planning and execution pipeline.
+[move_group-3] [INFO] [1791114129.270994655] [move_group.moveit.moveit.ros.plan_execution]: Planning attempt 1 of at most 1
+[move_group-3] [INFO] [1791114129.271340836] [move_group]: Calling PlanningRequestAdapter 'ResolveConstraintFrames'
+[move_group-3] [INFO] [1791114129.271439468] [move_group]: Calling PlanningRequestAdapter 'ValidateWorkspaceBounds'
+[move_group-3] [WARN] [1791114129.271470430] [move_group.moveit.moveit.ros.validate_workspace_bounds]: It looks like the planning volume was not specified. Using default values.
+[move_group-3] [INFO] [1791114129.271545201] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateBounds'
+[move_group-3] [INFO] [1791114129.271643411] [move_group]: Calling PlanningRequestAdapter 'CheckStartStateCollision'
+[move_group-3] [INFO] [1791114129.272469941] [move_group.moveit.moveit.planners.ompl.model_based_planning_context]: Planner configuration 'panda_arm' will use planner 'geometric::RRTConnect'. Additional configuration parameters will be set when the planner is constructed.
+[move_group-3] [INFO] [1791114129.272704370] [move_group]: Calling Planner 'OMPL'
+[move_group-3] [INFO] [1791114129.300465142] [move_group]: Calling PlanningResponseAdapter 'AddTimeOptimalParameterization'
+[move_group-3] [INFO] [1791114129.302305270] [move_group]: Calling PlanningResponseAdapter 'ValidateSolution'
+[move_group-3] [INFO] [1791114129.302762621] [move_group]: Calling PlanningResponseAdapter 'DisplayMotionPath'
+[move_group-3] [WARN] [1791114129.302837078] [move_group.moveit.moveit.ros.planning_pipeline]: The planner plugin did not fill out the 'planner_id' field of the MotionPlanResponse. Setting it to the planner ID name of the MotionPlanRequest assuming that the planner plugin does warn you if it does not use the requested planner.
+[move_group-3] [INFO] [1791114129.302981790] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114129.303015018] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114129.303078989] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Validating trajectory with allowed_start_tolerance 0.01
+[move_group-3] [INFO] [1791114129.310878178] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Starting trajectory execution ...
+[move_group-3] [INFO] [1791114129.311035342] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114129.311136433] [move_group.moveit.moveit.plugins.simple_controller_manager]: Returned 1 controllers in list
+[move_group-3] [INFO] [1791114129.311418752] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: sending trajectory to panda_arm_controller
+[ros2_control_node-4] [INFO] [1791114129.311816352] [panda_arm_controller]: Received new action goal
+[ros2_control_node-4] [INFO] [1791114129.311882400] [panda_arm_controller]: Accepted new action goal
+[move_group-3] [INFO] [1791114129.312324696] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: panda_arm_controller started execution
+[move_group-3] [INFO] [1791114129.312376530] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Goal request accepted!
+[ros2_control_node-4] [INFO] [1791114131.040437555] [panda_arm_controller]: Goal reached, success!
+[move_group-3] [INFO] [1791114131.062792541] [moveit.simple_controller_manager.follow_joint_trajectory_controller_handle]: Controller 'panda_arm_controller' successfully finished
+[move_group-3] [INFO] [1791114131.090600663] [move_group.moveit.moveit.ros.trajectory_execution_manager]: Completed trajectory execution with status SUCCEEDED ...
+[move_group-3] [INFO] [1791114131.091058200] [move_group.moveit.moveit.ros.move_group.move_action]: Solution was found and executed.
+[ros2_control_node-4] [INFO] [1791114131.164042188] [panda_hand_controller]: Received & accepted new action goal
+[robot_runtime-8] [INFO] [1791114131.214797775] [robot_runtime]: Panda gripper action result: code=4 reached_goal=true stalled=false
+[robot_runtime-8] [INFO] [1791114131.383640490] [robot_runtime]: Task succeeded:  synthetic grasp and placement evidence verified; no physical object/contact sensing
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [robot_runtime-8]: sending signal 'SIGINT' to process[robot_runtime-8]
+[INFO] [ros2_control_node-4]: sending signal 'SIGINT' to process[ros2_control_node-4]
+[INFO] [move_group-3]: sending signal 'SIGINT' to process[move_group-3]
+[INFO] [robot_state_publisher-2]: sending signal 'SIGINT' to process[robot_state_publisher-2]
+[INFO] [static_transform_publisher-1]: sending signal 'SIGINT' to process[static_transform_publisher-1]
+[robot_runtime-8] [INFO] [1791114131.409348646] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114131.409945958] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114131.410047127] [controller_manager]: Shutdown request received....
+[ros2_control_node-4] [INFO] [1791114131.410090910] [controller_manager]: Shutting down all controllers in the controller manager.
+[ros2_control_node-4] [INFO] [1791114131.410116861] [controller_manager]: Deactivating controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114131.410165719] [controller_manager]: Shutting down controller 'panda_hand_controller'
+[ros2_control_node-4] [INFO] [1791114131.410431493] [controller_manager]: Deactivating controller 'joint_state_broadcaster'
+[ros2_control_node-4] [INFO] [1791114131.410483462] [controller_manager]: Shutting down controller 'joint_state_broadcaster'
+[move_group-3] [INFO] [1791114131.410495920] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114131.410571720] [controller_manager]: Deactivating controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114131.410612377] [controller_manager]: Shutting down controller 'panda_arm_controller'
+[ros2_control_node-4] [INFO] [1791114131.410675696] [resource_manager]: 'deactivate' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114131.410695597] [resource_manager]: Successful 'deactivate' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114131.410700470] [resource_manager]: 'shutdown' hardware 'PandaHandFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114131.410704957] [resource_manager]: Successful 'shutdown' of hardware 'PandaHandFakeSystem'
+[ros2_control_node-4] [INFO] [1791114131.410746605] [resource_manager]: 'deactivate' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114131.410753035] [resource_manager]: Successful 'deactivate' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114131.410756902] [resource_manager]: 'shutdown' hardware 'PandaFakeSystem' 
+[ros2_control_node-4] [INFO] [1791114131.410761240] [resource_manager]: Successful 'shutdown' of hardware 'PandaFakeSystem'
+[ros2_control_node-4] [INFO] [1791114131.410781029] [controller_manager]: Shutting down the controller manager.
+[ros2_control_node-4] [ERROR] [1791114131.410866873] [controller_manager.pal_statistics]: Exception in publisher thread: context cannot be slept with because it's invalid!. Aborting!
+[robot_state_publisher-2] [INFO] [1791114131.411047564] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[static_transform_publisher-1] [INFO] [1791114131.411699877] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ros2_control_node-4] [INFO] [1791114131.420512383] [controller_manager.pal_statistics]: Async messages lost 0
+[ros2_control_node-4] [INFO] [1791114131.420537648] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[ros2_control_node-4] [INFO] [1791114131.422486823] [controller_manager.pal_statistics]: Async messages lost 0
+[ros2_control_node-4] [INFO] [1791114131.422499219] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[move_group-3] [INFO] [1791114131.430046045] [move_group.moveit.moveit.ros.moveit_cpp]: Deleting MoveItCpp
+[move_group-3] [INFO] [1791114131.434638759] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopped publishing maintained planning scene.
+[move_group-3] [INFO] [1791114131.435011003] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping world geometry monitor
+[move_group-3] [INFO] [1791114131.435106310] [move_group.moveit.moveit.ros.planning_scene_monitor]: Stopping planning scene monitor
+[INFO] [static_transform_publisher-1]: process has finished cleanly [pid 1698]
+[INFO] [robot_state_publisher-2]: process has finished cleanly [pid 1699]
+[INFO] [robot_runtime-8]: process has finished cleanly [pid 1705]
+[INFO] [ros2_control_node-4]: process has finished cleanly [pid 1701]
+[INFO] [move_group-3]: process has finished cleanly [pid 1700]
+
+----------------------------------------------------------------------
+Ran 11 tests in 60.194s
+
+OK
+

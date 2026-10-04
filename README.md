@@ -2,7 +2,7 @@
 
 面向可扩展机器人应用的初步框架：**ROS 2 集成 + BehaviorTree.CPP 执行 + 技能语义 + 可替换组件**。
 
-当前版本为 **v0.4 显式位姿解析开发版（7A）**。包含 ROS 2 Action、技能目录、配置任务、结构化计划、执行记录、感知来源/质量/位姿语义、抓稳和放置证据验证，以及物体位姿到末端目标的解析组件。位姿、反馈时效、样本窗口和停止确认均参与验收。当前证据与标定为显式合成示例，尚未连接真实机器人。
+当前版本在 **v0.4 显式位姿解析开发版（7A）** 上增加 Gazebo Harmonic Panda 抓取/放置仿真入口。包含 ROS 2 Action、技能目录、配置任务、结构化计划、执行记录、感知来源/质量/位姿语义、抓稳和放置证据验证，以及物体位姿到末端目标的解析组件。位姿、反馈时效、样本窗口和停止确认均参与验收。Gazebo 使用仿真真值和接触传感器；没有连接真实机器人或视觉算法。
 
 ## 技能与组件
 
@@ -25,6 +25,7 @@
 | `src/robot_bringup` | 启动文件及组件选择配置 |
 | `src/robot_ros_adapters` | 非阻塞 MoveIt/并联夹爪 Action 客户端、JointState/TF 反馈 |
 | `src/robot_panda_demo` | Panda + ros2_control GenericSystem 示例及配置 |
+| `src/robot_panda_gz_sim` | Gazebo Harmonic Panda、桌面/方块/托盘场景及独立物理仿真入口 |
 | `docs` | 架构、扩展流程、执行约束和后续路线 |
 | `scripts` | 核心测试与 ROS 2 集成测试 |
 
@@ -40,7 +41,7 @@ bash scripts/test_core.sh
 
 ## ROS 2 构建与运行
 
-首个构建目标为 **Ubuntu 24.04 + ROS 2 Jazzy + BehaviorTree.CPP 4**。使用已有 ROS 2 Jazzy 环境，在仓库根目录运行：
+首个构建目标为 **Ubuntu 24.04 + ROS 2 Jazzy + BehaviorTree.CPP 4**。隔离环境、依赖版本和检查命令见[环境搭建说明](docs/environment.md)；已有其他 ROS 发行版时使用仓库容器入口。使用已有 ROS 2 Jazzy 环境，也可在仓库根目录运行：
 
 ```bash
 source /opt/ros/jazzy/setup.bash
@@ -170,6 +171,8 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 
 此示例实际运行 MoveIt 规划、轨迹控制器、夹爪控制器和 TF，硬件固定为 GenericSystem。目标位姿为示例配置，夹持信号为显式合成信号；没有物体接触物理，也没有视觉检测。详细配置、停止语义与实机接入要求见 [ROS 后端](docs/ros_backend.md)。
 
+Gazebo DART 物理场景和可复现命令见 [Panda Gazebo 仿真](docs/gazebo-simulation.md)。它保留 GenericSystem mock 测试，并以仿真物体位姿、左右指接触、托盘接触和稳定窗口判定抓取/放置结果；不能作为实机或安全验证。
+
 ## 当前边界
 
 - 单机器人、单活动任务、单线程 executor；没有分布式资源锁。
@@ -181,6 +184,6 @@ ros2 action send_goal /execute_task robot_interfaces/action/ExecuteTask \
 - 停止未确认或异常时保留资源并拒绝后续任务；mock 节点可重启复位。真实设备必须先确认物理状态，不能将进程重启当作停机确认。
 - 初始仓库未指定开源许可；本次未替仓库所有者授予开源许可证。包清单使用 `LicenseRef-Proprietary` 占位，发布前由所有者选择许可证并同步修改。
 
-阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [感知证据与结果验证](docs/perception_verification.md) · [显式位姿解析](docs/target_resolution.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
+阅读：[架构与术语](docs/architecture.md) · [技能目录与任务配置](docs/task_catalog.md) · [结构化计划](docs/structured_plans.md) · [执行记录](docs/execution_records.md) · [感知证据与结果验证](docs/perception_verification.md) · [显式位姿解析](docs/target_resolution.md) · [Panda Gazebo 仿真](docs/gazebo-simulation.md) · [扩展指南](docs/extensions.md) · [执行规则](docs/execution.md) · [路线与验证状态](docs/roadmap.md)
 
 稳定版本备份和升级顺序见 [版本与回退](docs/versions.md)。组件契约位于 `components.hpp`，几何验证位于 `geometry.hpp`，技能实现位于 `skills.hpp`，mock 后端保留在 `demo.hpp`。

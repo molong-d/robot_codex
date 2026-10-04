@@ -1,0 +1,626 @@
+{
+  "code_commit": "8c3649548b6b6b944838dd9c62aa01be9d1b4dd8",
+  "batch_id": "pr11-8c36495-20trials-20261004",
+  "scenario_batch_id": "20261004T113449Z-66ca4f218a",
+  "raw_artifacts_location": "host-local ignored workspace directory .review-runs (not pushed; not available from a fresh clone)",
+  "raw_artifacts": [
+    {
+      "role": "official_batch_summary",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/summary.json",
+      "size_bytes": 62031,
+      "sha256": "eb6f4756076a9592daf13afc916978f8147560c84d10b2bfe96897fc2d42ef8d",
+      "committed_copy": "evidence/batch-summary.json"
+    },
+    {
+      "role": "full_scenario_summary",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/scenario-summary.json",
+      "size_bytes": 1839472,
+      "sha256": "a2e82c1f44d829426bae99c4198f542febea35adf847f998ef63f5aaf9c75502",
+      "committed_copy": "evidence/scenario-outcomes.json (compact extraction; raw source omitted due to repeated feedback history)"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 200,
+      "run_id": "trial-001-seed-200-7cd31447c311",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-001-seed-200/result.json",
+      "size_bytes": 13066871,
+      "sha256": "1249d576dc9d700dfb96e15b65b1546146719af1f208bdd1005c4c87d905c0ac"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 200,
+      "run_id": "trial-001-seed-200-7cd31447c311",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-001-seed-200/gazebo.log",
+      "size_bytes": 61435,
+      "sha256": "1a0d0b98f6eb6da0ca8a373df49cf8bc862943b8b642525a1cefc6d0dc1ab69f"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 201,
+      "run_id": "trial-002-seed-201-8783d90cd893",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-002-seed-201/result.json",
+      "size_bytes": 12450976,
+      "sha256": "cf61150735577104551e429cf1028932b8c26640768efcbe40338ee47f2e30f2"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 201,
+      "run_id": "trial-002-seed-201-8783d90cd893",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-002-seed-201/gazebo.log",
+      "size_bytes": 61634,
+      "sha256": "5bd8c48ce78529884702c6107d08583fdfd3fce8831077b3bcd31b68a428d9e0"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 202,
+      "run_id": "trial-003-seed-202-4a42e11c5c2e",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-003-seed-202/result.json",
+      "size_bytes": 12386719,
+      "sha256": "81f6c26b854a59afa98893a48b623fc438bec0ae5ed6b2f65fce35980c3e07ab"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 202,
+      "run_id": "trial-003-seed-202-4a42e11c5c2e",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-003-seed-202/gazebo.log",
+      "size_bytes": 58967,
+      "sha256": "c2d97920f920f71aa52f511c32c5d590888b9fef9c4089236a4d6ec104140549"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 203,
+      "run_id": "trial-004-seed-203-38e50c94fd2e",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-004-seed-203/result.json",
+      "size_bytes": 13327026,
+      "sha256": "04a5a95f345f8f69e722b001599d6a1379cbebe46be7a2d2e19ecea17b2ee97f"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 203,
+      "run_id": "trial-004-seed-203-38e50c94fd2e",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-004-seed-203/gazebo.log",
+      "size_bytes": 62065,
+      "sha256": "9f6751efd44dd28da145e5eb54f3cb4b631fe23742e8d171bf471d6651611441"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 204,
+      "run_id": "trial-005-seed-204-10cc231a23d1",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-005-seed-204/result.json",
+      "size_bytes": 15202415,
+      "sha256": "78b13ee1be6e7c70844be7f3129f31ee58bced68c648222b59b86bae2b29d458"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 204,
+      "run_id": "trial-005-seed-204-10cc231a23d1",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-005-seed-204/gazebo.log",
+      "size_bytes": 61838,
+      "sha256": "98e255443e64a1f65ce7a9d1097820cae3162214924538394ae4f1d8975e6dc1"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 205,
+      "run_id": "trial-006-seed-205-3dd044edf726",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-006-seed-205/result.json",
+      "size_bytes": 18198515,
+      "sha256": "18c7faec9e298560db957f9ed88e9caebafc1655ea45cdde68df9bc421ad4e1d"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 205,
+      "run_id": "trial-006-seed-205-3dd044edf726",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-006-seed-205/gazebo.log",
+      "size_bytes": 61271,
+      "sha256": "bc2fb5f09873ab4a6becb5ce0b22d38ea17c9de297e545fc95906a010c5386fc"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 206,
+      "run_id": "trial-007-seed-206-15ffd4c4a6c9",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-007-seed-206/result.json",
+      "size_bytes": 12500635,
+      "sha256": "15dfdd9dfadf4514fad62fe66598019dedaf0799bd250bc2eaeefe7cdb165355"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 206,
+      "run_id": "trial-007-seed-206-15ffd4c4a6c9",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-007-seed-206/gazebo.log",
+      "size_bytes": 62461,
+      "sha256": "d22183a71ed59fd898d779bda5bed8aabe7db5302878a652bea5d343d888f44b"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 207,
+      "run_id": "trial-008-seed-207-734e526b7901",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-008-seed-207/result.json",
+      "size_bytes": 12700585,
+      "sha256": "f0dedb6a028d9f558baa389817fe81aeaf71b5008c160337442c50613b1336bd"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 207,
+      "run_id": "trial-008-seed-207-734e526b7901",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-008-seed-207/gazebo.log",
+      "size_bytes": 57722,
+      "sha256": "3b476ff14b4925d3b3470a90e1bc945f21db918a655e4a8bde39356916fc6c1b"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 208,
+      "run_id": "trial-009-seed-208-0f13a0173b20",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-009-seed-208/result.json",
+      "size_bytes": 13031567,
+      "sha256": "94a008070d6c4d599e43787118c81a80b0bc65778ec204d8de59ba521a9e4fe6"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 208,
+      "run_id": "trial-009-seed-208-0f13a0173b20",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-009-seed-208/gazebo.log",
+      "size_bytes": 62069,
+      "sha256": "3e63aa365b7fd85c0a38bf34a4cdd7c8e865fe2accd688e8bbe3c64e9c4362f8"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 209,
+      "run_id": "trial-010-seed-209-d0759cd59b2a",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-010-seed-209/result.json",
+      "size_bytes": 13324226,
+      "sha256": "2716f6f844009fbe206a6d219abdb302c5470b01e15efb8e73a9f792cd31088d"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 209,
+      "run_id": "trial-010-seed-209-d0759cd59b2a",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-010-seed-209/gazebo.log",
+      "size_bytes": 61823,
+      "sha256": "22f07af5e5e8d2ff7ea20d90923f46a2961f724b26ff4633a7d75d2fe367c34b"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 210,
+      "run_id": "trial-011-seed-210-2f78238e7692",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-011-seed-210/result.json",
+      "size_bytes": 14058028,
+      "sha256": "0735a21ad1ddc5835537c8bfcad95130fd4448a2e1cce0afa1490e7baa991c29"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 210,
+      "run_id": "trial-011-seed-210-2f78238e7692",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-011-seed-210/gazebo.log",
+      "size_bytes": 61673,
+      "sha256": "a2995141c0a41139944cc9fd749f4653147a4e5007d17756578f6d7675e40612"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 211,
+      "run_id": "trial-012-seed-211-53f8c82a97d8",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-012-seed-211/result.json",
+      "size_bytes": 13435159,
+      "sha256": "0426bfd920e6e3241a9b7d3687c96e84c868bcc4e468ecca83c8d9e0d4725bc2"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 211,
+      "run_id": "trial-012-seed-211-53f8c82a97d8",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-012-seed-211/gazebo.log",
+      "size_bytes": 61412,
+      "sha256": "1b9504d3fe5909c4eb094f605412da270c7a6eb33089ee31f524cb9f507479e0"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 212,
+      "run_id": "trial-013-seed-212-bfd78d3d0626",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-013-seed-212/result.json",
+      "size_bytes": 13483056,
+      "sha256": "36a1a0d062b0a39a2c003c8145424c4877a227a90bd077da1cff9f80eac4f685"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 212,
+      "run_id": "trial-013-seed-212-bfd78d3d0626",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-013-seed-212/gazebo.log",
+      "size_bytes": 61923,
+      "sha256": "1ffc2c17c60d85e359968207d9b4f68e6ff44a2f4525ff20629a5c4e55742fd9"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 213,
+      "run_id": "trial-014-seed-213-9f6874ebdd9b",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-014-seed-213/result.json",
+      "size_bytes": 17225016,
+      "sha256": "2681e0cd3ec7affe64fab3dc766304664ea2a560100e2f47d8cc47b8153c51c4"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 213,
+      "run_id": "trial-014-seed-213-9f6874ebdd9b",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-014-seed-213/gazebo.log",
+      "size_bytes": 61435,
+      "sha256": "3e228d49cb9364cd856d2aeef07bb707ed2488642c1bf4084ea0664be3907596"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 214,
+      "run_id": "trial-015-seed-214-e4576e5f79a9",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-015-seed-214/result.json",
+      "size_bytes": 14997416,
+      "sha256": "fe8ca16aa3e9e3638614ea97cc2f08403789cb9887d0fd565dff00f10f5febde"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 214,
+      "run_id": "trial-015-seed-214-e4576e5f79a9",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-015-seed-214/gazebo.log",
+      "size_bytes": 62431,
+      "sha256": "402575ba0e82cb4b8ab7ba0d87aeac95c715da67a96532bb66226fc77ce18e56"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 215,
+      "run_id": "trial-016-seed-215-37d944990e56",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-016-seed-215/result.json",
+      "size_bytes": 15408308,
+      "sha256": "887078cefe0d0b1f22184176242662a02f08266b1601bd97ae559947022ec91b"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 215,
+      "run_id": "trial-016-seed-215-37d944990e56",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-016-seed-215/gazebo.log",
+      "size_bytes": 61996,
+      "sha256": "3cabb2e1590e273e8c30d24cc1bd0a09636fac1ad61cae371b76f39cd26c1033"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 216,
+      "run_id": "trial-017-seed-216-b326940f8b2a",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-017-seed-216/result.json",
+      "size_bytes": 13573608,
+      "sha256": "5ee49ddb888b36cb0a04c42acf156ba7cb6a22757eb082cbd8ba8abd6592d351"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 216,
+      "run_id": "trial-017-seed-216-b326940f8b2a",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-017-seed-216/gazebo.log",
+      "size_bytes": 61639,
+      "sha256": "340766597cbc9594e0e11514cf4899b441e99f7e8440bbd679c715f4314835bf"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 217,
+      "run_id": "trial-018-seed-217-8b9fff934b69",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-018-seed-217/result.json",
+      "size_bytes": 14792694,
+      "sha256": "0da1ca3d862b928ad8230ec030d97f99959fd7bc7ce64686713b3ce9a7733eca"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 217,
+      "run_id": "trial-018-seed-217-8b9fff934b69",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-018-seed-217/gazebo.log",
+      "size_bytes": 61349,
+      "sha256": "13bd34646804b40440b6e13f1ffa818f6ad6218e562d3d758b139693c86a1495"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 218,
+      "run_id": "trial-019-seed-218-6bc735c37b7c",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-019-seed-218/result.json",
+      "size_bytes": 13377250,
+      "sha256": "f81841d51f54b9e9c72d8a47a1696bf6bc483ede292d045c3e04368b32dc4353"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 218,
+      "run_id": "trial-019-seed-218-6bc735c37b7c",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-019-seed-218/gazebo.log",
+      "size_bytes": 62069,
+      "sha256": "36c9af900cf04f58be5eade954ad11931636ba907160a982055fbb410d71cde8"
+    },
+    {
+      "role": "raw_physical_result",
+      "seed": 219,
+      "run_id": "trial-020-seed-219-11e87566a11f",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-020-seed-219/result.json",
+      "size_bytes": 16820355,
+      "sha256": "bc5ff06381de263fedddd4ce907eb51e5c9a4be08e4631ef5111c6ba919230b4"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "seed": 219,
+      "run_id": "trial-020-seed-219-11e87566a11f",
+      "path": ".review-runs/pr11-8c36495-20trials-20261004/trial-020-seed-219/gazebo.log",
+      "size_bytes": 62389,
+      "sha256": "f33d321af7c62aed6cc5bb8780abd0d525678359270e89b4beae9bd910ca45d0"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "normal",
+      "seed": 700,
+      "run_id": "trial-001-seed-700-453629a46045",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-001-seed-700/result.json",
+      "size_bytes": 23125086,
+      "sha256": "5156853a0aad5abe41cecbfc98403654290b19b7bcc6247bd31b6cb40cb60f62"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "normal",
+      "seed": 700,
+      "run_id": "trial-001-seed-700-453629a46045",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-001-seed-700/gazebo.log",
+      "size_bytes": 43837,
+      "sha256": "89a080f9ac545d755bbe032bb45d59758b4b5cfdc3cef8ad202fe1d55164d68c"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "initial_pose_perturbation",
+      "seed": 708,
+      "run_id": "trial-002-seed-708-0f3e1fa85ec9",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-002-seed-708/result.json",
+      "size_bytes": 16823347,
+      "sha256": "34544a7fc07812f2733b24ea0fb0fcf879186965aebb749b0d2501eb9978e3bd"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "initial_pose_perturbation",
+      "seed": 708,
+      "run_id": "trial-002-seed-708-0f3e1fa85ec9",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-002-seed-708/gazebo.log",
+      "size_bytes": 61787,
+      "sha256": "90c751dae6ec103661977422e64e842312bfada73b0faed191f69a7e2880e7d7"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "placement_verification_reject",
+      "seed": 701,
+      "run_id": "trial-003-seed-701-0cf90e05fe1a",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-003-seed-701/result.json",
+      "size_bytes": 12392313,
+      "sha256": "fddec3e51822d4411c919868af539a59cd8aede3aa51e5c0e899f7e8472cd15d"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "placement_verification_reject",
+      "seed": 701,
+      "run_id": "trial-003-seed-701-0cf90e05fe1a",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-003-seed-701/gazebo.log",
+      "size_bytes": 63463,
+      "sha256": "72b684a3c40771008696a9d0ba16399c8b156b5709de5b51b96075826ddf5227"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "post_grasp_drop",
+      "seed": 702,
+      "run_id": "trial-004-seed-702-8e038fe903c0",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-004-seed-702/result.json",
+      "size_bytes": 8122819,
+      "sha256": "4639213b4055ac81b1a5852dc7150d700ec046323849086fa5dda4646d304c99"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "post_grasp_drop",
+      "seed": 702,
+      "run_id": "trial-004-seed-702-8e038fe903c0",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-004-seed-702/gazebo.log",
+      "size_bytes": 55335,
+      "sha256": "c524c27b7c2b010b6ed7158740c7188edf78bd20010cf6f4a710b4cf47d80ede"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "post_release_contact_feedback_loss",
+      "seed": 703,
+      "run_id": "trial-005-seed-703-3fec8a808a9b",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-005-seed-703/result.json",
+      "size_bytes": 14883145,
+      "sha256": "104fe2cc99e2824d237c3b14f4dee48eb0b70286e85b67fe7f5f914e62ed5b47"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "post_release_contact_feedback_loss",
+      "seed": 703,
+      "run_id": "trial-005-seed-703-3fec8a808a9b",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-005-seed-703/gazebo.log",
+      "size_bytes": 61909,
+      "sha256": "0c7598ae98bc6af54519517751b7b5acf528ceceda7c1ab54407aa2d834a6f22"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "cancel",
+      "seed": 704,
+      "run_id": "trial-006-seed-704-9137b5baebb4",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-006-seed-704/result.json",
+      "size_bytes": 5462190,
+      "sha256": "5a2168e83515c01e3e90d8b1ebad94b8e4e5041b1f16407f50920ca799e6e6fd"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "cancel",
+      "seed": 704,
+      "run_id": "trial-006-seed-704-9137b5baebb4",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-006-seed-704/gazebo.log",
+      "size_bytes": 39346,
+      "sha256": "4eb228e59ab3539124369816541f130b87eceafe135aa7ddb7211569bdb3b97a"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "timeout",
+      "seed": 705,
+      "run_id": "trial-007-seed-705-4e5d2f73e34c",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-007-seed-705/result.json",
+      "size_bytes": 6278279,
+      "sha256": "d92b4e4d6819e5c827dbf2e15d31526c6f4909c81f9fd30e9fc45da42375c2c2"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "timeout",
+      "seed": 705,
+      "run_id": "trial-007-seed-705-4e5d2f73e34c",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-007-seed-705/gazebo.log",
+      "size_bytes": 38786,
+      "sha256": "ef830c6957f0534db75ed2ce5875c52c2402a91a77bd28d83b9c1160219e9a7a"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "pause_resume",
+      "seed": 706,
+      "run_id": "trial-008-seed-706-34c28cada9f5",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-008-seed-706/result.json",
+      "size_bytes": 14101983,
+      "sha256": "18995631c836243180bf0aa042ad1b00bed4e12563fc318200fb5f1734b79256"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "pause_resume",
+      "seed": 706,
+      "run_id": "trial-008-seed-706-34c28cada9f5",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-008-seed-706/gazebo.log",
+      "size_bytes": 62585,
+      "sha256": "0e8d7d7a218ed6662e3255ffb9db184e39a73050748f77e884139c3381af9d59"
+    },
+    {
+      "role": "raw_physical_result",
+      "scenario": "time_reset",
+      "seed": 707,
+      "run_id": "trial-009-seed-707-2f6a5a237694",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-009-seed-707/result.json",
+      "size_bytes": 6677038,
+      "sha256": "f8b8ce6978d96dd1c31cb109713bf45e25fcfb660578724167b851efa2ccae1a"
+    },
+    {
+      "role": "gazebo_launch_log",
+      "scenario": "time_reset",
+      "seed": 707,
+      "run_id": "trial-009-seed-707-2f6a5a237694",
+      "path": ".review-runs/pr11-8c36495-scenarios-20261004/scenarios-20261004T113449Z-66ca4f218a/trial-009-seed-707/gazebo.log",
+      "size_bytes": 53068,
+      "sha256": "48d8424dcc05374e71af78ef24215fd621cc722c4b5b453217124dccd796ea4e"
+    }
+  ],
+  "committed_evidence": [
+    {
+      "path": "../phase2-gazebo.md",
+      "size_bytes": 11547,
+      "sha256": "2514ba6b3ede12a6afdeae0f585bc5c1399a4c3c860bd9fabe2b42efd23c39e2"
+    },
+    {
+      "path": "REPORT.md",
+      "size_bytes": 12681,
+      "sha256": "25a2c4dfac41d2a13848a83ec206d6a241a07e9c58ebbb76d778a15a63cf0680"
+    },
+    {
+      "path": "evidence/batch-summary.json",
+      "size_bytes": 62031,
+      "sha256": "eb6f4756076a9592daf13afc916978f8147560c84d10b2bfe96897fc2d42ef8d"
+    },
+    {
+      "path": "evidence/logs/batch-seed202.gazebo.log",
+      "size_bytes": 58967,
+      "sha256": "c2d97920f920f71aa52f511c32c5d590888b9fef9c4089236a4d6ec104140549"
+    },
+    {
+      "path": "evidence/logs/batch-seed207.gazebo.log",
+      "size_bytes": 57722,
+      "sha256": "3b476ff14b4925d3b3470a90e1bc945f21db918a655e4a8bde39356916fc6c1b"
+    },
+    {
+      "path": "evidence/logs/colcon-build.log",
+      "size_bytes": 92366,
+      "sha256": "e7cd08f6a4e4bfaf1b07d5c317958e50efe924d1d48b375c62e12f14f0189211"
+    },
+    {
+      "path": "evidence/logs/colcon-test-result.log",
+      "size_bytes": 50,
+      "sha256": "86cf30b7bc388dac603c85e0f56b7039e658e7212070c051e2799357946cb0b0"
+    },
+    {
+      "path": "evidence/logs/colcon-test.log",
+      "size_bytes": 9227,
+      "sha256": "e126a9f6b8d847b6f86c34d7fbcb4a1ab76b23e5d39fbfb86f53fe188fe23a10"
+    },
+    {
+      "path": "evidence/logs/core.log",
+      "size_bytes": 4138,
+      "sha256": "e32a6bc473de8b4db03c661e433b9953a3b56ddfa0b8693db276d4c1b97fceb0"
+    },
+    {
+      "path": "evidence/logs/scenario-cancel-seed704.gazebo.log",
+      "size_bytes": 39346,
+      "sha256": "4eb228e59ab3539124369816541f130b87eceafe135aa7ddb7211569bdb3b97a"
+    },
+    {
+      "path": "evidence/logs/scenario-initial_pose_perturbation-seed708.gazebo.log",
+      "size_bytes": 61787,
+      "sha256": "90c751dae6ec103661977422e64e842312bfada73b0faed191f69a7e2880e7d7"
+    },
+    {
+      "path": "evidence/logs/scenario-normal-seed700.gazebo.log",
+      "size_bytes": 43837,
+      "sha256": "89a080f9ac545d755bbe032bb45d59758b4b5cfdc3cef8ad202fe1d55164d68c"
+    },
+    {
+      "path": "evidence/logs/scenario-pause_resume-seed706.gazebo.log",
+      "size_bytes": 62585,
+      "sha256": "0e8d7d7a218ed6662e3255ffb9db184e39a73050748f77e884139c3381af9d59"
+    },
+    {
+      "path": "evidence/logs/scenario-placement_verification_reject-seed701.gazebo.log",
+      "size_bytes": 63463,
+      "sha256": "72b684a3c40771008696a9d0ba16399c8b156b5709de5b51b96075826ddf5227"
+    },
+    {
+      "path": "evidence/logs/scenario-post_grasp_drop-seed702.gazebo.log",
+      "size_bytes": 55335,
+      "sha256": "c524c27b7c2b010b6ed7158740c7188edf78bd20010cf6f4a710b4cf47d80ede"
+    },
+    {
+      "path": "evidence/logs/scenario-post_release_contact_feedback_loss-seed703.gazebo.log",
+      "size_bytes": 61909,
+      "sha256": "0c7598ae98bc6af54519517751b7b5acf528ceceda7c1ab54407aa2d834a6f22"
+    },
+    {
+      "path": "evidence/logs/scenario-time_reset-seed707.gazebo.log",
+      "size_bytes": 53068,
+      "sha256": "48d8424dcc05374e71af78ef24215fd621cc722c4b5b453217124dccd796ea4e"
+    },
+    {
+      "path": "evidence/logs/scenario-timeout-seed705.gazebo.log",
+      "size_bytes": 38786,
+      "sha256": "ef830c6957f0534db75ed2ce5875c52c2402a91a77bd28d83b9c1160219e9a7a"
+    },
+    {
+      "path": "evidence/logs/scene-state.log",
+      "size_bytes": 73,
+      "sha256": "47df488a53ac461a8d8654bbfcd2e08307fcfb15925b057e3d25ee2384887c8e"
+    },
+    {
+      "path": "evidence/logs/sensor-timestamps.log",
+      "size_bytes": 107,
+      "sha256": "42f237d7abc9eb371abada54db94861f647b2fd2e4008b692ec18dfdcc2e00d5"
+    },
+    {
+      "path": "evidence/logs/test-panda.log",
+      "size_bytes": 177868,
+      "sha256": "5c99d4facf1171e7c883fae7349235d676de1fe6472676edf5ef95477c48cda3"
+    },
+    {
+      "path": "evidence/logs/test-ros.log",
+      "size_bytes": 46936,
+      "sha256": "27c6266bcb862a85bb8072f4d15b409a13400624f4db5942d084787efc1048e5"
+    },
+    {
+      "path": "evidence/logs/trial-driver-unit.log",
+      "size_bytes": 70,
+      "sha256": "555c79af4fd8635235e3b6e350d27d454512523a9cd40719794ded6a98b6cfe3"
+    },
+    {
+      "path": "evidence/scenario-outcomes.json",
+      "size_bytes": 36497,
+      "sha256": "8b933d043be626a3bd15fd47e211bc2fba8553ff1996965f4b09641a707c8cb3"
+    }
+  ]
+}

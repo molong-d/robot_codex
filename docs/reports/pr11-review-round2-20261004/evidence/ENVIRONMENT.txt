@@ -1,0 +1,29 @@
+Tested code SHA: f92d5325d13505f14a3d24767fdc4dab9b314560
+Tracked workspace before code tests and each physical run: clean
+
+Host
+  OS: Ubuntu 22.04.5 LTS
+  Kernel: Linux 6.8.0-138-generic x86_64
+  CPU: Intel Core i5-14600KF, 20 logical CPUs
+  RAM: 31 GiB
+  Disk at test time: 95 GiB free of 756 GiB
+  NVIDIA driver: unavailable; Gazebo ran headless on CPU
+  Docker Engine: 29.3.1
+
+Isolated test container
+  OS: Ubuntu 24.04.5 LTS
+  ROS_DISTRO: jazzy
+  Local image ID: sha256:e78120951b67089bbad339217778e865734801e5faa4d360c13e70e1dd40d7d1
+  Dockerfile base OCI digest: ros:jazzy-ros-base@sha256:066420e07f60aa18262f2479981def87ebcfcec42eefb0c0c57c4a46098348ca
+  Ubuntu/ROS apt mirror defaults: mirrors.ustc.edu.cn (see docker/jazzy.Dockerfile and scripts/with_jazzy.sh)
+  ROS packages were installed from Jazzy apt repositories at image build time; apt repositories are not immutable snapshots.
+
+Recorded package versions inside the container
+  ros-jazzy-behaviortree-cpp 4.10.0-1noble.20260902.082337
+  ros-jazzy-controller-manager 4.48.0-1noble.20260905.073118
+  ros-jazzy-gz-ros2-control 1.2.20-1noble.20260905.083607
+  ros-jazzy-moveit-core 2.12.4-1noble.20260903.075716
+  ros-jazzy-ros-gz-sim 1.0.24-1noble.20260905.085151
+  Gazebo Sim / Harmonic: 8.15.0
+
+Build, colcon and scripts ran in this container. The Gazebo scenario/batch orchestrators ran on the host and started one isolated Jazzy container per trial.

@@ -25,6 +25,10 @@
 
 ## 升级流程
 
+PR #11 第二轮将 `robot_interfaces` 从 0.1.0 升为 0.2.0。`GraspContact` 的旧 `bool detected` 替换为 `schema_version=2` 与 `state`：`NO_FINGER_CONTACT`、`LEFT_FINGER_ONLY`、`RIGHT_FINGER_ONLY`、`BOTH_FINGERS`、`UNKNOWN`。消费者必须重建接口包和全部依赖；旧 Bool `/panda/grasp_contact` 只保留作诊断，不能用于确认释放。新增 `PlanningSceneStatus` 用于报告 MoveIt 场景期望/确认版本、附着状态、epoch 和在途更新。
+
+同轮将核心 `gripper` 组件接口升为 v3、`manipulation_observer` 升为 v2：反馈及验证统一使用 `ContactState`，未知/单指状态不能冒充夹稳或完全释放。所有实现与依赖声明需完整重编译并校验版本。
+
 每个阶段使用独立开发分支和 PR；通过核心和 ROS CI 后由所有者确认合并。合并后的新基线再创建新的 `stable/` 备份分支，保留旧备份。避免用强制推送覆盖主线或备份。
 
 4A 将 `arm_motion` 与 `gripper` 契约升级为版本 2：`poll(Time)` 与带时间戳的测量反馈替代旧的布尔到位/夹持查询。旧实现应编译失败或在绑定时被拒绝，不能伪装成兼容实现。

@@ -106,6 +106,94 @@ class ProbeMotion final : public ArmMotion {
   MotionFeedback feedback() const override { return measured; }
 };
 
+class RecordingArm final : public ArmMotion {
+ public:
+  explicit RecordingArm(std::shared_ptr<ArmMotion> inner) : inner_(std::move(inner)) {}
+  std::string resource_id() const override { return inner_->resource_id(); }
+  void begin_move(const CartesianTarget& target) override { targets.push_back(target); inner_->begin_move(target); }
+  Status poll(Time now) override { return inner_->poll(now); }
+  void request_stop() override { inner_->request_stop(); }
+  MotionFeedback feedback() const override { return inner_->feedback(); }
+  std::vector<CartesianTarget> targets;
+ private:
+  std::shared_ptr<ArmMotion> inner_;
+};
+
+class ManualPlanningScene final : public PlanningSceneGate {
+ public:
+  std::string resource_id() const override { return "manual_planning_scene"; }
+  PlanningSceneSnapshot snapshot() const override {
+    auto result = state;
+    result.received_at = Clock::now();
+    return result;
+  }
+  void set(bool ready, uint64_t epoch, uint64_t desired_version, uint64_t confirmed_version,
+           std::string desired_attached, std::string confirmed_attached, bool in_flight = false,
+           bool cleanup_pending = false) {
+    state.valid = true;
+    state.ready = ready;
+    state.request_in_flight = in_flight;
+    state.cleanup_pending = cleanup_pending;
+    state.epoch = epoch;
+    ++state.sequence;
+    state.desired_version = desired_version;
+    state.confirmed_version = confirmed_version;
+    state.desired_attached_object = std::move(desired_attached);
+    state.confirmed_attached_object = std::move(confirmed_attached);
+  }
+  PlanningSceneSnapshot state;
+};
+
+void add_scene_gated_skill(Fixture& fixture, const std::string& skill, bool pick,
+                           double post_action_clearance, std::chrono::milliseconds timeout = 5000ms) {
+  ManipulationPolicy policy;
+  policy.allow_synthetic = true;
+  policy.post_action_clearance_m = post_action_clearance;
+  policy.scene_sync_timeout = timeout;
+  const Dependencies dependencies{{{"motion", "arm_motion", 2}, {"gripper", "gripper", 3},
+                                  {"safety", "execution_gate", 1}},
+                                  {"motion", "gripper"}, "safety"};
+  fixture.skills.implement(skill, "scene_gated",
+      [pick, policy](Context& context) { return std::make_unique<Manipulate>(context, pick, policy); },
+      dependencies);
+}
+
+struct SceneGatedContext {
+  std::shared_ptr<RecordingArm> arm;
+  std::shared_ptr<ManualPlanningScene> scene;
+  std::unique_ptr<Bindings> bindings;
+  std::unique_ptr<Context> context;
+  explicit SceneGatedContext(Fixture& fixture)
+      : arm(std::make_shared<RecordingArm>(fixture.bindings.get<ArmMotion>("motion"))),
+        scene(std::make_shared<ManualPlanningScene>()) {
+    fixture.components.add("scene_test_arm", arm);
+    fixture.components.add("scene_test_gate", scene);
+    bindings = std::make_unique<Bindings>(fixture.components,
+        std::map<std::string, std::string>{{"motion", "scene_test_arm"}, {"gripper", "gripper"},
+            {"safety", "gate"}, {"planning_scene", "scene_test_gate"}});
+    context = std::make_unique<Context>(Context{*bindings, fixture.world});
+  }
+};
+
+class ProbeGripper final : public Gripper {
+ public:
+  bool stationary{false}, holding{false};
+  double width{0.08};
+  Status status{Status::succeeded};
+  std::string resource_id() const override { return "probe_gripper"; }
+  void begin_grasp(const GraspCommand& command) override { width = command.width_m; holding = true; status = Status::succeeded; }
+  void begin_release(double value) override { width = value; holding = false; status = Status::succeeded; }
+  Status poll(Time now) override {
+    measured_ = {width, now, true, stationary, holding ? ContactState::both : ContactState::none,
+                 static_cast<uint64_t>(now.time_since_epoch().count())};
+    return status;
+  }
+  void request_stop() override { stationary = true; status = Status::canceled; }
+  GripperFeedback feedback() const override { return measured_; }
+ private:
+  GripperFeedback measured_;
+};
+
 class ProbeObserver final : public ManipulationObserver {
  public:
   OutcomeEvidence value{"workpiece", "", {}, true, true, {"sensor", false, 0.95}, 1};
@@ -161,6 +249,93 @@ int main() {
     run(); ++passed; std::cout << "PASS " << name << '\n';
   };
   try {
+    test("contact evidence distinguishes unknown, partial, empty, and bilateral states", [] {
+      check(!dual_finger_grasp(ContactState::left_only) && !dual_finger_grasp(ContactState::right_only),
+            "single finger is not a grasp");
+      check(!no_finger_contact(ContactState::left_only) && !no_finger_contact(ContactState::right_only) &&
+            !no_finger_contact(ContactState::unknown), "partial or missing evidence is not release");
+      check(dual_finger_grasp(ContactState::both) && no_finger_contact(ContactState::none),
+            "only bilateral contact grasps and bilateral absence releases");
+    });
+    test("direct skill entry waits for fresh exact planning-scene version", [] {
+      Fixture f; f.locate(); add_scene_gated_skill(f, "pick_object", true, 0.0);
+      SceneGatedContext gated(f);
+      gated.scene->set(true, 3, 7, 6, "workpiece", "workpiece");  // stale/incomplete attached state
+      auto request = f.request("scene-gate", "pick_object"); request.implementation = "scene_gated";
+      Session session(f.skills, f.resources, *gated.context, request);
+      check(session.start(f.now).status == Status::running && gated.arm->targets.empty(),
+            "direct skill request must not bypass scene readiness");
+      check(!f.resources.empty(), "motion resources remain owned while the gate waits");
+      gated.scene->set(true, 3, 7, 7, "", "");
+      f.now += 10ms; session.tick(f.now);
+      check(gated.arm->targets.size() == 1, "matching exact scene state dispatches once");
+      f.now += 10ms; session.tick(f.now);
+      check(gated.arm->targets.size() == 1, "polling does not duplicate a dispatched move");
+      for (int i = 0; i < 20 && !terminal(session.result().status); ++i)
+        session.tick(f.now += 10ms);
+      check(session.result().status == Status::succeeded, "motion continues after current scene confirmation");
+    });
+    test("scene wait cancellation timeout and epoch reset fail closed", [] {
+      {
+        Fixture f; f.locate(); add_scene_gated_skill(f, "pick_object", true, 0.0);
+        SceneGatedContext gated(f); gated.scene->set(false, 4, 2, 1, "", "");
+        auto request = f.request("scene-cancel", "pick_object"); request.implementation = "scene_gated";
+        Session session(f.skills, f.resources, *gated.context, request); session.start(f.now);
+        session.cancel();
+        check(session.tick(f.now += 10ms).status == Status::canceled && gated.arm->targets.empty() && f.resources.empty(),
+              "cancel while waiting sends no move and releases only idle resources");
+      }
+      {
+        Fixture f; f.locate(); add_scene_gated_skill(f, "pick_object", true, 0.0, 100ms);
+        SceneGatedContext gated(f); gated.scene->set(false, 0, 1, 0, "", "");
+        auto request = f.request("scene-timeout", "pick_object"); request.timeout = 2s;
+        request.implementation = "scene_gated";
+        Session session(f.skills, f.resources, *gated.context, request); session.start(f.now);
+        const auto result = session.tick(f.now += 101ms);
+        check(result.code == "PLANNING_SCENE_TIMEOUT" && gated.arm->targets.empty() && f.resources.empty(),
+              "scene response timeout blocks motion");
+      }
+      {
+        Fixture f; f.locate(); add_scene_gated_skill(f, "pick_object", true, 0.0);
+        SceneGatedContext gated(f); gated.scene->set(false, 8, 4, 3, "", "");
+        auto request = f.request("scene-reset", "pick_object"); request.implementation = "scene_gated";
+        Session session(f.skills, f.resources, *gated.context, request); session.start(f.now);
+        gated.scene->set(true, 9, 5, 5, "", "");
+        const auto result = session.tick(f.now += 10ms);
+        check(result.code == "SCENE_EPOCH_CHANGED" && gated.arm->targets.empty(),
+              "post-reset ready snapshot cannot satisfy old motion request");
+      }
+    });
+    test("pick lift and place retreat wait for delayed attach and detach confirmations", [] {
+      Fixture f; f.locate();
+      add_scene_gated_skill(f, "pick_object", true, 0.05);
+      add_scene_gated_skill(f, "place_object", false, 0.05);
+      SceneGatedContext gated(f); gated.scene->set(true, 0, 1, 1, "", "");
+      auto pick_request = f.request("delayed-attach", "pick_object"); pick_request.implementation = "scene_gated";
+      Session pick(f.skills, f.resources, *gated.context, pick_request); pick.start(f.now);
+      for (int i = 0; i < 20 && f.world.attached_object.empty(); ++i) pick.tick(f.now += 10ms);
+      check(f.world.attached_object == "workpiece" && gated.arm->targets.size() == 1 &&
+            pick.result().status == Status::running,
+            "lift is held until attach response confirms the carried-object scene");
+      gated.scene->set(true, 0, 2, 2, "workpiece", "workpiece");
+      for (int i = 0; i < 20 && !terminal(pick.result().status); ++i) pick.tick(f.now += 10ms);
+      check(pick.result().status == Status::succeeded && gated.arm->targets.size() == 2,
+            "confirmed attach dispatches exactly one lift");
+
+      f.locate("tray");
+      auto place_request = f.request("delayed-detach", "place_object",
+          {{"object", "workpiece"}, {"target", "tray"}});
+      place_request.implementation = "scene_gated";
+      Session place(f.skills, f.resources, *gated.context, place_request); place.start(f.now);
+      for (int i = 0; i < 20 && !f.world.attached_object.empty(); ++i) place.tick(f.now += 10ms);
+      check(f.world.attached_object.empty() && gated.arm->targets.size() == 3 &&
+            place.result().status == Status::running,
+            "retreat is held until detach response confirms the world-object scene");
+      gated.scene->set(true, 0, 3, 3, "", "");
+      for (int i = 0; i < 20 && !terminal(place.result().status); ++i) place.tick(f.now += 10ms);
+      check(place.result().status == Status::succeeded && gated.arm->targets.size() == 4,
+            "confirmed detach dispatches exactly one retreat");
+    });
     test("native poses resolve through rotation and separate tool offsets", [] {
       StaticMotionTargetResolver resolver(demo_calibration());
       ConfiguredDemoLocator locator(native_scene(), PoseMeaning::object_pose, "depth_camera");
@@ -707,6 +882,85 @@ int main() {
       check(f.world.placement_candidates.at("workpiece") == "tray", "inferred placement");
       check(f.world.known_locations.count("workpiece") == 0, "release is not a perception observation");
       check(f.resources.empty(), "leases released");
+    });
+    test("closed empty gripper opens and verifies before arm approach", [] {
+      Fixture f; f.robot->width_m = 0.0; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      f.components.add("recording_arm", arm);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      Session session(f.skills, f.resources, context, f.request("open-first", "pick_object"));
+      check(session.start(f.now).status == Status::running, "empty gripper opening started");
+      check(arm->targets.empty(), "arm does not approach with closed fingers");
+      for (int i = 0; i < 3 && arm->targets.empty(); ++i)
+        session.tick(f.now += 10ms);
+      check(std::abs(f.robot->width_m-0.08) < 1e-9, "empty gripper opened to the configured width");
+      check(arm->targets.size() == 1 && arm->targets[0].id == "workpiece",
+            "arm command follows verified gripper opening");
+      for (int i = 0; i < 100 && !terminal(session.result().status); ++i)
+        session.tick(f.now += 10ms);
+      check(session.result().status == Status::succeeded, "pick succeeds after opening first");
+    });
+    test("moving gripper is allowed to stop before manipulation starts", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      auto gripper = std::make_shared<ProbeGripper>();
+      f.components.add("recording_arm", arm);
+      f.components.add("probe_gripper", gripper);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "probe_gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      Session session(f.skills, f.resources, context, f.request("wait-stop", "pick_object"));
+      check(session.start(f.now).status == Status::running && arm->targets.empty(),
+            "arm waits while the measured gripper is moving");
+      gripper->stationary = true;
+      session.tick(f.now += 10ms);
+      check(arm->targets.size() == 1, "fresh stationary feedback unlocks arm motion");
+      session.cancel();
+      for (int i = 0; i < 5 && !terminal(session.result().status); ++i)
+        session.tick(f.now += 10ms);
+      check(session.result().status == Status::canceled && f.resources.empty(),
+            "cancellation waits for the arm stop and releases both leases");
+    });
+    test("configured manipulation approaches, descends, then lifts or retreats", [] {
+      Fixture f; f.locate();
+      auto arm = std::make_shared<RecordingArm>(f.bindings.get<ArmMotion>("motion"));
+      f.components.add("recording_arm", arm);
+      Bindings bindings(f.components, {{"perception", "camera"}, {"motion", "recording_arm"},
+          {"gripper", "gripper"}, {"safety", "gate"}, {"outcome", "observer"}, {"target_resolver", "resolver"}});
+      Context context{bindings, f.world};
+      ManipulationPolicy policy; policy.allow_synthetic = true;
+      policy.approach_clearance_m = 0.08; policy.post_action_clearance_m = 0.12;
+      Skills skills; VerificationPolicy verification; verification.evidence.allow_synthetic = true;
+      register_demo_skills(skills, policy, verification);
+      const auto run = [&](const std::string& id, const std::string& skill, Arguments args) {
+        Session session(skills, f.resources, context, f.request(id, skill, std::move(args)));
+        auto result = session.start(f.now);
+        for (int i = 0; i < 100 && !terminal(result.status); ++i) {
+          f.now += 10ms; result = session.tick(f.now);
+        }
+        return result;
+      };
+      check(run("pick-phases", "pick_object", {{"object", "workpiece"}}).status == Status::succeeded,
+            "pick phases complete");
+      check(arm->targets.size() == 3 &&
+            std::abs(arm->targets[0].pose.z-0.28) < 1e-9 &&
+            std::abs(arm->targets[1].pose.z-0.20) < 1e-9 &&
+            std::abs(arm->targets[2].pose.z-0.32) < 1e-9,
+            "pick moves above, descends, and lifts from the located pose");
+      f.locate("tray"); const auto prior = arm->targets.size();
+      check(run("place-phases", "place_object", {{"object", "workpiece"}, {"target", "tray"}}).status == Status::succeeded,
+            "place phases complete");
+      check(arm->targets.size() == prior+3 &&
+            std::abs(arm->targets[prior].pose.z-0.23) < 1e-9 &&
+            std::abs(arm->targets[prior+1].pose.z-0.15) < 1e-9 &&
+            std::abs(arm->targets[prior+2].pose.z-0.27) < 1e-9,
+            "place approaches, releases, and retreats from the target");
+      check(f.world.placement_candidates.at("workpiece") == "tray" && f.resources.empty(),
+            "phase sequence preserves inferred release and releases resource leases");
+      rejects([&] { policy.approach_clearance_m = std::numeric_limits<double>::quiet_NaN();
+        Manipulate invalid(context, true, policy); }, "non-finite clearance rejected");
     });
     test("motion implementation can change without skill changes", [] {
       Fixture f(7); f.locate();

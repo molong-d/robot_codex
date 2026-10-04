@@ -1,0 +1,13 @@
+OS: Ubuntu 24.04.5 LTS
+ROS_DISTRO: jazzy
+ros-jazzy-behaviortree-cpp	4.10.0-1noble.20260902.082337
+ros-jazzy-controller-manager	4.48.0-1noble.20260905.073118
+ros-jazzy-gz-ros2-control	1.2.20-1noble.20260905.083607
+ros-jazzy-moveit-core	2.12.4-1noble.20260903.075716
+ros-jazzy-ros-gz-sim	1.0.24-1noble.20260905.085151
+Gazebo Sim: 8.15.0
+moveit_core: /opt/ros/jazzy
+behaviortree_cpp: /opt/ros/jazzy
+controller_manager: /opt/ros/jazzy
+gz_ros2_control: /opt/ros/jazzy
+ros_gz_sim: /opt/ros/jazzy

@@ -1,0 +1,13 @@
+.F
+======================================================================
+FAIL: test_pre_release_500ms_plus_post_release_10ms_is_rejected (__main__.ReleaseWindowAuditTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/long/project/robot_codex/robot_codex/src/robot_panda_gz_sim/test/test_evidence_release_window.py", line 39, in test_pre_release_500ms_plus_post_release_10ms_is_rejected
+    self.assertFalse(audit["checks"]["stable_window_observed"], audit["checks"])
+AssertionError: True is not false : {'same_epoch_world_poses': True, 'fresh_final_object_pose': True, 'fresh_final_target_pose': True, 'dual_finger_contact_same_sample': False, 'object_lifted_after_grasp': False, 'release_event_observed': True, 'fresh_post_release_no_finger_contact': True, 'final_tray_floor_contact': True, 'final_contact_matches_pose_time': True, 'tray_contact_during_stable_window': True, 'placement_xy_within_tolerance': True, 'placement_z_within_tolerance': True, 'stable_window_observed': True, 'stable_pose_samples_fresh': True}
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+FAILED (failures=1)

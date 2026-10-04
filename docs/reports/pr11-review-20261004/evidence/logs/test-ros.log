@@ -1,0 +1,384 @@
+test_backend_failure_propagates (__main__.RuntimeTests.test_backend_failure_propagates) ... [WARN] [1791114024.845046774] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114024.845060711] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_busy_rejection_and_cancel_confirmation (__main__.RuntimeTests.test_busy_rejection_and_cancel_confirmation) ... [WARN] [1791114025.464444721] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114025.464466752] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_cancellation_during_verification_preserves_held_state (__main__.RuntimeTests.test_cancellation_during_verification_preserves_held_state) ... [WARN] [1791114028.043063945] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114028.043111156] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_catalog_describes_schemas_and_implementation_dependencies (__main__.RuntimeTests.test_catalog_describes_schemas_and_implementation_dependencies) ... [WARN] [1791114028.674689802] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114028.674717977] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_component_rebinding (__main__.RuntimeTests.test_component_rebinding) ... [WARN] [1791114029.160585146] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114029.160614213] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_deadline_stops_task (__main__.RuntimeTests.test_deadline_stops_task) ... [WARN] [1791114030.065379984] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114030.065408171] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_diagnostics_idle_and_rejected_goals_have_no_record (__main__.RuntimeTests.test_diagnostics_idle_and_rejected_goals_have_no_record) ... [WARN] [1791114030.620250945] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114030.620276706] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_execution_gate_denies_before_actuation (__main__.RuntimeTests.test_execution_gate_denies_before_actuation) ... [WARN] [1791114031.109352321] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114031.109375696] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_execution_history_capacity_and_export_example (__main__.RuntimeTests.test_execution_history_capacity_and_export_example) ... [WARN] [1791114031.605866945] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114031.605898542] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_failed_records_match_action_outcomes (__main__.RuntimeTests.test_failed_records_match_action_outcomes) ... [WARN] [1791114033.529185194] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114033.529212053] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_invalid_configuration_fails_before_runtime_starts (__main__.RuntimeTests.test_invalid_configuration_fails_before_runtime_starts) ... [WARN] [1791114034.017177620] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114034.017200399] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[WARN] [1791114024.989714846] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114024.989739845] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114025.000060044] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114025.240516426] [robot_runtime]: Task failed: GRIPPER_FAILED gripper action failed or canceled
+[INFO] [1791114025.249660651] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114025.603739430] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114025.603765487] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114025.613936204] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114025.774314375] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114027.874163338] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114027.878209895] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114028.174534252] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114028.174559602] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114028.185124162] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114028.445389145] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114028.459768246] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114028.806075709] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114028.806101460] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114028.816434521] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=false
+[INFO] [1791114028.946180410] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114029.313757537] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114029.313781005] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114029.324225806] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=slow_mock_arm; permitted=true
+[INFO] [1791114029.844887340] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114029.850526586] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114030.196577228] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114030.196604521] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114030.206981882] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114030.447430974] [robot_runtime]: Task timed_out: TIMEOUT all active actions confirmed stopped by measured feedback
+[INFO] [1791114030.455736098] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114030.752595520] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114030.752627813] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114030.763058947] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114030.891307454] [robot_runtime]: Task rejected before execution: map::at
+[INFO] [1791114030.894570114] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114031.231676453] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114031.231702157] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114031.242214227] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=false
+[INFO] [1791114031.382892310] [robot_runtime]: Task failed: SAFETY_INTERLOCK mock execution gate is not armed for pick_object
+[INFO] [1791114031.391366084] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114031.739655359] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114031.739685873] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114031.752016419] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114032.132287529] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114032.152268362] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114032.172379089] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114033.314774251] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114033.659208649] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114033.659234413] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114033.669595153] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=false
+[INFO] [1791114033.790244662] [robot_runtime]: Task failed: SAFETY_INTERLOCK mock execution gate is not armed for pick_object
+[INFO] [1791114033.802794568] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114034.151634512] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114034.151661129] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114034.159865300] [robot_runtime]: parameter 'entities.workpiece.pose' has already been declared
+[ros2run]: Process exited with failure 1
+[WARN] [1791114034.469750348] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114034.469769102] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114034.478171064] [robot_runtime]: entity pose needs x,y,z,qx,qy,qz,qw: workpiece
+[ros2run]: Process exited with failure 1
+[WARN] [1791114034.784745323] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114034.784764254] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114034.793511839] [robot_runtime]: invalid demo entity: workpiece
+[ros2run]: Process exited with failure 1
+[WARN] [1791114035.044160546] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114035.044177228] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114035.052913729] [robot_runtime]: invalid task definition: pick_place
+[ros2run]: Process exited with failure 1
+[WARN] [1791114035.308108112] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114035.308123649] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114035.316699228] [robot_runtime]: map::at
+[ros2run]: Process exited with failure 1
+ok
+test_invalid_parameters_rejected_and_runtime_remains_usable (__main__.RuntimeTests.test_invalid_parameters_rejected_and_runtime_remains_usable) ... [WARN] [1791114035.454172363] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114035.454185294] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_locate_only_template_uses_no_actuator_permission (__main__.RuntimeTests.test_locate_only_template_uses_no_actuator_permission) ... [WARN] [1791114036.397537675] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114036.397559212] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_missing_outcome_component_rejects_before_execution (__main__.RuntimeTests.test_missing_outcome_component_rejects_before_execution) ... [WARN] [1791114036.878320735] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114036.878344662] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_missing_resolver_rejects_entire_plan_before_execution (__main__.RuntimeTests.test_missing_resolver_rejects_entire_plan_before_execution) ... [WARN] [1791114037.666164100] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114037.666187343] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_native_pose_cancellation_uses_measured_stop_path (__main__.RuntimeTests.test_native_pose_cancellation_uses_measured_stop_path) ... [WARN] [1791114038.160943066] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114038.160950672] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_native_pose_invalid_tool_calibration_rejected_at_startup (__main__.RuntimeTests.test_native_pose_invalid_tool_calibration_rejected_at_startup) ... [WARN] [1791114039.650117093] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114039.650148209] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_native_pose_plan_and_client_select_second_implementation (__main__.RuntimeTests.test_native_pose_plan_and_client_select_second_implementation) ... [WARN] [1791114039.927567194] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114039.927582066] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_native_pose_template_keeps_perception_and_calibration_semantics (__main__.RuntimeTests.test_native_pose_template_keeps_perception_and_calibration_semantics) ... [WARN] [1791114044.628589530] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114044.628614511] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_native_pose_wrong_source_frame_fails_before_moving (__main__.RuntimeTests.test_native_pose_wrong_source_frame_fails_before_moving) ... [WARN] [1791114045.575447888] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114045.575473185] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_and_task_share_busy_guard_and_cancel_confirmation (__main__.RuntimeTests.test_plan_and_task_share_busy_guard_and_cancel_confirmation) ... [WARN] [1791114046.071266852] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114046.071291545] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_deadline_stops_then_allows_next_plan (__main__.RuntimeTests.test_plan_deadline_stops_then_allows_next_plan) ... [WARN] [1791114048.668137602] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114048.668162213] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+
+[WARN] [1791114035.583785887] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114035.583814251] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114035.593597623] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114035.961354798] [robot_runtime]: Task rejected before execution: map::at
+[WARN] [1791114035.962665486] [robot_runtime]: Task rejected before execution: map::at
+[WARN] [1791114035.963501424] [robot_runtime]: Task rejected before execution: object and target roles do not match task
+[WARN] [1791114035.964433082] [robot_runtime]: Task rejected before execution: invalid object ID
+[WARN] [1791114035.965655972] [robot_runtime]: Task rejected before execution: object and target roles do not match task
+[WARN] [1791114035.966510641] [robot_runtime]: Task rejected before execution: invalid object ID
+[INFO] [1791114036.173950571] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114036.182691264] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114036.527726607] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114036.527753416] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114036.538440995] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=false
+[WARN] [1791114036.656871415] [robot_runtime]: Task rejected before execution: locate task takes no target
+[INFO] [1791114036.658753288] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114036.663779210] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114037.031643705] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114037.031678658] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114037.042197298] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114037.230503296] [robot_runtime]: Task rejected before execution: plan step 2: unknown component: demo_outcome
+[INFO] [1791114037.442493987] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114037.451455508] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114037.808236133] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114037.808259598] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114037.818559353] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114037.934469152] [robot_runtime]: Task rejected before execution: plan step 1: unknown component: static_target_resolver
+[INFO] [1791114037.946850727] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114038.296395902] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114038.296421105] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114038.306706383] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114039.427109643] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114039.435187594] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114039.789422669] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114039.789449340] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[ERROR] [1791114039.798180089] [robot_runtime]: calibration tool frame must match end_effector_link
+[ros2run]: Process exited with failure 1
+
+[WARN] [1791114040.061632988] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114040.061657965] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114040.072250259] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114040.612808023] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114044.272667554] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114044.414142469] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114044.757951285] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114044.757978642] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114044.768414616] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114044.889450896] [robot_runtime]: Task succeeded:  fresh configured demo object pose obtained
+[INFO] [1791114045.348821132] [robot_runtime]: Task succeeded:  synthetic grasp and placement evidence verified; no physical object/contact sensing
+[INFO] [1791114045.360510942] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114045.711536390] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114045.711562228] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114045.722332210] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114045.842882809] [robot_runtime]: Task failed: TARGET_RESOLUTION_FAILED resolved target has incompatible frame/tool or altered evidence
+[INFO] [1791114045.856800959] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114046.204863833] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114046.204889437] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114046.215321638] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114046.375778239] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114046.395674221] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114048.495808647] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114048.503427875] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114048.810703875] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114048.810730795] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114048.821091918] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114049.301336641] [robot_runtime]: Task timed_out: TIMEOUT all active actions confirmed stopped by measured feedback
+[INFO] [1791114051.401558578] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114051.410185871] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+ok
+test_plan_diagnostics_track_ownership_and_confirmed_cancel (__main__.RuntimeTests.test_plan_diagnostics_track_ownership_and_confirmed_cancel) ... [WARN] [1791114051.624914253] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114051.624935009] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_invalid_late_steps_and_transport_shapes_rejected (__main__.RuntimeTests.test_plan_invalid_late_steps_and_transport_shapes_rejected) ... [WARN] [1791114055.176050840] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114055.176077921] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_invalid_semantic_order_rejected (__main__.RuntimeTests.test_plan_invalid_semantic_order_rejected) ... [WARN] [1791114056.132750149] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114056.132758122] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_second_pair_succeeds_with_four_verified_steps (__main__.RuntimeTests.test_plan_second_pair_succeeds_with_four_verified_steps) ... [WARN] [1791114056.610949261] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114056.611007184] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_plan_skill_failure_aborts_remaining_steps (__main__.RuntimeTests.test_plan_skill_failure_aborts_remaining_steps) ... [WARN] [1791114057.559638777] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114057.559667236] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_planner_example_queries_catalog_and_submits_plan (__main__.RuntimeTests.test_planner_example_queries_catalog_and_submits_plan) ... [WARN] [1791114058.169327833] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114058.169350560] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_scene_parameters_are_read_only_after_startup (__main__.RuntimeTests.test_scene_parameters_are_read_only_after_startup) ... [WARN] [1791114062.946129885] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114062.946157028] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_second_configured_pair_and_task_alias (__main__.RuntimeTests.test_second_configured_pair_and_task_alias) ... [WARN] [1791114063.656075669] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114063.656106969] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_stop_unconfirmed_record_keeps_fault_and_leases (__main__.RuntimeTests.test_stop_unconfirmed_record_keeps_fault_and_leases) ... [WARN] [1791114064.519310432] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114064.519338182] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+
+[WARN] [1791114051.753312941] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114051.753339904] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114051.763812045] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114052.904303339] [robot_runtime]: Task canceled: CANCELED all active actions confirmed stopped by measured feedback
+[INFO] [1791114055.004072472] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114055.011599704] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114055.298473602] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114055.298499935] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114055.308483883] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114055.687428138] [robot_runtime]: Task rejected before execution: plan step 3: unsupported plan skill semantics
+[WARN] [1791114055.688429155] [robot_runtime]: Task rejected before execution: plan step 3: map::at
+[WARN] [1791114055.689234863] [robot_runtime]: Task rejected before execution: plan step 3: map::at
+[WARN] [1791114055.689957677] [robot_runtime]: Task rejected before execution: duplicate plan input name
+[WARN] [1791114055.690502864] [robot_runtime]: Task rejected before execution: plan argument arrays must match and contain at most 2 entries
+[WARN] [1791114055.690716384] [robot_runtime]: Task rejected before execution: plan step 0: invalid entity_id input: object
+[WARN] [1791114055.690858753] [robot_runtime]: Task rejected before execution: plan requires schema version 1 and 1..32 steps
+[WARN] [1791114055.691098592] [robot_runtime]: Task rejected before execution: plan requires schema version 1 and 1..32 steps
+[WARN] [1791114055.691278879] [robot_runtime]: Task rejected before execution: plan requires schema version 1 and 1..32 steps
+[INFO] [1791114055.908829234] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114055.918109294] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114056.258639082] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114056.258665588] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114056.269042498] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114056.388251231] [robot_runtime]: Task rejected before execution: plan step 0: pick requires an object, preceding locate and empty gripper
+[WARN] [1791114056.389200657] [robot_runtime]: Task rejected before execution: plan step 2: place requires matching held object and preceding target locate
+[WARN] [1791114056.390091595] [robot_runtime]: Task rejected before execution: plan step 3: place requires matching held object and preceding target locate
+[INFO] [1791114056.395816440] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114056.744155567] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114056.744182602] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114056.754398120] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114057.334942153] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114057.344820966] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114057.695014097] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114057.695039846] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114057.705539240] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114057.925860834] [robot_runtime]: Task failed: GRIPPER_FAILED gripper action failed or canceled
+[INFO] [1791114057.945829931] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114057.954766163] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114058.312175575] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114058.312196382] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114058.322123508] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114062.582681556] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114062.731290708] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114063.082522080] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114063.082547033] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114063.093112613] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114063.433691722] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114063.441501106] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114063.794737560] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114063.794760633] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114063.805085325] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114064.125298036] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114064.345618259] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114064.354745951] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114064.646588589] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114064.646615314] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114064.656943008] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114064.877415493] [robot_runtime]: Task faulted: STOP_UNCONFIRMED stop deadline exceeded; control remains reserved
+[INFO] [1791114064.887820223] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[WARN] [1791114064.887939080] [robot_runtime]: Shutdown stop not confirmed. Real hardware needs an independent stop/watchdog.
+ok
+test_success (__main__.RuntimeTests.test_success) ... [WARN] [1791114065.102523488] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114065.102545055] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_task_record_and_world_snapshot_distinguish_inferred_placement (__main__.RuntimeTests.test_task_record_and_world_snapshot_distinguish_inferred_placement) ... [WARN] [1791114065.786584154] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114065.786609805] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_unknown_task_rejected (__main__.RuntimeTests.test_unknown_task_rejected) ... [WARN] [1791114066.760268087] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114066.760292093] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_verification_failure_aborts_without_promoting_placement (__main__.RuntimeTests.test_verification_failure_aborts_without_promoting_placement) ... [WARN] [1791114067.248784116] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114067.248811005] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_verified_plan_and_cli_succeed_with_six_steps (__main__.RuntimeTests.test_verified_plan_and_cli_succeed_with_six_steps) ... [WARN] [1791114068.080387101] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114068.080415681] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+test_verified_template_retains_both_step_proofs_and_provenance (__main__.RuntimeTests.test_verified_template_retains_both_step_proofs_and_provenance) ... [WARN] [1791114070.056862040] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114070.056896110] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 46.159s
+
+OK
+
+[WARN] [1791114065.232409784] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114065.232437078] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114065.242654970] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114065.563087430] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114065.572305369] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114065.922144878] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114065.922169332] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114065.932227874] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114066.512756272] [robot_runtime]: Task succeeded:  release verified; object placement needs perception confirmation
+[INFO] [1791114066.532751619] [robot_runtime]: Task succeeded:  fresh configured demo motion target obtained
+[INFO] [1791114066.545708075] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114066.899238186] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114066.899264197] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114066.909562632] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[WARN] [1791114067.025507347] [robot_runtime]: Task rejected before execution: map::at
+[INFO] [1791114067.034385020] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114067.381762850] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114067.381786534] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114067.392295405] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114067.853031139] [robot_runtime]: Task failed: PLACEMENT_NOT_VERIFIED observer reports condition not met
+[INFO] [1791114067.865841142] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114068.223440895] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114068.223473093] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114068.233476247] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114068.794028931] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114069.693997961] [robot_runtime]: Task succeeded:  all skill steps succeeded; consult verification provenance and remaining placement candidates
+[INFO] [1791114069.842002017] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+
+[WARN] [1791114070.202669111] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.
+[WARN] [1791114070.202695838] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.
+[INFO] [1791114070.213403305] [robot_runtime]: Demo runtime ready: /execute_task, /execute_plan, /get_catalog, /get_runtime_state, /get_execution; backend=mock; motion=mock_arm; permitted=true
+[INFO] [1791114070.773985385] [robot_runtime]: Task succeeded:  synthetic grasp and placement evidence verified; no physical object/contact sensing
+[INFO] [1791114070.787035504] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+

@@ -31,18 +31,24 @@ class Locate final : public Skill {
 };
 
 class Manipulate final : public Skill {
+  enum class Phase { idle, waiting_for_gripper, opening, waiting_for_scene, moving_to_approach,
+                     moving_to_target, gripping, moving_after_action, done };
  public:
   Manipulate(Context& c, bool pick, ManipulationPolicy policy = {}, bool resolve_target = false)
       : arm_(c.bindings.get<ArmMotion>("motion")), gripper_(c.bindings.get<Gripper>("gripper")),
         world_(c.world), pick_(pick), policy_(std::move(policy)) {
+    if (c.bindings.contains("planning_scene"))
+      scene_gate_ = c.bindings.get<PlanningSceneGate>("planning_scene");
     if (resolve_target) resolver_ = c.bindings.get<MotionTargetResolver>("target_resolver");
     if (policy_.frame_id.empty() || policy_.tool_frame.empty() || !valid_tolerance(policy_.tolerance) ||
         !valid_evidence_policy({policy_.observation_max_age, policy_.minimum_observation_quality, policy_.allow_synthetic}) ||
-        policy_.feedback_max_age.count() <= 0 ||
+        policy_.feedback_max_age.count() <= 0 || policy_.scene_sync_timeout.count() <= 0 ||
         !std::isfinite(policy_.grasp.width_m) || policy_.grasp.width_m < 0.0 ||
         !std::isfinite(policy_.grasp.max_effort_n) || policy_.grasp.max_effort_n <= 0.0 ||
         !std::isfinite(policy_.release_width_m) || policy_.release_width_m <= policy_.grasp.width_m ||
-        !std::isfinite(policy_.gripper_tolerance_m) || policy_.gripper_tolerance_m <= 0.0)
+        !std::isfinite(policy_.gripper_tolerance_m) || policy_.gripper_tolerance_m <= 0.0 ||
+        !std::isfinite(policy_.approach_clearance_m) || policy_.approach_clearance_m < 0.0 || policy_.approach_clearance_m > 0.5 ||
+        !std::isfinite(policy_.post_action_clearance_m) || policy_.post_action_clearance_m < 0.0 || policy_.post_action_clearance_m > 0.5)
       throw std::invalid_argument("invalid manipulation policy");
   }
   Result start(const Arguments& args, Time now) override {
@@ -51,16 +57,18 @@ class Manipulate final : public Skill {
     // Refresh/read measured initial gripper state before any arm command.
     gripper_->poll(now);
     const auto g = gripper_->feedback();
-    if (!gripper_valid(g, now) || !g.stopped)
-      return {Status::failed, "GRIPPER_NOT_READY", "fresh stationary gripper feedback required"};
-    if (pick_) {
-      if (g.grasp_detected || !world_.attached_object.empty())
-        return {Status::failed, "GRIPPER_OCCUPIED", "gripper must be empty"};
-    } else {
-      target_id_ = observation_id;
-      if (!g.grasp_detected || world_.attached_object != object_)
+    const bool wait_for_gripper = !gripper_valid(g, now) || !g.stopped;
+    bool open_before_motion = false;
+    if (!wait_for_gripper) {
+      if (pick_) {
+        if (!no_finger_contact(g.contact_state) || !world_.attached_object.empty())
+          return {Status::failed, "GRIPPER_OCCUPIED", "gripper must be empty"};
+        open_before_motion = std::abs(g.width_m-policy_.release_width_m) > policy_.gripper_tolerance_m;
+      } else if (!dual_finger_grasp(g.contact_state) || world_.attached_object != object_) {
         return {Status::failed, "NOT_HOLDING", "requested object not held"};
+      }
     }
+    if (!pick_) target_id_ = observation_id;
     const auto it = world_.observations.find(observation_id);
     if (it == world_.observations.end() || !it->second.valid ||
         it->second.object_id != observation_id || it->second.frame_id.empty() ||
@@ -97,6 +105,10 @@ class Manipulate final : public Skill {
         return {Status::failed, "TARGET_RESOLUTION_REQUIRED", "object pose needs an explicit calibrated motion-target transform"};
     }
     target_ = {motion_target.object_id, motion_target.frame_id, motion_target.pose, policy_.tolerance};
+    approach_target_ = target_;
+    approach_target_.pose.z += policy_.approach_clearance_m;
+    post_action_target_ = target_;
+    post_action_target_.pose.z += policy_.post_action_clearance_m;
     world_.observations.erase(observation_id);
     world_.grasp_verifications.erase(object_);
     world_.placement_verifications.erase(object_);
@@ -104,23 +116,42 @@ class Manipulate final : public Skill {
       world_.known_locations.erase(object_);
       world_.placement_candidates.erase(object_);
       world_.release_stamps.erase(object_);
+      world_.release_source_times_ns.erase(object_);
+      world_.release_epochs.erase(object_);
     }
     // Set phase before dispatch so a throwing adapter can still receive best-effort stop.
-    phase_ = Phase::moving;
-    arm_->begin_move(target_);
+    if (open_before_motion) {
+      phase_ = Phase::opening;
+      gripper_->begin_release(policy_.release_width_m);
+      return {Status::running, "", "opening and verifying the empty gripper before approach"};
+    }
+    if (wait_for_gripper) {
+      phase_ = Phase::waiting_for_gripper;
+      return {Status::running, "", "waiting for gripper to stop before arm motion"};
+    }
+    phase_ = policy_.approach_clearance_m > 0.0 ? Phase::moving_to_approach : Phase::moving_to_target;
+    queue_move(phase_ == Phase::moving_to_approach ? approach_target_ : target_, phase_, !pick_, now);
     return {Status::running, "", calibration.empty() ? "arm motion started" :
         "arm motion started; calibration=" + calibration + "; source_frame=" + source_frame + "; tool=" + policy_.tool_frame};
   }
   Result tick(Time now) override {
     if (phase_ == Phase::idle || phase_ == Phase::done) return result_;
-    const auto status = phase_ == Phase::moving ? arm_->poll(now) : gripper_->poll(now);
+    if (phase_ == Phase::waiting_for_scene) {
+      if (stopping_)
+        return complete({Status::canceled, "CANCELED", "canceled while awaiting confirmed planning scene; no move dispatched"});
+      return dispatch_pending_move(now);
+    }
+    const bool arm_phase = phase_ == Phase::moving_to_approach || phase_ == Phase::moving_to_target ||
+                           phase_ == Phase::moving_after_action;
+    const auto status = arm_phase ? arm_->poll(now) : gripper_->poll(now);
     if (status == Status::faulted)
       return {Status::faulted, "COMPONENT_FAULT", "component state unknown"};
-    if (!terminal(status))
+    const bool passive_gripper_wait = phase_ == Phase::waiting_for_gripper && status == Status::idle;
+    if (!terminal(status) && !passive_gripper_wait)
       return {stopping_ ? Status::canceling : Status::running, "", "awaiting component completion"};
-    if (terminal_since_ == Time{}) terminal_since_ = now;
+    if (terminal_since_ == Time{} && !passive_gripper_wait) terminal_since_ = now;
     // A server result (including canceled) is insufficient without current stop feedback.
-    if (phase_ == Phase::moving) {
+    if (arm_phase) {
       const auto f = arm_->feedback();
       if (!f.valid || !valid_pose(f.pose) || !fresh(f.stamp, now, policy_.feedback_max_age) ||
           f.stamp < terminal_since_ || !f.stopped)
@@ -128,42 +159,108 @@ class Manipulate final : public Skill {
       if (stopping_) return complete({Status::canceled, "CANCELED", "arm stopped; no next action dispatched"});
       if (status != Status::succeeded)
         return complete({Status::failed, "MOTION_FAILED", "arm action failed or canceled"});
-      if (f.frame_id != target_.frame_id || !pose_near(f.pose, target_.pose, target_.tolerance))
-        return complete({Status::failed, "MOTION_VERIFICATION_FAILED", "measured pose outside tolerance"});
-      phase_ = Phase::gripping;
+      const auto& expected = phase_ == Phase::moving_to_approach ? approach_target_ :
+                             phase_ == Phase::moving_after_action ? post_action_target_ : target_;
+      if (f.frame_id != expected.frame_id || !pose_near(f.pose, expected.pose, expected.tolerance)) {
+        const double dx = f.pose.x-expected.pose.x, dy = f.pose.y-expected.pose.y, dz = f.pose.z-expected.pose.z;
+        const double qdot = std::clamp(std::abs(f.pose.qx*expected.pose.qx + f.pose.qy*expected.pose.qy +
+            f.pose.qz*expected.pose.qz + f.pose.qw*expected.pose.qw), 0.0, 1.0);
+        return complete({Status::failed, "MOTION_VERIFICATION_FAILED",
+            "frame=" + f.frame_id + "/" + expected.frame_id +
+            "; position_error_m=" + std::to_string(std::sqrt(dx*dx+dy*dy+dz*dz)) +
+            "; orientation_error_rad=" + std::to_string(2.0*std::acos(qdot)) +
+            "; measured_xyz=" + std::to_string(f.pose.x) + "," + std::to_string(f.pose.y) + "," + std::to_string(f.pose.z) +
+            "; expected_xyz=" + std::to_string(expected.pose.x) + "," + std::to_string(expected.pose.y) + "," + std::to_string(expected.pose.z)});
+      }
       terminal_since_ = {};
-      if (pick_) gripper_->begin_grasp(policy_.grasp);
-      else gripper_->begin_release(policy_.release_width_m);
-      return {Status::running, "", pick_ ? "grasp started" : "release started"};
+      if (phase_ == Phase::moving_to_approach) {
+        queue_move(target_, Phase::moving_to_target, !pick_, now);
+        return {Status::running, "", "approach complete; moving to manipulation pose"};
+      }
+      if (phase_ == Phase::moving_to_target) {
+        phase_ = Phase::gripping;
+        if (pick_) gripper_->begin_grasp(policy_.grasp);
+        else gripper_->begin_release(policy_.release_width_m);
+        return {Status::running, "", pick_ ? "grasp started" : "release started"};
+      }
+      return complete({Status::succeeded, "", pick_ ? "object lifted after grasp" : "arm retreated after release"});
     }
     const auto g = gripper_->feedback();
     if (!gripper_valid(g, now) || g.stamp < terminal_since_ || !g.stopped)
-      return {stopping_ ? Status::canceling : Status::running, "STOP_UNCONFIRMED", "awaiting fresh stationary gripper feedback"};
+      return {stopping_ ? Status::canceling : Status::running, "STOP_UNCONFIRMED",
+          "awaiting fresh stationary gripper feedback: valid=" + std::to_string(g.valid) +
+          "; stopped=" + std::to_string(g.stopped) + "; sample_id=" + std::to_string(g.sample_id) +
+          "; width_m=" + std::to_string(g.width_m)};
+    if (phase_ == Phase::waiting_for_gripper) {
+      if (stopping_) return complete({Status::canceled, "CANCELED", "gripper stopped before arm motion"});
+      if (status != Status::idle && status != Status::succeeded)
+        return complete({Status::failed, "GRIPPER_FAILED", "prior gripper action did not succeed"});
+      if (pick_) {
+        if (!no_finger_contact(g.contact_state) || !world_.attached_object.empty())
+          return complete({Status::failed, "GRIPPER_OCCUPIED", "gripper became occupied while waiting"});
+        if (std::abs(g.width_m-policy_.release_width_m) > policy_.gripper_tolerance_m) {
+          phase_ = Phase::opening;
+          terminal_since_ = {};
+          gripper_->begin_release(policy_.release_width_m);
+          return {Status::running, "", "stationary empty gripper opening before approach"};
+        }
+      } else if (!dual_finger_grasp(g.contact_state) || world_.attached_object != object_) {
+        return complete({Status::failed, "NOT_HOLDING", "held object was not confirmed after gripper stopped"});
+      }
+      terminal_since_ = {};
+      phase_ = policy_.approach_clearance_m > 0.0 ? Phase::moving_to_approach : Phase::moving_to_target;
+      queue_move(phase_ == Phase::moving_to_approach ? approach_target_ : target_, phase_, !pick_, now);
+      return {Status::running, "", "stationary gripper confirmed; arm motion started"};
+    }
+    if (phase_ == Phase::opening) {
+      if (stopping_) return complete({Status::canceled, "CANCELED", "gripper stopped before arm motion"});
+      if (status != Status::succeeded)
+        return complete({Status::failed, "GRIPPER_FAILED", "empty gripper could not be opened"});
+      if (!no_finger_contact(g.contact_state) || std::abs(g.width_m-policy_.release_width_m) > policy_.gripper_tolerance_m)
+        return complete({Status::failed, "GRIPPER_VERIFICATION_FAILED", "open gripper width was not observed"});
+      terminal_since_ = {};
+      phase_ = policy_.approach_clearance_m > 0.0 ? Phase::moving_to_approach : Phase::moving_to_target;
+      queue_move(phase_ == Phase::moving_to_approach ? approach_target_ : target_, phase_, !pick_, now);
+      return {Status::running, "", "gripper open; arm approach started"};
+    }
     // Reconcile completed grasp/release even if cancellation won the ROS result race.
-    if (g.grasp_detected && pick_) {
+    if (dual_finger_grasp(g.contact_state) && pick_) {
       world_.attached_object = object_;
       world_.attachment_stamp = g.stamp;
+      world_.attachment_source_time_ns = g.source_time_ns;
+      world_.attachment_epoch = g.epoch;
       world_.known_locations[object_] = "gripper";
-    } else if (!g.grasp_detected && !pick_) {
+    } else if (no_finger_contact(g.contact_state) && !pick_) {
       world_.attached_object.clear();
       world_.attachment_stamp = {};
+      world_.attachment_source_time_ns = 0;
+      world_.attachment_epoch = g.epoch;
       world_.known_locations.erase(object_);
       world_.placement_candidates[object_] = target_id_;
       world_.release_stamps[object_] = g.stamp;
+      world_.release_source_times_ns[object_] = g.source_time_ns;
+      world_.release_epochs[object_] = g.epoch;
     }
     if (stopping_) return complete({Status::canceled, "CANCELED", "gripper stopped; state reconciled"});
     if (status != Status::succeeded)
       return complete({Status::failed, "GRIPPER_FAILED", "gripper action failed or canceled"});
-    const bool verified = pick_ ? g.grasp_detected :
-        !g.grasp_detected && std::abs(g.width_m-policy_.release_width_m) <= policy_.gripper_tolerance_m;
+    const bool verified = pick_ ? dual_finger_grasp(g.contact_state) :
+        no_finger_contact(g.contact_state) && std::abs(g.width_m-policy_.release_width_m) <= policy_.gripper_tolerance_m;
     if (!verified)
       return complete({Status::failed, "GRIPPER_VERIFICATION_FAILED", "gripper outcome not observed"});
+    if (policy_.post_action_clearance_m > 0.0) {
+      terminal_since_ = {};
+      queue_move(post_action_target_, Phase::moving_after_action, pick_, now);
+      return {Status::running, "", pick_ ? "grasp confirmed; lifting object" : "release confirmed; retreating"};
+    }
     return complete({Status::succeeded, "", pick_ ? "grasp detected" : "release verified; placement remains inferred"});
   }
   void cancel() override {
     if (stopping_ || phase_ == Phase::idle || phase_ == Phase::done) return;
     stopping_ = true;  // irreversible for this skill instance
-    if (phase_ == Phase::moving) arm_->request_stop();
+    if (phase_ == Phase::waiting_for_scene) return;
+    if (phase_ == Phase::moving_to_approach || phase_ == Phase::moving_to_target || phase_ == Phase::moving_after_action)
+      arm_->request_stop();
     else gripper_->request_stop();
   }
  private:
@@ -171,19 +268,51 @@ class Manipulate final : public Skill {
     return g.valid && std::isfinite(g.width_m) && g.width_m >= 0.0 &&
            fresh(g.stamp, now, policy_.feedback_max_age);
   }
+  void queue_move(const CartesianTarget& target, Phase destination, bool attached, Time now) {
+    pending_target_ = target;
+    pending_destination_ = destination;
+    pending_attached_object_ = attached ? object_ : std::string{};
+    scene_wait_started_ = now;
+    phase_ = scene_gate_ ? Phase::waiting_for_scene : destination;
+    if (scene_gate_) dispatch_pending_move(now);
+    else arm_->begin_move(pending_target_);
+  }
+  Result dispatch_pending_move(Time now) {
+    const auto state = scene_gate_->snapshot();
+    if (state.valid && !scene_epoch_) scene_epoch_ = state.epoch;
+    if (state.valid && scene_epoch_ && state.epoch != *scene_epoch_)
+      return complete({Status::failed, "SCENE_EPOCH_CHANGED", "planning scene reset while motion was waiting"});
+    const bool state_matches = state.valid && state.ready && !state.request_in_flight &&
+        !state.cleanup_pending && state.desired_version == state.confirmed_version &&
+        state.desired_attached_object == pending_attached_object_ &&
+        state.confirmed_attached_object == pending_attached_object_ &&
+        state.received_at <= now && fresh(state.received_at, now, policy_.feedback_max_age);
+    if (state_matches) {
+      phase_ = pending_destination_;
+      arm_->begin_move(pending_target_);  // exactly one dispatch after confirmation
+      return {Status::running, "", "planning scene confirmed; arm motion started"};
+    }
+    if (now - scene_wait_started_ >= policy_.scene_sync_timeout)
+      return complete({Status::failed, "PLANNING_SCENE_TIMEOUT", "required scene epoch/version/attachment was not confirmed"});
+    return {Status::running, "SCENE_SYNC_PENDING", "waiting asynchronously for exact MoveIt scene confirmation"};
+  }
   Result complete(Result r) { phase_ = Phase::done; return result_ = std::move(r); }
-  enum class Phase { idle, moving, gripping, done };
   std::shared_ptr<ArmMotion> arm_;
   std::shared_ptr<Gripper> gripper_;
   std::shared_ptr<MotionTargetResolver> resolver_;
+  std::shared_ptr<PlanningSceneGate> scene_gate_;
   WorldState& world_;
   bool pick_, stopping_{false};
   ManipulationPolicy policy_;
   Phase phase_{Phase::idle};
   Result result_;
   Time terminal_since_{};
+  Time scene_wait_started_{};
+  std::optional<uint64_t> scene_epoch_;
   std::string object_, target_id_;
-  CartesianTarget target_;
+  std::string pending_attached_object_;
+  Phase pending_destination_{Phase::idle};
+  CartesianTarget approach_target_, target_, post_action_target_, pending_target_;
 };
 
 inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {}, VerificationPolicy verification = {}) {
@@ -196,14 +325,14 @@ inline void register_demo_skills(Skills& skills, ManipulationPolicy policy = {},
       "requested object held and fresh target pose", "exclusive arm and gripper control", "release detected"});
   const EvidencePolicy observation_policy{policy.observation_max_age, policy.minimum_observation_quality, policy.allow_synthetic};
   const Dependencies manipulation{
-      {{"motion", "arm_motion", 2}, {"gripper", "gripper", 2}, {"safety", "execution_gate", 1}},
+      {{"motion", "arm_motion", 2}, {"gripper", "gripper", 3}, {"safety", "execution_gate", 1}},
       {"motion", "gripper"}, "safety"};
   skills.define({"verify_grasp", "Verify stable post-grasp evidence", {{"object", "entity_id", "Held object"}},
       "matching measured grasp", "read-only exclusive arm and gripper access", "accepted post-grasp evidence stable over a sample window"});
   skills.define({"verify_placement", "Verify stable post-release evidence",
       {{"object", "entity_id", "Released object"}, {"target", "entity_id", "Expected location"}},
       "matching measured release candidate", "read-only exclusive arm and gripper access", "accepted post-release evidence stable over a sample window"});
-  const Dependencies verify{{{"outcome", "manipulation_observer", 1}}, {"motion", "gripper"}, ""};
+  const Dependencies verify{{{"outcome", "manipulation_observer", 2}}, {"motion", "gripper"}, ""};
   // Task aliases select one implementation ID for every step. Read-only steps
   // retain the same behavior; only pick/place gain the resolver dependency.
   for (const std::string implementation : {"standard", "pose_resolved"}) {

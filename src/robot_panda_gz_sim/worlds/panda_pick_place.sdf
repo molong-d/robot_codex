@@ -1,0 +1,101 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="panda_pick_place">
+    <gravity>0 0 -9.81</gravity>
+    <physics name="dart_physics" type="dart">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+
+    <light name="sun" type="directional">
+      <pose>0 0 5 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <model name="floor">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><pose>0 0 -0.05 0 0 0</pose><geometry><box><size>10 10 0.1</size></box></geometry></collision>
+        <visual name="visual"><pose>0 0 -0.05 0 0 0</pose><geometry><box><size>10 10 0.1</size></box></geometry>
+          <material><ambient>0.25 0.25 0.27 1</ambient><diffuse>0.25 0.25 0.27 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="table">
+      <static>true</static>
+      <link name="link">
+        <collision name="top_collision"><pose>0.58 0 0.325 0 0 0</pose><geometry><box><size>0.90 0.80 0.05</size></box></geometry></collision>
+        <visual name="top_visual"><pose>0.58 0 0.325 0 0 0</pose><geometry><box><size>0.90 0.80 0.05</size></box></geometry>
+          <material><ambient>0.45 0.30 0.18 1</ambient><diffuse>0.45 0.30 0.18 1</diffuse></material>
+        </visual>
+        <collision name="leg_fl_collision"><pose>0.20 0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></collision>
+        <collision name="leg_fr_collision"><pose>0.20 -0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></collision>
+        <collision name="leg_bl_collision"><pose>0.96 0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></collision>
+        <collision name="leg_br_collision"><pose>0.96 -0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></collision>
+        <visual name="leg_fl_visual"><pose>0.20 0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></visual>
+        <visual name="leg_fr_visual"><pose>0.20 -0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></visual>
+        <visual name="leg_bl_visual"><pose>0.96 0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></visual>
+        <visual name="leg_br_visual"><pose>0.96 -0.32 0.15 0 0 0</pose><geometry><box><size>0.05 0.05 0.30</size></box></geometry></visual>
+        <sensor name="table_contact" type="contact">
+          <always_on>true</always_on><update_rate>100</update_rate>
+          <contact><collision>top_collision</collision></contact>
+        </sensor>
+      </link>
+    </model>
+
+    <model name="tray">
+      <static>true</static>
+      <pose>0.60 -0.18 0.37 0 0 0</pose>
+      <link name="link">
+        <collision name="tray_floor"><pose>0 0 -0.0195 0 0 0</pose><geometry><box><size>0.10 0.10 0.001</size></box></geometry></collision>
+        <collision name="tray_north"><pose>0 0.049 -0.0095 0 0 0</pose><geometry><box><size>0.10 0.002 0.02</size></box></geometry></collision>
+        <collision name="tray_south"><pose>0 -0.049 -0.0095 0 0 0</pose><geometry><box><size>0.10 0.002 0.02</size></box></geometry></collision>
+        <collision name="tray_east"><pose>0.049 0 -0.0095 0 0 0</pose><geometry><box><size>0.002 0.10 0.02</size></box></geometry></collision>
+        <collision name="tray_west"><pose>-0.049 0 -0.0095 0 0 0</pose><geometry><box><size>0.002 0.10 0.02</size></box></geometry></collision>
+        <visual name="placement_area"><pose>0 0 -0.0195 0 0 0</pose>
+          <geometry><box><size>0.10 0.10 0.001</size></box></geometry>
+          <material><ambient>0.15 0.55 0.18 1</ambient><diffuse>0.15 0.55 0.18 1</diffuse></material>
+        </visual>
+      </link>
+      <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+        <publish_link_pose>true</publish_link_pose><publish_model_pose>true</publish_model_pose>
+        <use_pose_vector_msg>true</use_pose_vector_msg><update_frequency>30</update_frequency>
+        <topic>/panda_gz/tray/pose</topic>
+      </plugin>
+    </model>
+
+    <model name="workpiece">
+      <pose>0.44 0.05 0.37 0 0 0</pose>
+      <link name="link">
+        <inertial><mass>0.08</mass><inertia><ixx>1.0667e-5</ixx><iyy>1.0667e-5</iyy><izz>1.0667e-5</izz></inertia></inertial>
+        <collision name="collision">
+          <geometry><box><size>0.04 0.04 0.04</size></box></geometry>
+          <surface>
+            <friction><ode><mu>1.2</mu><mu2>1.2</mu2></ode></friction>
+            <contact><ode><kp>1000000</kp><kd>100</kd></ode></contact>
+          </surface>
+        </collision>
+        <visual name="visual"><geometry><box><size>0.04 0.04 0.04</size></box></geometry>
+          <material><ambient>0.85 0.16 0.08 1</ambient><diffuse>0.85 0.16 0.08 1</diffuse></material>
+        </visual>
+        <sensor name="workpiece_contact" type="contact">
+          <always_on>true</always_on><update_rate>100</update_rate>
+          <contact><collision>collision</collision></contact>
+        </sensor>
+      </link>
+      <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
+        <publish_link_pose>true</publish_link_pose><publish_model_pose>true</publish_model_pose>
+        <use_pose_vector_msg>true</use_pose_vector_msg><update_frequency>30</update_frequency>
+        <topic>/panda_gz/workpiece/pose</topic>
+      </plugin>
+    </model>
+  </world>
+</sdf>

@@ -1,0 +1,3 @@
+exit_code=1
+code_sha=f92d5325d13505f14a3d24767fdc4dab9b314560
+command=python3 scripts/test_gazebo_trials.py --count 20 --seed-start 200 --process-timeout-s 240 --output-dir .review-runs --batch-id pr11-round2-f92d532-seeds-200-219

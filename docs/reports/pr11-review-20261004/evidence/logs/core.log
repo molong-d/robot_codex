@@ -1,0 +1,63 @@
+PASS native poses resolve through rotation and separate tool offsets
+PASS static calibration rejects malformed profiles and wrong input semantics
+PASS calibration preserves real source age and marks synthetic geometry
+PASS resolved six-step task preserves goals and calibration trace
+PASS resolved implementation needs its own dependency before plan admission
+PASS skills reject altered resolution provenance frames and tool identities
+PASS resolution failures and stale sources terminate without actuator commands
+PASS resolved motion uses the same gate and confirmed cancellation leases
+PASS evidence policy rejects missing source quality and synthetic data by default
+PASS locate validates source quality and pose meaning before storing
+PASS native object pose cannot be sent directly to arm motion
+PASS six-step verification promotes only accepted placement evidence
+PASS plan admission validates verification ordering without predicted facts
+PASS verification requires post-effect samples and does not count cached data
+PASS demo outcome identity advances only when oldest contributing sample advances
+PASS verification rejects malformed negative and misidentified evidence
+PASS verification rejects source changes regressions and large sample gaps
+PASS failed placement evidence leaves candidate and does not promote location
+PASS read-only verification cancellation releases leases without manipulating
+PASS execution journal keeps terminal evidence and snapshot copies
+PASS execution history evicts oldest completion and preserves active task
+PASS execution recording rejects invalid bounds and duplicate starts
+PASS fault diagnostic snapshot retains unknown resource ownership
+PASS cancel recording distinguishes stop request from confirmation
+PASS plan validation never writes predicted effects or dispatches
+PASS late invalid plan step blocks the entire plan before execution
+PASS plan checks locate grasp release ordering and matching identities
+PASS plan bounds versions and XML-like inputs are rejected
+PASS plan uses actual held state and requires new within-plan observations
+PASS plan permits implementation-specific dependencies without constructing skills
+PASS validated plan steps still execute through verified skill sessions
+PASS entity input schema rejects malformed identifiers before dispatch
+PASS demo scene rejects duplicate IDs and invalid poses
+PASS catalog reports implementation bindings without executing factories or gates
+PASS task admission checks every step before any actuator or factory
+PASS task aliases validate roles and only select reviewed templates
+PASS second configured object and target reuse complete manipulation flow
+PASS pose validation rejects NaN and invalid quaternion
+PASS cancel winning completion race never dispatches gripper
+PASS terminal result needs fresh stationary feedback to release lease
+PASS outside-tolerance pose blocks grasp after successful action
+PASS dispatch exception still requests stop and keeps ownership
+PASS skill composes perception arm motion and gripper
+PASS closed empty gripper opens and verifies before arm approach
+PASS moving gripper is allowed to stop before manipulation starts
+PASS configured manipulation approaches, descends, then lifts or retreats
+PASS motion implementation can change without skill changes
+PASS stale and future pose observations are rejected
+PASS place requires a fresh target pose
+PASS execution gate blocks all actuators before resource claim
+PASS invalid arguments fail before dispatch
+PASS unbound wrong type and wrong version are rejected
+PASS unknown implementation fails without resource leak
+PASS resource contention is atomic and owner IDs are unique
+PASS arm and gripper leases span the complete skill
+PASS cancel holds both leases until active component confirms stop
+PASS timeout uses confirmed cancellation path
+PASS start is idempotent across a multi-component skill
+PASS motion and gripper failures remain distinct
+PASS exceptions latch unknown state and retain control ownership
+PASS destruction does not falsely confirm a stop
+PASS skill implementation selection is independent of definition
+62 tests passed

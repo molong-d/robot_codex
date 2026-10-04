@@ -1,0 +1,413 @@
+{
+  "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+  "diagnostic_runs": [
+    {
+      "checks": {
+        "dual_finger_contact_same_sample": true,
+        "final_contact_matches_pose_time": true,
+        "final_tray_floor_contact": true,
+        "fresh_final_object_pose": true,
+        "fresh_final_target_pose": true,
+        "fresh_post_release_no_finger_contact": true,
+        "object_lifted_after_grasp": true,
+        "placement_xy_within_tolerance": true,
+        "placement_z_within_tolerance": true,
+        "release_identity_matches": true,
+        "same_epoch_world_poses": true,
+        "stable_pose_samples_fresh": true,
+        "stable_window_observed": true,
+        "tray_contact_during_stable_window": true
+      },
+      "group": "diagnostic_replay",
+      "passed": true,
+      "run_id": "trial-001-seed-202-c68e4fe322f4",
+      "scenario": null,
+      "seed": 202
+    },
+    {
+      "checks": {
+        "dual_finger_contact_same_sample": true,
+        "final_contact_matches_pose_time": true,
+        "final_tray_floor_contact": true,
+        "fresh_final_object_pose": true,
+        "fresh_final_target_pose": true,
+        "fresh_post_release_no_finger_contact": true,
+        "object_lifted_after_grasp": true,
+        "placement_xy_within_tolerance": true,
+        "placement_z_within_tolerance": true,
+        "release_identity_matches": true,
+        "same_epoch_world_poses": true,
+        "stable_pose_samples_fresh": true,
+        "stable_window_observed": true,
+        "tray_contact_during_stable_window": true
+      },
+      "group": "diagnostic_replay",
+      "passed": true,
+      "run_id": "trial-002-seed-207-99338621e577",
+      "scenario": null,
+      "seed": 207
+    }
+  ],
+  "formal_batch_id": "pr11-round2-f92d532-seeds-200-219",
+  "formal_run_ids": [
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-001-seed-200-2725f7788d71",
+      "seed": 200,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-002-seed-201-cfff6b566cea",
+      "seed": 201,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "TIMEOUT",
+      "exit_code": 1,
+      "run_id": "trial-003-seed-202-25c5122c4281",
+      "seed": 202,
+      "status": "timed_out",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "GRIPPER_VERIFICATION_FAILED",
+      "exit_code": 1,
+      "run_id": "trial-004-seed-203-e72ccecdb976",
+      "seed": 203,
+      "status": "failed",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-005-seed-204-d76849cdefb1",
+      "seed": 204,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "MOTION_FAILED",
+      "exit_code": 1,
+      "run_id": "trial-006-seed-205-91b1d771739e",
+      "seed": 205,
+      "status": "failed",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-007-seed-206-5d1325c163ce",
+      "seed": 206,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "MOTION_FAILED",
+      "exit_code": 1,
+      "run_id": "trial-008-seed-207-861e8229ef47",
+      "seed": 207,
+      "status": "failed",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-009-seed-208-502de9f41b5f",
+      "seed": 208,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "MOTION_FAILED",
+      "exit_code": 1,
+      "run_id": "trial-010-seed-209-9d731c06ce99",
+      "seed": 209,
+      "status": "failed",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-011-seed-210-f4d6143c64a6",
+      "seed": 210,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-012-seed-211-1ed1796805c6",
+      "seed": 211,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-013-seed-212-5b9e4614f282",
+      "seed": 212,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-014-seed-213-7e4a515d6f55",
+      "seed": 213,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-015-seed-214-a4de32f2d88a",
+      "seed": 214,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-016-seed-215-ce38cc40e36b",
+      "seed": 215,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-017-seed-216-9ce11b3f361f",
+      "seed": 216,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "MOTION_FAILED",
+      "exit_code": 1,
+      "run_id": "trial-018-seed-217-7fcfc429566e",
+      "seed": 217,
+      "status": "failed",
+      "trial_accepted": false
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-019-seed-218-2e6862b2a3d8",
+      "seed": 218,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "error_code": "",
+      "exit_code": 0,
+      "run_id": "trial-020-seed-219-14d24b15f8dd",
+      "seed": 219,
+      "status": "succeeded",
+      "trial_accepted": true
+    }
+  ],
+  "scenario_batch_id": "20261004T150945Z-5f83c11c05",
+  "scenario_count": 9,
+  "scenario_passed_count": 9,
+  "targeted_runs": [
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "no_fault_latched": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-001-seed-700-0a6a7238739a",
+      "scenario": "normal",
+      "seed": 700
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "initial_pose_perturbation_applied": true,
+        "no_fault_latched": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-002-seed-708-b6646339a296",
+      "scenario": "initial_pose_perturbation",
+      "seed": 708
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_injected_after_place_motion": true,
+        "fault_injected_after_release_before_verification": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "off_target_fault_injection_succeeded": true,
+        "place_motion_completed": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_rejected_after_motion": true,
+        "verification_step_was_terminal_step": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-003-seed-701-8e52d37eb1b4",
+      "scenario": "placement_verification_reject",
+      "seed": 701
+    },
+    {
+      "checks": {
+        "drop_injection_event_recorded": true,
+        "execution_resources_empty": true,
+        "forbidden_status_not_seen": true,
+        "independent_physics_audit_rejected": true,
+        "no_fault_latched": true,
+        "physical_gripper_open_command_succeeded": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-004-seed-702-6239b3c53d47",
+      "scenario": "post_grasp_drop",
+      "seed": 702
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "feedback_interruption_event_recorded": true,
+        "feedback_was_interrupted_after_release": true,
+        "no_fault_latched": true,
+        "required_step_reached": true,
+        "required_step_status": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "verification_step_was_terminal_step": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-005-seed-703-e24b8691d908",
+      "scenario": "post_release_contact_feedback_loss",
+      "seed": 703
+    },
+    {
+      "checks": {
+        "cancel_accepted": true,
+        "cancel_result_time_measured": true,
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "stop_confirmed_within_timeout": true,
+        "task_failure_returned_nonzero": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-006-seed-704-be26e895eab1",
+      "scenario": "cancel",
+      "seed": 704
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_error_code": true,
+        "expected_status": true,
+        "no_fault_latched": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "timeout_stop_confirmed_within_timeout": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-007-seed-705-4778408e05b6",
+      "scenario": "timeout",
+      "seed": 705
+    },
+    {
+      "checks": {
+        "execution_resources_empty": true,
+        "expected_status": true,
+        "independent_physics_audit_passed": true,
+        "no_fault_latched": true,
+        "pause_and_resume_services_succeeded": true,
+        "process_exit_zero": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "runtime_not_busy": true,
+        "runtime_resources_empty": true,
+        "stop_confirmed": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-008-seed-706-1f04b3e4f480",
+      "scenario": "pause_resume",
+      "seed": 706
+    },
+    {
+      "checks": {
+        "expected_error_code": true,
+        "expected_status": true,
+        "fault_latched": true,
+        "resource_lease_present": true,
+        "resources_retained": true,
+        "result_present": true,
+        "run_identity_matches": true,
+        "stop_not_confirmed": true,
+        "task_failure_returned_nonzero": true,
+        "world_reset_service_succeeded": true
+      },
+      "group": "targeted_scenario",
+      "passed": true,
+      "run_id": "trial-009-seed-707-89a292d8940d",
+      "scenario": "time_reset",
+      "seed": 707
+    }
+  ]
+}

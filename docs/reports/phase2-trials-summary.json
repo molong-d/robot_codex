@@ -1,0 +1,943 @@
+{
+  "code_commit": "5cda5f2cae9288d3125e96181678d3b37364381b",
+  "command_template": [
+    "scripts/with_jazzy.sh",
+    "scripts/test_gazebo.sh",
+    "--timeout-ms",
+    "30000",
+    "--seed",
+    "<seed>"
+  ],
+  "completed_count": 20,
+  "created_utc": "2026-10-04T07:18:57.960985+00:00",
+  "false_success_audit": {
+    "required": [
+      "task status succeeded",
+      "two-finger contact observed",
+      "released in final sample",
+      "Gazebo tray-floor contact observed",
+      "final XY error <= 0.05 m",
+      "final Z error <= 0.015 m"
+    ],
+    "stability_window_ms": 500,
+    "stability_window_verified_by": "runtime GazeboWorldAdapter using distinct advancing simulation-time samples"
+  },
+  "false_success_count": 0,
+  "independently_valid_success_count": 19,
+  "placement_xy_error_m": {
+    "measured_count": 20,
+    "measured_values": [
+      0.001548128111935687,
+      0.0110676492719477,
+      0.002363983778404619,
+      0.002661638108669996,
+      0.004349359382803324,
+      0.001492201169057151,
+      0.0032747964645753825,
+      0.0033459824287831504,
+      0.00691955111723488,
+      0.0025620283535413265,
+      0.007742364271135336,
+      0.003152239837796592,
+      0.0009497903455687478,
+      0.0005422358478475485,
+      0.002749897661425817,
+      0.005710249219354948,
+      0.0010809324915074547,
+      0.0040527724947708324,
+      0.0019254574268156147,
+      0.0028761713016905955
+    ],
+    "valid_success_count": 19,
+    "valid_success_max": 0.007742364271135336,
+    "valid_success_mean": 0.0031210410427852105
+  },
+  "requested_count": 20,
+  "seed_end": 119,
+  "seed_start": 100,
+  "success_rate": 0.95,
+  "trials": [
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "100",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-100.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-100.log"
+      ],
+      "elapsed_wall_s": 41.22286966500542,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5999621927646922,
+        -0.17845233360703155,
+        0.37099996601865004
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-100.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.001548128111935687,
+      "placement_z_error_m": 0.0009999660186500448,
+      "result_json": "docs/reports/phase2-trials/trial-100.json",
+      "seed": 100,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097669.418157691] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097669.418166069] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": false,
+        "released_at_final_sample": false,
+        "task_succeeded": false,
+        "workpiece_contacted_tray_floor": false
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "101",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-101.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-101.log"
+      ],
+      "elapsed_wall_s": 35.68133946599846,
+      "error_code": "MOTION_FAILED",
+      "exit_code": 1,
+      "final_workpiece_xyz_m": [
+        0.6037359861043484,
+        -0.16958197388009802,
+        0.38717291168221946
+      ],
+      "independently_valid_success": false,
+      "launch_log": "docs/reports/phase2-trials/trial-101.log",
+      "message": "arm action failed or canceled",
+      "placement_xy_error_m": 0.0110676492719477,
+      "placement_z_error_m": 0.01717291168221946,
+      "result_json": "docs/reports/phase2-trials/trial-101.json",
+      "seed": 101,
+      "status": "failed",
+      "stderr_tail": "[WARN] [1791097710.708911276] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097710.708919940] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "stdout_tail": "g a distinct verification sample\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"collecting distinct post-effect verification samples\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"awaiting a distinct verification sample\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"collecting distinct post-effect verification samples\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"awaiting a distinct verification sample\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"collecting distinct post-effect verification samples\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"verify_grasp\",\n        \"message\": \"awaiting a distinct verification sample\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"arm motion started; calibration=panda_gz_truth_v1; source_frame=world; tool=panda_hand\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"awaiting component completion\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"awaiting fresh stationary arm feedback\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"approach complete; moving to manipulation pose\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"awaiting component completion\",\n        \"status\": \"running\"\n      },\n      {\n        \"active_skill\": \"place_object\",\n        \"message\": \"awaiting fresh stationary arm feedback\",\n        \"status\": \"running\"\n      }\n    ],\n    \"message\": \"awaiting fresh stationary arm feedback\",\n    \"status\": \"running\"\n  }\n}\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "102",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-102.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-102.log"
+      ],
+      "elapsed_wall_s": 33.74404965699796,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6022489480484693,
+        -0.1807284586328998,
+        0.370999965488977
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-102.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.002363983778404619,
+      "placement_z_error_m": 0.000999965488977017,
+      "result_json": "docs/reports/phase2-trials/trial-102.json",
+      "seed": 102,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097746.431930763] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097746.431938290] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "103",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-103.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-103.log"
+      ],
+      "elapsed_wall_s": 30.550155265002104,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6015663306301877,
+        -0.18215195859125125,
+        0.37099997822524344
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-103.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.002661638108669996,
+      "placement_z_error_m": 0.0009999782252434475,
+      "result_json": "docs/reports/phase2-trials/trial-103.json",
+      "seed": 103,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097780.148812550] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097780.148820688] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "104",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-104.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-104.log"
+      ],
+      "elapsed_wall_s": 31.126580383002874,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6043483810008762,
+        -0.18009224810024174,
+        0.37099993908172446
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-104.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.004349359382803324,
+      "placement_z_error_m": 0.0009999390817244658,
+      "result_json": "docs/reports/phase2-trials/trial-104.json",
+      "seed": 104,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097810.748817454] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097810.748825520] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "105",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-105.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-105.log"
+      ],
+      "elapsed_wall_s": 41.385829730003024,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5988786927090253,
+        -0.17901545224181734,
+        0.3709999395964008
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-105.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.001492201169057151,
+      "placement_z_error_m": 0.0009999395964008229,
+      "result_json": "docs/reports/phase2-trials/trial-105.json",
+      "seed": 105,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097841.853787837] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097841.853797401] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "106",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-106.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-106.log"
+      ],
+      "elapsed_wall_s": 34.098243066997384,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5990393094680024,
+        -0.17686928672885463,
+        0.3709999188111357
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-106.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0032747964645753825,
+      "placement_z_error_m": 0.0009999188111357027,
+      "result_json": "docs/reports/phase2-trials/trial-106.json",
+      "seed": 106,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097883.221766227] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097883.221775046] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "107",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-107.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-107.log"
+      ],
+      "elapsed_wall_s": 34.78551875099947,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.59671496254714,
+        -0.17936428988758038,
+        0.37099967135836426
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-107.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0033459824287831504,
+      "placement_z_error_m": 0.0009996713583642625,
+      "result_json": "docs/reports/phase2-trials/trial-107.json",
+      "seed": 107,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097917.340045615] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097917.340053222] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "108",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-108.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-108.log"
+      ],
+      "elapsed_wall_s": 33.65161862799869,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5931985504023944,
+        -0.17872702276718788,
+        0.3709999372853228
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-108.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.00691955111723488,
+      "placement_z_error_m": 0.0009999372853228272,
+      "result_json": "docs/reports/phase2-trials/trial-108.json",
+      "seed": 108,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097952.161427461] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097952.161436105] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "109",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-109.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-109.log"
+      ],
+      "elapsed_wall_s": 33.16866588899575,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6019484049333091,
+        -0.1783363571596625,
+        0.3709999357483267
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-109.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0025620283535413265,
+      "placement_z_error_m": 0.0009999357483266857,
+      "result_json": "docs/reports/phase2-trials/trial-109.json",
+      "seed": 109,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791097985.778705556] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791097985.778713824] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "110",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-110.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-110.log"
+      ],
+      "elapsed_wall_s": 28.126427099996363,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6062641688946001,
+        -0.1845502079696292,
+        0.3709999737745641
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-110.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.007742364271135336,
+      "placement_z_error_m": 0.0009999737745641224,
+      "result_json": "docs/reports/phase2-trials/trial-110.json",
+      "seed": 110,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098018.924288185] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098018.924296430] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "111",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-111.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-111.log"
+      ],
+      "elapsed_wall_s": 34.222316728002625,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5973757211360912,
+        -0.18174636091328034,
+        0.3709999695877065
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-111.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.003152239837796592,
+      "placement_z_error_m": 0.000999969587706484,
+      "result_json": "docs/reports/phase2-trials/trial-111.json",
+      "seed": 111,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098047.075837434] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098047.075846131] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "112",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-112.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-112.log"
+      ],
+      "elapsed_wall_s": 33.65489219099982,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6000811437329521,
+        -0.18094631780873985,
+        0.37099991557740986
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-112.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0009497903455687478,
+      "placement_z_error_m": 0.00099991557740986,
+      "result_json": "docs/reports/phase2-trials/trial-112.json",
+      "seed": 112,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098081.259331413] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098081.259340209] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "113",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-113.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-113.log"
+      ],
+      "elapsed_wall_s": 35.062366004996875,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5994967246449194,
+        -0.17979817425422037,
+        0.3709999464362569
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-113.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0005422358478475485,
+      "placement_z_error_m": 0.0009999464362568933,
+      "result_json": "docs/reports/phase2-trials/trial-113.json",
+      "seed": 113,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098114.940553011] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098114.940561742] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "114",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-114.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-114.log"
+      ],
+      "elapsed_wall_s": 28.031835650006542,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.598363577225663,
+        -0.18220999041897165,
+        0.37099994549014165
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-114.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.002749897661425817,
+      "placement_z_error_m": 0.0009999454901416516,
+      "result_json": "docs/reports/phase2-trials/trial-114.json",
+      "seed": 114,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098150.030173239] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098150.030184523] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "115",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-115.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-115.log"
+      ],
+      "elapsed_wall_s": 31.278603872997337,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6057077580328669,
+        -0.18016865463345763,
+        0.3709999428703944
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-115.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.005710249219354948,
+      "placement_z_error_m": 0.000999942870394399,
+      "result_json": "docs/reports/phase2-trials/trial-115.json",
+      "seed": 115,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098177.995031612] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098177.995040044] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "116",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-116.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-116.log"
+      ],
+      "elapsed_wall_s": 34.47324268399825,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5994679235012823,
+        -0.18094090894921286,
+        0.3709999709663755
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-116.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0010809324915074547,
+      "placement_z_error_m": 0.0009999709663754963,
+      "result_json": "docs/reports/phase2-trials/trial-116.json",
+      "seed": 116,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098209.340107071] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098209.340114899] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "117",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-117.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-117.log"
+      ],
+      "elapsed_wall_s": 31.57412032299908,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6002019865402056,
+        -0.1759522640486382,
+        0.3709999388248031
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-117.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0040527724947708324,
+      "placement_z_error_m": 0.0009999388248030927,
+      "result_json": "docs/reports/phase2-trials/trial-117.json",
+      "seed": 117,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098243.776904838] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098243.776912834] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "118",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-118.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-118.log"
+      ],
+      "elapsed_wall_s": 30.948915139000746,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.5991249391398281,
+        -0.17828487470035723,
+        0.3709999567821785
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-118.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0019254574268156147,
+      "placement_z_error_m": 0.0009999567821785127,
+      "result_json": "docs/reports/phase2-trials/trial-118.json",
+      "seed": 118,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098275.363093116] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098275.363102743] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    },
+    {
+      "checks": {
+        "both_fingers_contacted_workpiece": true,
+        "final_xy_error_within_0.05m": true,
+        "final_z_error_within_0.015m": true,
+        "released_at_final_sample": true,
+        "task_succeeded": true,
+        "workpiece_contacted_tray_floor": true
+      },
+      "command": [
+        "scripts/with_jazzy.sh",
+        "scripts/test_gazebo.sh",
+        "--timeout-ms",
+        "30000",
+        "--seed",
+        "119",
+        "--result-json",
+        "docs/reports/phase2-trials/trial-119.json",
+        "--launch-log",
+        "docs/reports/phase2-trials/trial-119.log"
+      ],
+      "elapsed_wall_s": 32.55947411299712,
+      "error_code": "",
+      "exit_code": 0,
+      "final_workpiece_xyz_m": [
+        0.6007470724911564,
+        -0.1772225472011885,
+        0.37099982488896793
+      ],
+      "independently_valid_success": true,
+      "launch_log": "docs/reports/phase2-trials/trial-119.log",
+      "message": "Gazebo object-state and contact evidence verified over the configured window",
+      "placement_xy_error_m": 0.0028761713016905955,
+      "placement_z_error_m": 0.0009998248889679373,
+      "result_json": "docs/reports/phase2-trials/trial-119.json",
+      "seed": 119,
+      "status": "succeeded",
+      "stderr_tail": "[WARN] [1791098306.323956873] [rcl]: ROS_LOCALHOST_ONLY is deprecated but still honored if it is enabled. Use ROS_AUTOMATIC_DISCOVERY_RANGE and ROS_STATIC_PEERS instead.\n[WARN] [1791098306.323965117] [rcl]: 'localhost_only' is enabled, 'automatic_discovery_range' and 'static_peers' will be ignored.\n",
+      "tray_xyz_m": [
+        0.6,
+        -0.18,
+        0.37
+      ]
+    }
+  ],
+  "workspace_status_before_trials": ""
+}

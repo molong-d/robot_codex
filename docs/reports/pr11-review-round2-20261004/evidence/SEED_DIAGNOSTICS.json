@@ -1,0 +1,174 @@
+{
+  "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+  "diagnostic_replays_are_not_replacements": true,
+  "formal_batch": "pr11-round2-f92d532-seeds-200-219",
+  "seeds": [
+    {
+      "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+      "error_code": "",
+      "interpretation": "正常基准场景成功，任务结果、独立物理审计、停止确认和资源释放均通过。",
+      "placement_xy_error_m": 0.004316798745249125,
+      "process_exit_code": 0,
+      "run_id": "trial-001-seed-700-0a6a7238739a",
+      "scenario": "normal",
+      "scenario_harness_check_passed": true,
+      "seed": 700,
+      "status": "succeeded",
+      "trial_accepted": true
+    },
+    {
+      "diagnostic_replay": {
+        "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+        "error_code": "",
+        "independently_valid_physical_outcome": true,
+        "message": "Gazebo object-state and contact evidence verified over the configured window",
+        "placement_xy_error_m": 0.0074546713639439465,
+        "placement_z_error_m": 0.000999944317145507,
+        "process_exit_code": 0,
+        "process_timed_out": false,
+        "result_complete": true,
+        "result_present": true,
+        "run_id": "trial-001-seed-202-c68e4fe322f4",
+        "runtime_stop_and_resource_release_confirmed": true,
+        "seed": 202,
+        "status": "succeeded",
+        "trial_accepted": true
+      },
+      "interpretation": "正式运行在 pick_object 超时后被取消并测得停止；物体未抬起。一次独立同 seed 重放成功。Gazebo seed 未固定 OMPL 随机流，因此重放不替代正式失败，也不能证明轨迹可重现。",
+      "official_audit_checks": {
+        "dual_finger_contact_same_sample": true,
+        "final_contact_matches_pose_time": true,
+        "final_tray_floor_contact": false,
+        "fresh_final_object_pose": true,
+        "fresh_final_target_pose": true,
+        "fresh_post_release_no_finger_contact": false,
+        "object_lifted_after_grasp": false,
+        "placement_xy_within_tolerance": false,
+        "placement_z_within_tolerance": true,
+        "release_identity_matches": false,
+        "same_epoch_world_poses": true,
+        "stable_pose_samples_fresh": false,
+        "stable_window_observed": false,
+        "tray_contact_during_stable_window": false
+      },
+      "official_batch_run": {
+        "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+        "error_code": "TIMEOUT",
+        "independently_valid_physical_outcome": false,
+        "message": "all active actions confirmed stopped by measured feedback",
+        "placement_xy_error_m": 0.2781958511931155,
+        "placement_z_error_m": 7.822881688163141e-05,
+        "process_exit_code": 1,
+        "process_timed_out": false,
+        "result_complete": true,
+        "result_present": true,
+        "run_id": "trial-003-seed-202-25c5122c4281",
+        "runtime_stop_and_resource_release_confirmed": true,
+        "seed": 202,
+        "status": "timed_out",
+        "trial_accepted": false
+      },
+      "official_resources_empty": true,
+      "official_steps": [
+        {
+          "error_code": "",
+          "skill_id": "locate_object",
+          "status": "succeeded"
+        },
+        {
+          "error_code": "CANCELED",
+          "skill_id": "pick_object",
+          "status": "canceled"
+        }
+      ],
+      "official_stop_confirmed": true,
+      "seed": 202
+    },
+    {
+      "diagnostic_replay": {
+        "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+        "error_code": "",
+        "independently_valid_physical_outcome": true,
+        "message": "Gazebo object-state and contact evidence verified over the configured window",
+        "placement_xy_error_m": 0.0033820772771729016,
+        "placement_z_error_m": 0.0009997841520421047,
+        "process_exit_code": 0,
+        "process_timed_out": false,
+        "result_complete": true,
+        "result_present": true,
+        "run_id": "trial-002-seed-207-99338621e577",
+        "runtime_stop_and_resource_release_confirmed": true,
+        "seed": 207,
+        "status": "succeeded",
+        "trial_accepted": true
+      },
+      "gazebo_collision_log_excerpt": [
+        "[move_group-4] [ERROR] [1791127145.967026187] [move_group]: PlanningRequestAdapter 'CheckStartStateCollision' failed, because '1 contact(s) detected : panda_leftfinger - sim_tray, '. Aborting planning pipeline."
+      ],
+      "interpretation": "正式运行在释放后撤离动作规划失败；Gazebo 日志明确记录 CheckStartStateCollision 检出指尖与 sim_tray 接触。独立同 seed 重放通过；该结果说明碰撞/时序对轨迹敏感，不能据此抹除正式失败。",
+      "official_audit_checks": {
+        "dual_finger_contact_same_sample": true,
+        "final_contact_matches_pose_time": true,
+        "final_tray_floor_contact": true,
+        "fresh_final_object_pose": true,
+        "fresh_final_target_pose": true,
+        "fresh_post_release_no_finger_contact": true,
+        "object_lifted_after_grasp": true,
+        "placement_xy_within_tolerance": true,
+        "placement_z_within_tolerance": true,
+        "release_identity_matches": true,
+        "same_epoch_world_poses": true,
+        "stable_pose_samples_fresh": true,
+        "stable_window_observed": true,
+        "tray_contact_during_stable_window": true
+      },
+      "official_batch_run": {
+        "code_commit": "f92d5325d13505f14a3d24767fdc4dab9b314560",
+        "error_code": "MOTION_FAILED",
+        "independently_valid_physical_outcome": true,
+        "message": "arm action failed or canceled",
+        "placement_xy_error_m": 0.006278008505506876,
+        "placement_z_error_m": 0.0009999116304800215,
+        "process_exit_code": 1,
+        "process_timed_out": false,
+        "result_complete": true,
+        "result_present": true,
+        "run_id": "trial-008-seed-207-861e8229ef47",
+        "runtime_stop_and_resource_release_confirmed": true,
+        "seed": 207,
+        "status": "failed",
+        "trial_accepted": false
+      },
+      "official_resources_empty": true,
+      "official_steps": [
+        {
+          "error_code": "",
+          "skill_id": "locate_object",
+          "status": "succeeded"
+        },
+        {
+          "error_code": "",
+          "skill_id": "pick_object",
+          "status": "succeeded"
+        },
+        {
+          "error_code": "",
+          "skill_id": "verify_grasp",
+          "status": "succeeded"
+        },
+        {
+          "error_code": "",
+          "skill_id": "locate_object",
+          "status": "succeeded"
+        },
+        {
+          "error_code": "MOTION_FAILED",
+          "skill_id": "place_object",
+          "status": "failed"
+        }
+      ],
+      "official_stop_confirmed": true,
+      "seed": 207
+    }
+  ]
+}

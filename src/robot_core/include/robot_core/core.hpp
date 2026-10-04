@@ -103,6 +103,7 @@ class Bindings {
     if (!value) throw std::invalid_argument("component type mismatch: " + role);
     return value;
   }
+  bool contains(const std::string& role) const { return roles_.find(role) != roles_.end(); }
  private:
   const Components& components_;
   std::map<std::string, std::string> roles_;
@@ -142,12 +143,22 @@ struct Observation {
   EvidenceMetadata evidence;
   PoseMeaning meaning{PoseMeaning::object_pose};
 };
+// Contact evidence is deliberately four-way: partial finger contact and
+// unknown feedback are neither a secure grasp nor a confirmed release.
+enum class ContactState { unknown, none, left_only, right_only, both };
+inline bool dual_finger_grasp(ContactState state) { return state == ContactState::both; }
+inline bool no_finger_contact(ContactState state) { return state == ContactState::none; }
 struct OutcomeEvidence {
   std::string object_id, target_id;
   Time stamp{};
   bool valid{false}, condition_met{false};
   EvidenceMetadata evidence;
   uint64_t sample_id{0};
+  // Optional source-domain measurement time and epoch. Adapters keep this
+  // independent from the steady-time stamp used for communication freshness.
+  uint64_t source_time_ns{0}, epoch{0};
+  ContactState contact_state{ContactState::unknown};
+  uint64_t contact_source_time_ns{0};
 };
 struct OutcomeVerification {
   OutcomeEvidence evidence;
@@ -161,7 +172,9 @@ struct WorldState {
   // An inferred release location is not a new perception measurement.
   std::map<std::string, std::string> placement_candidates;
   Time attachment_stamp{};
+  uint64_t attachment_source_time_ns{0}, attachment_epoch{0};
   std::map<std::string, Time> release_stamps;
+  std::map<std::string, uint64_t> release_source_times_ns, release_epochs;
   std::map<std::string, OutcomeVerification> grasp_verifications, placement_verifications;
 };
 struct Requirement {

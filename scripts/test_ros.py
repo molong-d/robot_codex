@@ -528,7 +528,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertTrue(pick.dependencies_satisfied)  # does not claim the closed gate is armed
         self.assertEqual(pick.execution_gate_role, "safety")
         self.assertEqual({r.role: r.interface_version for r in pick.components},
-                         {"motion": 2, "gripper": 2, "safety": 1})
+                         {"motion": 2, "gripper": 3, "safety": 1})
         self.assertEqual(skills["locate_object"].implementations[0].components[0].interface_version, 2)
         verify = skills["verify_placement"].implementations[0]
         self.assertTrue(verify.dependencies_satisfied)

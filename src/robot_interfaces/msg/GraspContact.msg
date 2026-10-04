@@ -1,0 +1,12 @@
+builtin_interfaces/Time source_stamp
+string frame_id
+string object_id
+uint64 epoch
+uint64 sequence
+uint8 UNKNOWN=0
+uint8 NO_FINGER_CONTACT=1
+uint8 LEFT_FINGER_ONLY=2
+uint8 RIGHT_FINGER_ONLY=3
+uint8 BOTH_FINGERS=4
+uint8 schema_version
+uint8 state

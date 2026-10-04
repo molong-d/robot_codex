@@ -20,6 +20,8 @@ class VerifyOutcome final : public Skill {
       if (world_.attached_object != object_ || world_.attachment_stamp == Time{})
         return done(Status::failed, "NOT_HOLDING", "matching measured grasp required before verification");
       effect_stamp_ = world_.attachment_stamp;
+      effect_source_time_ns_ = world_.attachment_source_time_ns;
+      effect_epoch_ = world_.attachment_epoch;
     } else {
       target_ = args.at("target");
       world_.placement_verifications.erase(object_);
@@ -29,6 +31,10 @@ class VerifyOutcome final : public Skill {
           candidate->second != target_ || release == world_.release_stamps.end() || release->second == Time{})
         return done(Status::failed, "NO_RELEASE_CANDIDATE", "matching measured release required before verification");
       effect_stamp_ = release->second;
+      const auto source = world_.release_source_times_ns.find(object_);
+      effect_source_time_ns_ = source == world_.release_source_times_ns.end() ? 0 : source->second;
+      const auto epoch = world_.release_epochs.find(object_);
+      effect_epoch_ = epoch == world_.release_epochs.end() ? 0 : epoch->second;
     }
     return sample(now);
   }
@@ -44,7 +50,19 @@ class VerifyOutcome final : public Skill {
     if (!value || !value->valid || value->sample_id == 0 || value->object_id != object_ || value->target_id != target_ ||
         !acceptable_evidence(value->evidence, value->stamp, now, policy_.evidence))
       return done(Status::failed, "INVALID_VERIFICATION_EVIDENCE", "fresh identified evidence with accepted source/quality required");
-    if (value->stamp <= effect_stamp_)
+    if (value->epoch != effect_epoch_)
+      return done(Status::failed, "VERIFICATION_EPOCH_CHANGED", "evidence cannot cross a simulator epoch");
+    if (value->source_time_ns != 0 && value->contact_state == ContactState::unknown)
+      return done(Status::failed, "UNKNOWN_CONTACT_STATE", "physical verification requires explicit fresh contact state");
+    if (value->source_time_ns != 0 &&
+        ((grasp_ && value->contact_state != ContactState::both) ||
+         (!grasp_ && value->contact_state != ContactState::none)))
+      return done(Status::failed, grasp_ ? "GRASP_NOT_VERIFIED" : "PLACEMENT_NOT_VERIFIED",
+                  "physical contact state does not match the requested outcome");
+    if ((effect_source_time_ns_ != 0 &&
+         (value->source_time_ns == 0 || value->source_time_ns <= effect_source_time_ns_)) ||
+        (effect_source_time_ns_ != 0 && value->contact_source_time_ns <= effect_source_time_ns_) ||
+        (effect_source_time_ns_ == 0 && value->stamp <= effect_stamp_))
       return result_ = {Status::running, "PRE_EFFECT_EVIDENCE", "awaiting evidence captured after grasp/release"};
     if (!value->condition_met)
       return done(Status::failed, grasp_ ? "GRASP_NOT_VERIFIED" : "PLACEMENT_NOT_VERIFIED", "observer reports condition not met");
@@ -54,15 +72,35 @@ class VerifyOutcome final : public Skill {
     // can introduce sub-millisecond clock jitter; it is still the same frame.
     if (samples_ != 0 && value->sample_id == last_sample_)
       return result_ = {Status::running, "", "awaiting a distinct verification sample"};
-    if (samples_ != 0 && (value->stamp < last_stamp_ || value->sample_id < last_sample_))
+    if (samples_ != 0 && (value->stamp < last_stamp_ || value->sample_id < last_sample_ ||
+        (last_source_time_ns_ != 0 && value->source_time_ns <= last_source_time_ns_)))
       return done(Status::failed, "OUT_OF_ORDER_EVIDENCE", "verification evidence went backwards");
-    if (samples_ != 0 && value->stamp-last_stamp_ > policy_.evidence.max_age)
-      return done(Status::failed, "EVIDENCE_GAP", "verification sample gap exceeds evidence age limit");
-    if (value->stamp != last_stamp_ && value->sample_id != last_sample_) {
-      if (samples_ == 0) { first_stamp_ = value->stamp; source_ = value->evidence.source; synthetic_ = value->evidence.synthetic; }
-      ++samples_; last_stamp_ = value->stamp; last_sample_ = value->sample_id;
+    if (samples_ != 0) {
+      const auto max_gap_ns = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+          policy_.evidence.max_age).count());
+      if (last_source_time_ns_ != 0 && value->source_time_ns != 0 &&
+          value->source_time_ns-last_source_time_ns_ > max_gap_ns)
+        return done(Status::failed, "EVIDENCE_GAP", "verification source-time gap exceeds evidence age limit");
+      if (last_source_time_ns_ == 0 && value->source_time_ns == 0 &&
+          value->stamp-last_stamp_ > policy_.evidence.max_age)
+        return done(Status::failed, "EVIDENCE_GAP", "verification receipt-time gap exceeds evidence age limit");
     }
-    const auto span = std::chrono::duration_cast<std::chrono::milliseconds>(last_stamp_-first_stamp_);
+    if (value->stamp != last_stamp_ && value->sample_id != last_sample_) {
+      if (samples_ == 0) {
+        first_stamp_ = value->stamp;
+        first_source_time_ns_ = value->source_time_ns;
+        source_ = value->evidence.source;
+        synthetic_ = value->evidence.synthetic;
+      } else if ((first_source_time_ns_ == 0) != (value->source_time_ns == 0)) {
+        return done(Status::failed, "VERIFICATION_TIME_DOMAIN_CHANGED", "cannot mix source-time and receipt-time samples");
+      }
+      ++samples_; last_stamp_ = value->stamp; last_sample_ = value->sample_id;
+      last_source_time_ns_ = value->source_time_ns;
+    }
+    const auto span = first_source_time_ns_ != 0 ?
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::nanoseconds(last_source_time_ns_-first_source_time_ns_)) :
+        std::chrono::duration_cast<std::chrono::milliseconds>(last_stamp_-first_stamp_);
     if (samples_ < policy_.minimum_samples || span < policy_.stable_duration)
       return result_ = {Status::running, "", "collecting distinct post-effect verification samples"};
     const OutcomeVerification verified{*value, samples_, span};
@@ -83,6 +121,8 @@ class VerifyOutcome final : public Skill {
   VerificationPolicy policy_;
   std::string object_, target_, source_;
   Time effect_stamp_{}, first_stamp_{}, last_stamp_{};
+  uint64_t effect_source_time_ns_{0}, effect_epoch_{0};
+  uint64_t first_source_time_ns_{0}, last_source_time_ns_{0};
   unsigned samples_{0};
   uint64_t last_sample_{0};
   Result result_;
