@@ -71,6 +71,16 @@ scripts/test_gazebo_trials.py --count 20 --seed-start 100
 
 seed 101 以退出码 1 结束，状态为 `failed/MOTION_FAILED`，因此整个批测脚本也按设计返回 **1**（未达到要求的 20/20 全通过）。它通过过双指接触，但放置动作阶段手臂轨迹未到达停止状态；Gazebo 日志记录 Panda joint 1 位置误差 20.070 mm、joint 5 误差 11.888 mm，均超过 ros2_control 配置的 1 mm 容差。物体仍被夹持，终点高于托盘底 17.173 mm，没有托盘底接触，故不满足释放、托盘接触和 Z 误差条件。可用 seed 101 和汇总中给出的命令复现；该运行记录在 `phase2-trials/trial-101.json` 与 `.log`。这是场景/轨迹跟踪可靠性问题，具体是规划路径、DART 动态或控制器容差/跟踪之间的哪一项尚未分离定位。
 
+随后在代码 SHA 不变且工作区干净时，以同一 seed 101 单独诊断重放：
+
+```bash
+scripts/with_jazzy.sh scripts/test_gazebo.sh --seed 101 --timeout-ms 30000 \
+  --result-json docs/reports/phase2-replay-seed-101.json \
+  --launch-log docs/reports/phase2-replay-seed-101.log
+```
+
+这次任务成功，退出码 0，XY 误差 5.831 mm、Z 误差 1.000 mm，且有双指接触、释放和托盘底接触证据。它是额外诊断结果，不计入 20 次批测的 19/20 成绩。两次相同 Gazebo seed 得到不同终态，说明 `--seed` 固定的是 Gazebo 世界种子，尚未固定 MoveIt/OMPL 的规划随机数流；本仓库没有给 OMPL 配置随机种子。OMPL 的随机数种子需要在实例生成前设置，默认种子取决于启动时钟（见 [OMPL RNG API](https://ompl.kavrakilab.org/RandomNumbers_8cpp_source.html)）。因此当前批测是固定 Gazebo seed 的重复测试，不保证规划轨迹逐次相同；失败可以由 seed 101 单独触发，但不能声称它在相同 seed 下稳定复现。
+
 ## 指定故障场景与时钟边界
 
 下表来自独立注入场景，结果 JSON 与启动日志均保留在 `docs/reports/`。故障注入场景以非零退出码表示任务按预期失败，并非测试框架跳过。
@@ -92,7 +102,7 @@ C++ 和 Python 时间源/传感器新鲜度契约测试均包含在上述 colcon
 
 - `robot_core` 仍不依赖 ROS、Gazebo 或模型 SDK。技能拥有抓取/放置语义、阶段和结果校验；ROS/MoveIt、时间戳、Gazebo 真值与接触传感器通过适配层接入。原有 GenericSystem/mock 路径仍独立保留。
 - Gazebo DART 启动日志提示不支持 URDF mimic constraint。测试能观测双指接触，但该警告和 19/20 的批测结果要求继续检查夹爪模型、接触参数和轨迹跟踪。
-- seed 101 的失败是现阶段应保留的物理闭环失败结果。不得据此宣称 100% 稳定抓放；批测 95% 也不足以作为实机、可靠性或安全认证证据。
+- seed 101 的失败及同 seed 成功重放均为现阶段应保留的物理闭环证据。该差异显示规划随机性尚未固定，且跟踪失败原因未隔离。不得据此宣称 100% 稳定抓放；批测 95% 也不足以作为实机、可靠性或安全认证证据。
 - 反馈中断、运动中重置下 `STOP_UNCONFIRMED` 会保留资源，是保守故障策略。操作者需重启/复位控制栈并重新检查世界状态；当前没有自动恢复机制。
 - 日志里还存在 `ROS_LOCALHOST_ONLY` 弃用警告、MoveIt 无 3D sensor plugin 的提示，以及 ros2_control 关闭阶段统计线程警告。场景明确使用 Gazebo 真值，不提供真实 3D 感知；这些警告没有令测试退出失败，但仍应由审查者判断是否要消除。
 - 证据校验值清单为 [`phase2-artifacts.sha256`](phase2-artifacts.sha256)。批测原始 JSON/日志约 1.8 MiB，阶段二回归及指定场景日志也一并提交；没有录像、rosbag、模型权重、容器镜像、构建缓存或凭据。

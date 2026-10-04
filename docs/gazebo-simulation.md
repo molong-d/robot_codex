@@ -59,6 +59,8 @@ scripts/with_jazzy.sh python3 scripts/test_gazebo_trials.py --count 20 --seed-st
 
 可用 `--output-dir` 和 `--summary` 指定报告输出位置。重复测试不会重试失败场景；汇总中的成功率和误报成功数按实际结果计算。
 
+`--seed` 传递给 Gazebo Sim，用于固定世界随机种子；当前 MoveIt/OMPL 规划随机数流未配置固定 seed。因此固定 Gazebo seed 不保证生成相同机械臂轨迹。一次 seed 101 运行失败、同 seed 独立重放成功的实测和原始证据见[阶段二报告](reports/phase2-gazebo.md)。
+
 ## 边界与已知风险
 
 - 位姿来自仿真真值，不是相机或视觉算法。仿真和真值插件只用于隔离验证。
